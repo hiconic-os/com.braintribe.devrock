@@ -32,7 +32,7 @@ You should have received a copy of the GNU Lesser General Public License along w
         <V.com.braintribe.xml>[2.0,2.1)</V.com.braintribe.xml>
         <V.com.braintribe.logging>[2.0,2.1)</V.com.braintribe.logging>
         <V.com.zaxxer>2.6.2</V.com.zaxxer>
-        <V.javax.servlet>2.4</V.javax.servlet>
+        <V.javax.servlet>3.1.0</V.javax.servlet>
         <V.junit>4.11</V.junit>
         <V.joda-time>2.3</V.joda-time>
         <V.com.github.ben-manes.caffeine>2.7.0</V.com.github.ben-manes.caffeine>

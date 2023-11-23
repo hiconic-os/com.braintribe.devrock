@@ -5,6 +5,7 @@ buildscript {
     dependencies {
         classpath 'com.braintribe.devrock.cicd:devrock-cicd-steps-plugin:1.0+'
         classpath 'com.braintribe.devrock.cicd:devrock-cicd-steps:1.0+'
+        classpath 'com.braintribe.devrock.cicd:github-notification:1.0+'
     }
 }
 
@@ -17,6 +18,8 @@ defaultTasks 'build-artifacts'
 steps {
     
     step InitializeExchange.T
+
+    step EnrichExchangeContext.T
 
     step AnalyzeCodebase.T
 
@@ -31,10 +34,3 @@ steps {
     step PublishArtifacts.T
 
 }
-
-/* Notes:
-
-1. Validation of repo config (e.g in case of publishing there must be a configured upload repo)
-2. where to get candidate info from
-
-*/
