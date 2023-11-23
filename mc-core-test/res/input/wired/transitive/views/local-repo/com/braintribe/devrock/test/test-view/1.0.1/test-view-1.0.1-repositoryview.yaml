@@ -1,0 +1,24 @@
+!com.braintribe.devrock.model.repositoryview.RepositoryView {        
+   displayName: "test-view",      
+   enrichments: [
+       !com.braintribe.devrock.model.repositoryview.enrichments.ArtifactFilterEnrichment {
+           artifactFilter :  !com.braintribe.devrock.model.repository.filters.DisjunctionArtifactFilter {
+                                        operands : [
+                                            !com.braintribe.devrock.model.repository.filters.QualifiedArtifactFilter { 
+                                            groupId : 'com.braintribe.devrock.test',
+                                            artifactId: 'a',
+                                            version: '1.0.1',
+                                        },
+                                        !com.braintribe.devrock.model.repository.filters.QualifiedArtifactFilter { 
+                                            groupId : 'com.braintribe.devrock.test',
+                                            artifactId: 't',                                        
+                                        },
+                                        !com.braintribe.devrock.model.repository.filters.QualifiedArtifactFilter { 
+                                            groupId : 'com.braintribe.devrock.test',
+                                            artifactId: 'b',                                         
+                                        },
+                                        ]
+                                    }
+       }
+   ]
+}            

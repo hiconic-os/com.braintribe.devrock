@@ -1,0 +1,26 @@
+# definition for classifier combinations (self reference with different classifiers)
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+
+    # terminal
+    { artifactId: "t", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},       
+        dependencies: [      
+          { artifactId: "a",  groupId: "com.braintribe.devrock.test", version: "1.0.1", classifier: "javadoc", type: "jar", scope: "compile"},                                  
+          { artifactId: "b",  groupId: "com.braintribe.devrock.test", version: "1.0.1", classifier: "javadoc", type: "jar", scope: "test"},                                  
+          
+       ],         
+    }, 
+
+  { artifactId: "a", groupId: "com.braintribe.devrock.test", version: "1.0.1",       
+       parts: {       
+         "javadoc:jar": null,
+      }
+    }, 
+    { artifactId: "b", groupId: "com.braintribe.devrock.test", version: "1.0.1",       
+       parts: {       
+         "javadoc:jar": null,
+      }
+    }, 
+
+  ]
+}

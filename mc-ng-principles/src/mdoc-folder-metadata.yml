@@ -1,0 +1,7 @@
+!com.braintribe.doc.meta.CustomFolderMetaData
+files:
+  howToSetupADevEnvironment.md:
+    displayTitle: "Setting-up a 'dev-env'"
+  howToReadPoms.md:
+    displayTitle: "Reading artifacts (pom)"
+  

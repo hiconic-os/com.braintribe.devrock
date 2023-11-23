@@ -1,0 +1,6 @@
+com.braintribe.devrock.test.ape:parent
+com.braintribe.devrock.test.ape:a
+com.braintribe.devrock.test.ape:b
+com.braintribe.devrock.test.ape:c
+com.braintribe.devrock.test.ape:ape-terminal
+=res/param/artifact-processing-extension/archive.zip

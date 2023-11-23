@@ -1,0 +1,3 @@
+com.braintribe.devrock.test.bias:a#1.0.3
+com.braintribe.devrock.test.bias:b
+=res/param/ignoreEmptyRepos/archive.add.zip

@@ -1,0 +1,5 @@
+09cd1278-30bb-4c05-b413-21e6d78c6124
+-:pom
+-:jar
+-sources:jar
+-javadoc:jar

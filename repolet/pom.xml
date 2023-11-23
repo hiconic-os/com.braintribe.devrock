@@ -1,0 +1,113 @@
+<!--
+Copyright BRAINTRIBE TECHNOLOGY GMBH, Austria, 2002-2022
+
+This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License along with this library; See http://www.gnu.org/licenses/.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.braintribe.devrock</groupId>
+        <artifactId>parent</artifactId>
+        <version>[2.0,2.1)</version>
+    </parent>
+    <artifactId>repolet</artifactId>
+    <version>2.0.26</version>
+    <properties>
+    </properties>
+    <licenses>
+        <license>
+            <name>GNU Lesser General Public License v3.0</name>
+            <url>https://www.gnu.org/licenses/lgpl-3.0.html</url>
+            <distribution>repo</distribution>
+            <comments>A free software license that allows users to run, study, share, and modify the software.</comments>
+        </license>
+    </licenses>
+    <dependencies>
+        <dependency>
+            <groupId>io.undertow</groupId>
+            <artifactId>undertow-core</artifactId>
+            <version>${V.io.undertow}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.undertow</groupId>
+            <artifactId>undertow-servlet</artifactId>
+            <version>${V.io.undertow}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.braintribe.common</groupId>
+            <artifactId>platform-api</artifactId>
+            <version>${V.com.braintribe.common}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.braintribe.archives</groupId>
+            <artifactId>archives</artifactId>
+            <version>${V.com.braintribe.archives}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.braintribe.velocity</groupId>
+            <artifactId>velocity-template-renderer</artifactId>
+            <version>${V.com.braintribe.velocity}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.braintribe.common</groupId>
+            <artifactId>network-tools</artifactId>
+            <version>${V.com.braintribe.common}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.braintribe.gm</groupId>
+            <artifactId>gm-core4-jvm</artifactId>
+            <version>${V.com.braintribe.gm}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.braintribe.wire</groupId>
+            <artifactId>wire</artifactId>
+            <version>${V.com.braintribe.wire}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.braintribe.wire</groupId>
+            <artifactId>wire-api</artifactId>
+            <version>${V.com.braintribe.wire}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.braintribe.devrock</groupId>
+            <artifactId>artifactory-api-model</artifactId>
+            <version>${V.com.braintribe.devrock}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.braintribe.gm</groupId>
+            <artifactId>json-marshaller</artifactId>
+            <version>${V.com.braintribe.gm}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.braintribe.devrock</groupId>
+            <artifactId>repolet-content-model</artifactId>
+            <version>${V.com.braintribe.devrock}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.braintribe.devrock</groupId>
+            <artifactId>repolet-content-generator</artifactId>
+            <version>${V.com.braintribe.devrock}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.xnio</groupId>
+            <artifactId>xnio-nio</artifactId>
+            <version>${V.org.jboss.xnio}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.braintribe.devrock</groupId>
+            <artifactId>mc-api</artifactId>
+            <version>${V.com.braintribe.devrock}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.braintribe.devrock</groupId>
+            <artifactId>repolet-event-model</artifactId>
+            <version>${V.com.braintribe.devrock}</version>
+        </dependency>
+    </dependencies>
+</project>

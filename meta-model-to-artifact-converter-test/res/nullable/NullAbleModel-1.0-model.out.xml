@@ -1,0 +1,764 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?gm-xml version="3"?><gm-data>
+<required-types>
+<type>com.braintribe.model.meta.GmSimpleType</type>
+<type>com.braintribe.model.meta.GmEntityType</type>
+<type>com.braintribe.model.meta.GmProperty</type>
+<type>com.braintribe.model.meta.BindingArtifact</type>
+<type>com.braintribe.model.meta.GmMetaModel</type>
+<type>com.braintribe.model.meta.GmBaseType</type>
+</required-types>
+<root-value>
+<entity ref="0"/>
+</root-value>
+<pool>
+<entity id="1" type="com.braintribe.model.meta.BindingArtifact">
+<property name="artifactId">
+<string>NullableModel</string>
+</property>
+<property name="groupId">
+<string>com.braintribe.model</string>
+</property>
+<property name="gwtModuleName">
+<null/>
+</property>
+<property name="id">
+<null/>
+</property>
+<property name="version">
+<string>1.0</string>
+</property>
+</entity>
+<entity id="2" type="com.braintribe.model.meta.GmBaseType">
+<property name="id">
+<null/>
+</property>
+<property name="typeSignature">
+<string>object</string>
+</property>
+</entity>
+<entity id="5" type="com.braintribe.model.meta.GmSimpleType">
+<property name="id">
+<null/>
+</property>
+<property name="typeSignature">
+<string>string</string>
+</property>
+</entity>
+<entity id="4" type="com.braintribe.model.meta.GmProperty">
+<property name="entityType">
+<entity ref="3"/>
+</property>
+<property name="id">
+<null/>
+</property>
+<property name="isId">
+<boolean>true</boolean>
+</property>
+<property name="isOverlay">
+<boolean>false</boolean>
+</property>
+<property name="metaData">
+<null/>
+</property>
+<property name="name">
+<string>id</string>
+</property>
+<property name="nullable">
+<boolean>false</boolean>
+</property>
+<property name="type">
+<entity ref="5"/>
+</property>
+</entity>
+<entity id="6" type="com.braintribe.model.meta.GmEntityType">
+<property name="artifactBinding">
+<entity ref="1"/>
+</property>
+<property name="id">
+<null/>
+</property>
+<property name="isAbstract">
+<boolean>true</boolean>
+</property>
+<property name="isPlain">
+<boolean>false</boolean>
+</property>
+<property name="metaData">
+<null/>
+</property>
+<property name="properties">
+<null/>
+</property>
+<property name="propertyMetaData">
+<null/>
+</property>
+<property name="superTypes">
+<null/>
+</property>
+<property name="typeSignature">
+<string>com.braintribe.model.generic.GenericEntity</string>
+</property>
+</entity>
+<entity id="3" type="com.braintribe.model.meta.GmEntityType">
+<property name="artifactBinding">
+<entity ref="1"/>
+</property>
+<property name="id">
+<null/>
+</property>
+<property name="isAbstract">
+<boolean>true</boolean>
+</property>
+<property name="isPlain">
+<boolean>false</boolean>
+</property>
+<property name="metaData">
+<null/>
+</property>
+<property name="properties">
+<list>
+<entity ref="4"/>
+</list>
+</property>
+<property name="propertyMetaData">
+<null/>
+</property>
+<property name="superTypes">
+<list>
+<entity ref="6"/>
+</list>
+</property>
+<property name="typeSignature">
+<string>com.braintribe.model.generic.StandardStringIdentifiable</string>
+</property>
+</entity>
+<entity id="9" type="com.braintribe.model.meta.GmSimpleType">
+<property name="id">
+<null/>
+</property>
+<property name="typeSignature">
+<string>integer</string>
+</property>
+</entity>
+<entity id="8" type="com.braintribe.model.meta.GmProperty">
+<property name="entityType">
+<entity ref="7"/>
+</property>
+<property name="id">
+<null/>
+</property>
+<property name="isId">
+<boolean>true</boolean>
+</property>
+<property name="isOverlay">
+<boolean>false</boolean>
+</property>
+<property name="metaData">
+<null/>
+</property>
+<property name="name">
+<string>id</string>
+</property>
+<property name="nullable">
+<boolean>false</boolean>
+</property>
+<property name="type">
+<entity ref="9"/>
+</property>
+</entity>
+<entity id="7" type="com.braintribe.model.meta.GmEntityType">
+<property name="artifactBinding">
+<entity ref="1"/>
+</property>
+<property name="id">
+<null/>
+</property>
+<property name="isAbstract">
+<boolean>true</boolean>
+</property>
+<property name="isPlain">
+<boolean>false</boolean>
+</property>
+<property name="metaData">
+<null/>
+</property>
+<property name="properties">
+<list>
+<entity ref="8"/>
+</list>
+</property>
+<property name="propertyMetaData">
+<null/>
+</property>
+<property name="superTypes">
+<list>
+<entity ref="6"/>
+</list>
+</property>
+<property name="typeSignature">
+<string>com.braintribe.model.generic.StandardIntegerIdentifiable</string>
+</property>
+</entity>
+<entity id="11" type="com.braintribe.model.meta.GmProperty">
+<property name="entityType">
+<entity ref="10"/>
+</property>
+<property name="id">
+<null/>
+</property>
+<property name="isId">
+<boolean>false</boolean>
+</property>
+<property name="isOverlay">
+<boolean>false</boolean>
+</property>
+<property name="metaData">
+<null/>
+</property>
+<property name="name">
+<string>nullableInteger</string>
+</property>
+<property name="nullable">
+<boolean>true</boolean>
+</property>
+<property name="type">
+<entity ref="9"/>
+</property>
+</entity>
+<entity id="12" type="com.braintribe.model.meta.GmProperty">
+<property name="entityType">
+<entity ref="10"/>
+</property>
+<property name="id">
+<null/>
+</property>
+<property name="isId">
+<boolean>false</boolean>
+</property>
+<property name="isOverlay">
+<boolean>false</boolean>
+</property>
+<property name="metaData">
+<null/>
+</property>
+<property name="name">
+<string>nonNullableInteger</string>
+</property>
+<property name="nullable">
+<boolean>false</boolean>
+</property>
+<property name="type">
+<entity ref="9"/>
+</property>
+</entity>
+<entity id="14" type="com.braintribe.model.meta.GmSimpleType">
+<property name="id">
+<null/>
+</property>
+<property name="typeSignature">
+<string>boolean</string>
+</property>
+</entity>
+<entity id="13" type="com.braintribe.model.meta.GmProperty">
+<property name="entityType">
+<entity ref="10"/>
+</property>
+<property name="id">
+<null/>
+</property>
+<property name="isId">
+<boolean>false</boolean>
+</property>
+<property name="isOverlay">
+<boolean>false</boolean>
+</property>
+<property name="metaData">
+<null/>
+</property>
+<property name="name">
+<string>nonNullalbeBoolean</string>
+</property>
+<property name="nullable">
+<boolean>false</boolean>
+</property>
+<property name="type">
+<entity ref="14"/>
+</property>
+</entity>
+<entity id="15" type="com.braintribe.model.meta.GmProperty">
+<property name="entityType">
+<entity ref="10"/>
+</property>
+<property name="id">
+<null/>
+</property>
+<property name="isId">
+<boolean>false</boolean>
+</property>
+<property name="isOverlay">
+<boolean>false</boolean>
+</property>
+<property name="metaData">
+<null/>
+</property>
+<property name="name">
+<string>nullableBoolean</string>
+</property>
+<property name="nullable">
+<boolean>true</boolean>
+</property>
+<property name="type">
+<entity ref="14"/>
+</property>
+</entity>
+<entity id="17" type="com.braintribe.model.meta.GmSimpleType">
+<property name="id">
+<null/>
+</property>
+<property name="typeSignature">
+<string>date</string>
+</property>
+</entity>
+<entity id="16" type="com.braintribe.model.meta.GmProperty">
+<property name="entityType">
+<entity ref="10"/>
+</property>
+<property name="id">
+<null/>
+</property>
+<property name="isId">
+<boolean>false</boolean>
+</property>
+<property name="isOverlay">
+<boolean>false</boolean>
+</property>
+<property name="metaData">
+<null/>
+</property>
+<property name="name">
+<string>nonNullableDate</string>
+</property>
+<property name="nullable">
+<boolean>false</boolean>
+</property>
+<property name="type">
+<entity ref="17"/>
+</property>
+</entity>
+<entity id="18" type="com.braintribe.model.meta.GmProperty">
+<property name="entityType">
+<entity ref="10"/>
+</property>
+<property name="id">
+<null/>
+</property>
+<property name="isId">
+<boolean>false</boolean>
+</property>
+<property name="isOverlay">
+<boolean>false</boolean>
+</property>
+<property name="metaData">
+<null/>
+</property>
+<property name="name">
+<string>nullableDate</string>
+</property>
+<property name="nullable">
+<boolean>true</boolean>
+</property>
+<property name="type">
+<entity ref="17"/>
+</property>
+</entity>
+<entity id="20" type="com.braintribe.model.meta.GmSimpleType">
+<property name="id">
+<null/>
+</property>
+<property name="typeSignature">
+<string>double</string>
+</property>
+</entity>
+<entity id="19" type="com.braintribe.model.meta.GmProperty">
+<property name="entityType">
+<entity ref="10"/>
+</property>
+<property name="id">
+<null/>
+</property>
+<property name="isId">
+<boolean>false</boolean>
+</property>
+<property name="isOverlay">
+<boolean>false</boolean>
+</property>
+<property name="metaData">
+<null/>
+</property>
+<property name="name">
+<string>nonNullableDouble</string>
+</property>
+<property name="nullable">
+<boolean>false</boolean>
+</property>
+<property name="type">
+<entity ref="20"/>
+</property>
+</entity>
+<entity id="21" type="com.braintribe.model.meta.GmProperty">
+<property name="entityType">
+<entity ref="10"/>
+</property>
+<property name="id">
+<null/>
+</property>
+<property name="isId">
+<boolean>false</boolean>
+</property>
+<property name="isOverlay">
+<boolean>false</boolean>
+</property>
+<property name="metaData">
+<null/>
+</property>
+<property name="name">
+<string>nullableDouble</string>
+</property>
+<property name="nullable">
+<boolean>true</boolean>
+</property>
+<property name="type">
+<entity ref="20"/>
+</property>
+</entity>
+<entity id="23" type="com.braintribe.model.meta.GmSimpleType">
+<property name="id">
+<null/>
+</property>
+<property name="typeSignature">
+<string>long</string>
+</property>
+</entity>
+<entity id="22" type="com.braintribe.model.meta.GmProperty">
+<property name="entityType">
+<entity ref="10"/>
+</property>
+<property name="id">
+<null/>
+</property>
+<property name="isId">
+<boolean>false</boolean>
+</property>
+<property name="isOverlay">
+<boolean>false</boolean>
+</property>
+<property name="metaData">
+<null/>
+</property>
+<property name="name">
+<string>nonNullableLong</string>
+</property>
+<property name="nullable">
+<boolean>false</boolean>
+</property>
+<property name="type">
+<entity ref="23"/>
+</property>
+</entity>
+<entity id="24" type="com.braintribe.model.meta.GmProperty">
+<property name="entityType">
+<entity ref="10"/>
+</property>
+<property name="id">
+<null/>
+</property>
+<property name="isId">
+<boolean>false</boolean>
+</property>
+<property name="isOverlay">
+<boolean>false</boolean>
+</property>
+<property name="metaData">
+<null/>
+</property>
+<property name="name">
+<string>nullableLong</string>
+</property>
+<property name="nullable">
+<boolean>true</boolean>
+</property>
+<property name="type">
+<entity ref="23"/>
+</property>
+</entity>
+<entity id="26" type="com.braintribe.model.meta.GmSimpleType">
+<property name="id">
+<null/>
+</property>
+<property name="typeSignature">
+<string>float</string>
+</property>
+</entity>
+<entity id="25" type="com.braintribe.model.meta.GmProperty">
+<property name="entityType">
+<entity ref="10"/>
+</property>
+<property name="id">
+<null/>
+</property>
+<property name="isId">
+<boolean>false</boolean>
+</property>
+<property name="isOverlay">
+<boolean>false</boolean>
+</property>
+<property name="metaData">
+<null/>
+</property>
+<property name="name">
+<string>nonNullableFloat</string>
+</property>
+<property name="nullable">
+<boolean>false</boolean>
+</property>
+<property name="type">
+<entity ref="26"/>
+</property>
+</entity>
+<entity id="27" type="com.braintribe.model.meta.GmProperty">
+<property name="entityType">
+<entity ref="10"/>
+</property>
+<property name="id">
+<null/>
+</property>
+<property name="isId">
+<boolean>false</boolean>
+</property>
+<property name="isOverlay">
+<boolean>false</boolean>
+</property>
+<property name="metaData">
+<null/>
+</property>
+<property name="name">
+<string>nullableFloat</string>
+</property>
+<property name="nullable">
+<boolean>true</boolean>
+</property>
+<property name="type">
+<entity ref="26"/>
+</property>
+</entity>
+<entity id="10" type="com.braintribe.model.meta.GmEntityType">
+<property name="artifactBinding">
+<entity ref="1"/>
+</property>
+<property name="id">
+<null/>
+</property>
+<property name="isAbstract">
+<boolean>false</boolean>
+</property>
+<property name="isPlain">
+<boolean>false</boolean>
+</property>
+<property name="metaData">
+<null/>
+</property>
+<property name="properties">
+<list>
+<entity ref="11"/>
+<entity ref="12"/>
+<entity ref="13"/>
+<entity ref="15"/>
+<entity ref="16"/>
+<entity ref="18"/>
+<entity ref="19"/>
+<entity ref="21"/>
+<entity ref="22"/>
+<entity ref="24"/>
+<entity ref="25"/>
+<entity ref="27"/>
+</list>
+</property>
+<property name="propertyMetaData">
+<null/>
+</property>
+<property name="superTypes">
+<list>
+<entity ref="6"/>
+</list>
+</property>
+<property name="typeSignature">
+<string>com.braintribe.model.Entity</string>
+</property>
+</entity>
+<entity id="29" type="com.braintribe.model.meta.GmProperty">
+<property name="entityType">
+<entity ref="28"/>
+</property>
+<property name="id">
+<null/>
+</property>
+<property name="isId">
+<boolean>true</boolean>
+</property>
+<property name="isOverlay">
+<boolean>false</boolean>
+</property>
+<property name="metaData">
+<null/>
+</property>
+<property name="name">
+<string>id</string>
+</property>
+<property name="nullable">
+<boolean>false</boolean>
+</property>
+<property name="type">
+<entity ref="23"/>
+</property>
+</entity>
+<entity id="28" type="com.braintribe.model.meta.GmEntityType">
+<property name="artifactBinding">
+<entity ref="1"/>
+</property>
+<property name="id">
+<null/>
+</property>
+<property name="isAbstract">
+<boolean>true</boolean>
+</property>
+<property name="isPlain">
+<boolean>false</boolean>
+</property>
+<property name="metaData">
+<null/>
+</property>
+<property name="properties">
+<list>
+<entity ref="29"/>
+</list>
+</property>
+<property name="propertyMetaData">
+<null/>
+</property>
+<property name="superTypes">
+<list>
+<entity ref="6"/>
+</list>
+</property>
+<property name="typeSignature">
+<string>com.braintribe.model.generic.StandardIdentifiable</string>
+</property>
+</entity>
+<entity id="30" type="com.braintribe.model.meta.GmSimpleType">
+<property name="id">
+<null/>
+</property>
+<property name="typeSignature">
+<string>boolean</string>
+</property>
+</entity>
+<entity id="31" type="com.braintribe.model.meta.GmSimpleType">
+<property name="id">
+<null/>
+</property>
+<property name="typeSignature">
+<string>double</string>
+</property>
+</entity>
+<entity id="32" type="com.braintribe.model.meta.GmSimpleType">
+<property name="id">
+<null/>
+</property>
+<property name="typeSignature">
+<string>date</string>
+</property>
+</entity>
+<entity id="33" type="com.braintribe.model.meta.GmSimpleType">
+<property name="id">
+<null/>
+</property>
+<property name="typeSignature">
+<string>long</string>
+</property>
+</entity>
+<entity id="34" type="com.braintribe.model.meta.GmSimpleType">
+<property name="id">
+<null/>
+</property>
+<property name="typeSignature">
+<string>float</string>
+</property>
+</entity>
+<entity id="35" type="com.braintribe.model.meta.GmSimpleType">
+<property name="id">
+<null/>
+</property>
+<property name="typeSignature">
+<string>string</string>
+</property>
+</entity>
+<entity id="36" type="com.braintribe.model.meta.GmSimpleType">
+<property name="id">
+<null/>
+</property>
+<property name="typeSignature">
+<string>integer</string>
+</property>
+</entity>
+<entity id="37" type="com.braintribe.model.meta.GmSimpleType">
+<property name="id">
+<null/>
+</property>
+<property name="typeSignature">
+<string>decimal</string>
+</property>
+</entity>
+<entity id="0" type="com.braintribe.model.meta.GmMetaModel">
+<property name="artifactBinding">
+<entity ref="1"/>
+</property>
+<property name="baseType">
+<entity ref="2"/>
+</property>
+<property name="entityTypes">
+<set>
+<entity ref="3"/>
+<entity ref="7"/>
+<entity ref="10"/>
+<entity ref="6"/>
+<entity ref="28"/>
+</set>
+</property>
+<property name="enumTypes">
+<set/>
+</property>
+<property name="id">
+<null/>
+</property>
+<property name="metaData">
+<null/>
+</property>
+<property name="name">
+<string>com.braintribe.model:NullableModel#1.0</string>
+</property>
+<property name="simpleTypes">
+<set>
+<entity ref="30"/>
+<entity ref="31"/>
+<entity ref="32"/>
+<entity ref="33"/>
+<entity ref="34"/>
+<entity ref="35"/>
+<entity ref="36"/>
+<entity ref="37"/>
+</set>
+</property>
+</entity>
+</pool>
+</gm-data>

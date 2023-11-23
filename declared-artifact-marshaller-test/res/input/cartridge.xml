@@ -1,0 +1,67 @@
+<!--
+	============================================================================
+	BRAINTRIBE TECHNOLOGY GMBH - www.braintribe.com
+	Copyright BRAINTRIBE TECHNOLOGY GMBH, Austria, 2002-2018 - All Rights Reserved
+	It is strictly forbidden to copy, modify, distribute or use this code without written permission
+	To this file the Braintribe License Agreement applies.
+	============================================================================
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>tribefire.extension.artifact</groupId>
+        <artifactId>parent</artifactId>
+        <version>[${major}.${minor},${major}.${nextMinor})</version>
+    </parent>
+    <artifactId>artifact-processing-cartridge</artifactId>
+    <version>${major}.${minor}.${revision}</version>
+    <packaging>war</packaging>
+    <properties>
+        <major>1</major>
+        <minor>0</minor>
+        <nextMinor>1</nextMinor>
+        <revision>240-pc</revision>
+        <archetype>cartridge</archetype>
+    </properties>
+    <dependencies>
+        <!-- Default cartridge dependencies.
+          (This is a convenient solution to get most of the standard dependencies one usually needs for cartridge development. -->
+        <dependency>
+            <groupId>tribefire.cortex</groupId>
+            <artifactId>tribefire-cartridge-default-deps</artifactId>
+            <version>${V.tribefire.cortex}</version>
+        </dependency>
+        <!-- The servlet-api is provided by the app server! -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Data models -->
+        <dependency>
+            <groupId>tribefire.extension.artifact</groupId>
+            <artifactId>artifact-processing</artifactId>
+            <version>${V.tribefire.extension.artifact}</version>
+        </dependency>
+        <!-- Deployment models -->
+        <dependency>
+            <groupId>tribefire.extension.artifact</groupId>
+            <artifactId>artifact-processing-deployment-model</artifactId>
+            <version>${V.tribefire.extension.artifact}</version>
+            <?tag asset ?>
+        </dependency>
+        <dependency>
+            <groupId>tribefire.extension.artifact</groupId>
+            <artifactId>artifact-processing-service-model</artifactId>
+            <version>${V.tribefire.extension.artifact}</version>
+            <?tag asset ?>
+        </dependency>
+        <dependency>
+            <groupId>tribefire.extension.artifact</groupId>
+            <artifactId>artifact-processing-access-model</artifactId>
+            <version>${V.tribefire.extension.artifact}</version>
+            <classifier>asset</classifier>
+            <type>man</type>
+            <?tag asset ?>
+        </dependency>
+    </dependencies>
+</project>

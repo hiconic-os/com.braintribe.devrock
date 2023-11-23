@@ -1,0 +1,11 @@
+  !com.braintribe.devrock.model.repository.RepositoryConfiguration {        
+    localRepositoryPath: "cache",
+    repositories: [
+        !com.braintribe.devrock.model.repository.MavenHttpRepository {
+            name: "devrock-repo",
+            user: "repo-user",
+            password: "repo-pwd",
+            url: "http://repo/contents",
+        },
+    ],
+  }            

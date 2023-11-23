@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!-- simple settings for a test with the local repository and two repolet backed remote repositories : NO FILTER aka AllMatchingFilter -->
+<settings>	
+	<localRepository>${env.M2_REPO}</localRepository>		
+	<profiles>		
+		<profile>
+			<id>default</id>
+			<repositories>				
+				<repository>
+					<id>archive</id>
+					<layout>default</layout>
+					<url>http://localhost:${env.port}/archive/</url>					
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>daily</updatePolicy>
+						<checksumPolicy>fail</checksumPolicy>
+					</releases>
+				</repository>>
+			</repositories>						
+			<properties>			 
+			</properties>
+		</profile>		
+	</profiles>
+	<activeProfiles>
+		<activeProfile>default</activeProfile>
+	</activeProfiles>
+</settings>

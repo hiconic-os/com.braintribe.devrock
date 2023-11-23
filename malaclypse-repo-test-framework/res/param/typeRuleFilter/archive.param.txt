@@ -1,0 +1,10 @@
+com.braintribe.devrock.test.types:parent
+com.braintribe.devrock.test.types:none
+com.braintribe.devrock.test.types:standard
+com.braintribe.devrock.test.types:asset-man
+com.braintribe.devrock.test.types:asset-other
+com.braintribe.devrock.test.types:noasset-man
+com.braintribe.devrock.test.types:war
+com.braintribe.devrock.test.types:zip
+com.braintribe.devrock.test.types:types-terminal
+=res/param/typeRuleFilter/archive.zip

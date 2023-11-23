@@ -1,0 +1,13 @@
+!com.braintribe.devrock.model.repository.RepositoryConfiguration {   
+  localRepositoryPath: "${env.cache}",
+
+  
+  # the list of repos for resolving  
+  repositories: [
+       !com.braintribe.devrock.model.repository.MavenHttpRepository {
+           name: "archive",           
+           url: "http://localhost:${env.port}/archive",
+           updateable: true
+       },
+   ],
+}            

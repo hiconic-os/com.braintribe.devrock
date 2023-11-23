@@ -1,0 +1,23 @@
+com.braintribe.devrock.test:remote-t#1.0.1
+    -r         
+        com.braintribe.devrock.test:remote-parent#[1.0,1.1)
+    -d
+        com.braintribe.devrock.test:remote-x#
+        com.braintribe.devrock.test:remote-y#
+    -x
+      
+com.braintribe.devrock.test:remote-parent#1.0.1
+    -m
+      com.braintribe.devrock.test:remote-x#1.0.1
+      com.braintribe.devrock.test:remote-y#1.0.1      
+    -x
+    
+com.braintribe.devrock.test:remote-x#1.0.1
+    -x
+    
+com.braintribe.devrock.test:remote-y#1.0.1
+    -x
+    
+com.braintribe.devrock.test:remote-global-stuff#1.0.1
+    -x
+    

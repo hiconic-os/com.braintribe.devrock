@@ -1,0 +1,7 @@
+73f8ab32-cff1-4b7d-8a3e-b08864058594
++:pom
++javadoc:jar
++sources:jar
++asset:man
++:jar
+-notExpected:toBeThere

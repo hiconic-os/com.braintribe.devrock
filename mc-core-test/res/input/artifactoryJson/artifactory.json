@@ -1,0 +1,28 @@
+{
+"repo": "core-dev",
+"path": "/com/braintribe/wire/wire/1.0.36",
+"created": "2019-11-26T16:14:23.309Z",
+"createdBy": "core-write",
+"lastModified": "2019-11-26T16:14:23.309Z",
+"modifiedBy": "core-write",
+"lastUpdated": "2019-11-26T16:14:23.309Z",
+"children": [
+{
+"uri": "/wire-1.0.36-javadoc.jar",
+"folder": false
+},
+{
+"uri": "/wire-1.0.36-sources.jar",
+"folder": false
+},
+{
+"uri": "/wire-1.0.36.jar",
+"folder": false
+},
+{
+"uri": "/wire-1.0.36.pom",
+"folder": false
+}
+],
+"uri": "https://artifactory.example.com:443/artifactory/api/storage/core-dev/com/braintribe/wire/wire/1.0.36"
+}

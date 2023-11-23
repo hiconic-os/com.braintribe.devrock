@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<settings>
+	<localRepository>${env.M2_REPO}</localRepository>
+ <servers>
+  
+    <server>
+      <id>mirror.base</id>
+      <username>builder</username>
+      <password>operating2005</password>
+      <filePermissions>664</filePermissions>
+      <directoryPermissions>775</directoryPermissions>
+    </server>
+  	<server>
+      <id>mirror.addOn</id>
+      <username>builder</username>
+      <password>operating2005</password>
+      <filePermissions>664</filePermissions>
+      <directoryPermissions>775</directoryPermissions>
+    </server>    
+  </servers>
+  
+  <mirrors>
+    <mirror>
+      <id>mirror.base</id>
+      <url>http://localhost:${env.port}/archiveBase/</url>
+      <mirrorOf>braintribe.Base</mirrorOf>
+    </mirror>
+    <mirror>
+      <id>mirror.addOn</id>
+      <url>http://localhost:${env.port}/archiveAddOn/</url>
+      <mirrorOf>braintribe.AddOn</mirrorOf>
+    </mirror>    
+  </mirrors>
+
+	<profiles>
+		<profile>
+			<id>braintribe</id>
+			<repositories>
+				<repository>
+					<id>braintribe.Base</id>
+					<layout>default</layout>
+					<url>http://UNUSED</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>never</updatePolicy>
+					</releases>
+				</repository>
+				<repository>
+					<id>braintribe.AddOn</id>
+					<layout>default</layout>
+					<url>http://UNUSED</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>never</updatePolicy>
+					</releases>
+				</repository>				
+			</repositories>
+			<properties>		
+				<trustworthyRepositories>*</trustworthyRepositories>
+				<listingLenientRepositories>*</listingLenientRepositories>
+			</properties>
+		</profile>
+	</profiles>
+
+	<activeProfiles>
+		<activeProfile>braintribe</activeProfile>
+	</activeProfiles>
+</settings>

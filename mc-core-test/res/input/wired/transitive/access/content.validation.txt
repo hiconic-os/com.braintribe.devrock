@@ -1,0 +1,5 @@
+@local
+;  inital stage, all 1.0.1
+com.braintribe.devrock.test:a#1.0.1
+    -x
+    

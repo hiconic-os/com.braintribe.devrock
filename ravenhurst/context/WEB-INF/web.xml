@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- 
+ ============================================================================
+ Braintribe IT-Technologies GmbH - www.braintribe.com
+ Copyright Braintribe IT-Technologies GmbH, Austria, 2002-2015 - All Rights Reserved
+ It is strictly forbidden to copy, modify, distribute or use this code without written permission
+ To this file the Braintribe License Agreement applies.
+ ============================================================================
+
+-->
+
+
+
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+    version="2.4">
+    
+	<display-name>Braintribe's Ravenhurst</display-name>
+  
+    <servlet>
+	   <servlet-name>RavenhurstServlet</servlet-name>
+	   <servlet-class>com.braintribe.build.artifacts.ravenhurst.RavenhurstServlet</servlet-class>
+	</servlet>
+	
+    <servlet-mapping>
+      <servlet-name>RavenhurstServlet</servlet-name>
+      <url-pattern>/rest/*</url-pattern>
+    </servlet-mapping>
+    
+    
+</web-app>

@@ -1,0 +1,40 @@
+!com.braintribe.devrock.model.repository.RepositoryConfiguration {        
+    localRepositoryPath: "${env.repo}",    
+    repositories: [       
+       !com.braintribe.devrock.model.repository.CodebaseRepository {
+            name: "com.braintribe.devrock",
+            template: "$${artifactId}",
+            rootPath: "${env.sources}/com.braintribe.devrock"
+       },
+       !com.braintribe.devrock.model.repository.CodebaseRepository {
+            name: "com.braintribe.devrock.ant",
+            template: "$${artifactId}",
+            rootPath: "${env.sources}/com.braintribe.devrock.ant"
+       },
+       !com.braintribe.devrock.model.repository.CodebaseRepository {
+            name: "com.braintribe.devrock.eclipse",
+            template: "$${artifactId}",
+            rootPath: "${env.sources}/com.braintribe.devrock.eclipse"
+       },
+       !com.braintribe.devrock.model.repository.CodebaseRepository {
+            name: "com.braintribe.gm",
+            template: "$${artifactId}",
+            rootPath: "${env.sources}/com.braintribe.gm"
+       },
+       !com.braintribe.devrock.model.repository.CodebaseRepository {
+            name: "com.braintribe.common",
+            template: "$${artifactId}",
+            rootPath: "${env.sources}/com.braintribe.common"
+       },
+       !com.braintribe.devrock.model.repository.CodebaseRepository {
+            name: "tribefire.extension.artifact",
+            template: "$${artifactId}",
+            rootPath: "${env.sources}/tribefire.extension.artifact"
+       },
+       !com.braintribe.devrock.model.repository.CodebaseRepository {
+            name: "tribefire.extension.setup",
+            template: "$${artifactId}",
+            rootPath: "${env.sources}/tribefire.extension.setup"
+       }
+   ]
+}            

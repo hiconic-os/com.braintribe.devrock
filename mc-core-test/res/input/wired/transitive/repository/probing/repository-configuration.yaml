@@ -1,0 +1,15 @@
+!com.braintribe.devrock.model.repository.RepositoryConfiguration {        
+    localRepositoryPath: "${env.repo}",    
+    repositories: [
+       !com.braintribe.devrock.model.repository.MavenHttpRepository {
+           name: "archive",           
+           url: "http://localhost:${env.port}/archive",
+           updateable: true
+       },
+       !com.braintribe.devrock.model.repository.MavenHttpRepository {
+           name: "failing-archive",           
+           url: "http://localhost:${env.port}/failing-archive",           
+       },
+       
+   ],
+}            

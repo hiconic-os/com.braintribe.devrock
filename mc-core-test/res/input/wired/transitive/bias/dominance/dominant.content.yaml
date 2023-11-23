@@ -1,0 +1,7 @@
+
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+  {artifactId: "b", groupId: "com.braintribe.devrock.test", version: "1.1" , parts: {":jar": null} }
+]
+}
+  

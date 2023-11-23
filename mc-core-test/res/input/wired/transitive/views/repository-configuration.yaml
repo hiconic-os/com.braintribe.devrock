@@ -1,0 +1,19 @@
+!com.braintribe.devrock.model.repositoryview.ViewRepositoryConfiguration {        
+   baseConfiguration: {
+    localRepositoryPath: "${env.repo}",    
+    repositories: [
+       !com.braintribe.devrock.model.repository.MavenHttpRepository {
+           name: "archive",           
+           url: "http://localhost:${env.port}/archive",
+       },
+   ],
+   },
+   localRepositoryPath: "${env.repo}",
+   repositories: [
+       !com.braintribe.devrock.model.repository.MavenHttpRepository {
+           name: "archive",           
+           url: "http://localhost:${env.port}/archive",
+       },
+   ],
+   views: ["com.braintribe.devrock.test:test-view#[1.0,1.1)"]
+}            

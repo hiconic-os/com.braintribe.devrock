@@ -1,0 +1,37 @@
+# definition for scope combinations
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+   { artifactId: "t", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},
+       dependencies: [         
+         { artifactId: "a", groupId: "com.braintribe.devrock.test", version: "1.0.1"},
+         { artifactId: "b", groupId: "com.braintribe.devrock.test", version: "1.0.1"},
+         { artifactId: "c", groupId: "com.braintribe.devrock.test", version: "1.0.1"}
+        ] 
+    }, 
+  
+    # a - first level child      
+   { artifactId: "a", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},
+       dependencies: [             
+         { artifactId: "d", groupId: "com.braintribe.devrock.test", version: "1.0.2"}
+        ] 
+    }, 
+    # b - second level child     
+   { artifactId: "b", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null}, 
+       dependencies: [
+         { artifactId: "d", groupId: "com.braintribe.devrock.test", version: "1.0.2"}
+        ]
+    },   
+    
+    # c - second level child
+    { artifactId: "c", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null}, 
+       dependencies: [         
+         { artifactId: "d", groupId: "com.braintribe.devrock.test", version: "1.0.2"}
+        ]
+    },
+    # clash resolved dependency
+    { artifactId: "d", groupId: "com.braintribe.devrock.test", version: "1.0.2", parts: {":jar": null}, 
+       dependencies: [         
+        ]
+    },       
+  ]
+}

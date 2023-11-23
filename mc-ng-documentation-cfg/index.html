@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <title>Documentation</title>
+	<link rel='stylesheet' href='.mdoc/res/index.css'/>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   	<link href="https://fonts.googleapis.com/css?family=News+Cycle:400,700|Roboto:300,300i,400,400i,500,500i&amp;subset=latin-ext" rel="stylesheet">
+	<link rel="stylesheet" href=".mdoc/res/jquery.navgoco.css" type="text/css" media="screen" />
+	<link rel='stylesheet' href='.mdoc/res/navigation.css'/>
+	<link rel='stylesheet' href='.mdoc/res/general.css'/>
+	<link rel='stylesheet' href='.mdoc/res/custom.css'/>
+	<link rel="icon" href=".mdoc/res/favicon.png">
+  
+	<script type="text/javascript" src=".mdoc/res/jquery-latest.min.js"></script>
+	<!-- Load jquery.cookie plugin (optional) -->
+	<script type="text/javascript" src=".mdoc/res/jquery.cookie.min.js"></script>
+	<!-- Load jquery.navgoco plugin js and css files -->
+	<script type="text/javascript" src=".mdoc/res/jquery.navgoco.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('.nav').navgoco({accordion: true});
+		});
+	</script>
+	
+</head>
+<body>
+	<div class='container'>
+  <a id="skipnav" href="#main-content-start" class="non-visual-only">Skip to content</a>
+  <header class='header'>
+    <span class='home-button'><a href=index.html><img src='.mdoc/res/tribefire-logo-orange.svg' alt='logo'/><span class='non-visual-only'>Back to home screen</span></a></span>
+    <nav>
+	    <ul id=header-menu class=tile>
+		    <li><a href=../javadoc/index.html class='outsidelink api-link' target='_blank'>API</a></li>
+	    	<li class=''><a href="com.braintribe.devrock.eclipse/devrock-documentation/devrock.html">Devrock plugin</a></li>
+	    	<li class=''><a href="com.braintribe.devrock.eclipse/artifact-container-ng-documentation/artifact-container.html">Artifact Container</a></li>
+	    	<li class=''><a href="com.braintribe.devrock.eclipse/greyface-documentation/greyface.html">Greyface plugin</a></li>
+	    	<li class=''><a href="com.braintribe.devrock.eclipse/model-builder-ng-documentation/model-builder.html">Model builder</a></li>
+	    	<li class=''><a href="com.braintribe.devrock.eclipse/debug-module-builder-ng-documentation/debug-module-builder.html">Debug module builder</a></li>
+	    </ul>
+	    
+	    <ul class='nav dark tile tiny-screen-only'>
+	    	<li class='tile'>
+	    		<a href=# class='tile'>MENU</a>
+		    	<ul>
+				    <li><a href=../javadoc/index.html class='outsidelink api-link' target='_blank'>API</a></li>
+			    	<li class=''><a href="com.braintribe.devrock.eclipse/devrock-documentation/devrock.html">Devrock plugin</a></li>
+			    	<li class=''><a href="com.braintribe.devrock.eclipse/artifact-container-ng-documentation/artifact-container.html">Artifact Container</a></li>
+			    	<li class=''><a href="com.braintribe.devrock.eclipse/greyface-documentation/greyface.html">Greyface plugin</a></li>
+			    	<li class=''><a href="com.braintribe.devrock.eclipse/model-builder-ng-documentation/model-builder.html">Model builder</a></li>
+			    	<li class=''><a href="com.braintribe.devrock.eclipse/debug-module-builder-ng-documentation/debug-module-builder.html">Debug module builder</a></li>
+			    </ul>
+		    </li>
+	    </ul>
+    </nav>
+	<form id=search-bar action="search.html" method="get" class='tile' role='search'>
+		<div class='tile' id='search-icon'>
+			<input type=image src=".mdoc/res/search.svg" value="search" alt='search icon' />
+			<label id="toggleIcon" class="switch" title="Toggle Highlighting">
+				<span class="non-visual-only">Toggle Highlighting (this takes immediate effect)</span>
+				<input type=checkbox id="toggleHighlightingCheckbox" />
+				<div class="slider"></div>
+			</label>
+		</div>
+		<label>
+			<span class="non-visual-only">Search in all documentation</span>
+	        <input class='search-input tile' placeholder="Search in documentation..." name="searchText" />
+        </label>            
+    </form>
+  </header>	  <div class='below-header'>
+	  	<a name='main-content-start' id='main-content-start'></a> 
+	  	<div class='inner-container' id='main-content-wrapper'>
+		<article id=front class='center-content'>
+			<header id=greeting>
+				<h1>TECH. DOCUMENTATION. </h1>
+				<h2>  CONCEPTS. TUTORIALS. REFERENCES.</h2>
+				<br />
+				<p class="lead"> Our documentation is made for techies by techies. Combined with the training presentations and videos, it provides you with all necessary concepts and tutorials for a deep understanding of tribefire.
+				<p class="lead"> For a quick start, use one of the following:
+				<br /> <br />
+			</header>
+			<div id=entrypoints class='center-content'>				
+				 <a href="com.braintribe.devrock.eclipse/ng-plugin-documentation/ng-plugins.html" class='entrypoint card'>
+					 <span class='asset-name'>Devrock NG plugin documentation</span>
+					 <div class='entrypoint-image'>
+					 </div>
+				 </a>			
+
+		 	</div>
+		    
+		    <a href="all-docs.html" id="all-docs-link">> All Docs</a>
+		</article>
+	  	</div>
+	<footer>
+		<span class='feedback'><a href=#>Feedback</a></span>
+		<div class=logo><a href="https://www.braintribe.com"><img src=".mdoc/res/braintribe-black-32x152.png"/></a></div>
+		<div class=copyright> 
+			©2020 Braintribe. All rights reserved. <br/>
+			<span class='builtwith'>Built with jinni#2.1.305 at 13. April 2022 um 10:51:58 MESZ</span>
+		</div>
+	</footer>	  </div>
+	</div>
+</body>
+</html>
+
+

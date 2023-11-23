@@ -1,0 +1,5 @@
+There is a reason this project has custom compiler settings. 
+
+The "Store information about method parameters" flag for the Java Compiler has to be turned on. 
+
+Everything else should be kept at default.

@@ -1,0 +1,3 @@
+com.braintribe.test.dependencies.repositoryRoleTest:A#1.1-SNAPSHOT
+com.braintribe.test.dependencies.repositoryRoleTest:B#1.1-SNAPSHOT
+=res/content/repositoryRole/archiveSnapshot.zip

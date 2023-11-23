@@ -1,0 +1,3 @@
+com.braintribe.devrock.test.classes:a
+com.braintribe.devrock.test.classes:classifier-test-terminal
+=res/param/classesTest/archive.zip

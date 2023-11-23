@@ -1,0 +1,47 @@
+;
+; validation tree for com.braintribe.devrock.mc.core.wired.resolving.transitive.classpath.PackagingAndTypeCombinationsTest
+; tests checks on artifact-packaging/dependency-type combinations on a non-terminal
+;
+
+com.braintribe.devrock.test:t#1.0.1
+    -d
+        com.braintribe.devrock.test:a#1.0.1
+    -c
+        :jar
+    -x
+    
+
+com.braintribe.devrock.test:a#1.0.1
+    -d       
+        com.braintribe.devrock.test:bundle#1.0.1
+        com.braintribe.devrock.test:jar#1.0.1        
+    -c
+        :jar
+    -x
+    	
+    
+
+com.braintribe.devrock.test:bundle#1.0.1|bundle
+    -d 
+        com.braintribe.devrock.test:x-bundle#1.0.1
+	-c
+		:jar
+	-x	
+	
+com.braintribe.devrock.test:jar#1.0.1|jar
+    -d 
+        com.braintribe.devrock.test:x#1.0.1
+	-c
+		:jar
+	-x
+	
+com.braintribe.devrock.test:x#1.0.1
+	-c
+		:jar
+	-x
+	
+com.braintribe.devrock.test:x-bundle#1.0.1
+    -c
+        :jar
+    -x
+	

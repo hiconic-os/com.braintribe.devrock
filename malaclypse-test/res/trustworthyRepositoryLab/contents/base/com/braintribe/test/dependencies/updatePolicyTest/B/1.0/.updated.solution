@@ -1,0 +1,132 @@
+{
+  "_id" : "0",
+  "_type" : "com.braintribe.model.ravenhurst.data.RavenhurstSolutionDataContainer",
+  "globalId" : null,
+  "id" : null,
+  "lastAccess" : {
+    "_type" : "date",
+    "value" : "2017-08-10T15:20:39.357+0200"
+  },
+  "mavenMetaDataToRepositoryRoleMap" : {
+    "_type" : "map",
+    "value" : [ ]
+  },
+  "partition" : null,
+  "solution" : null,
+  "urlToMetaDataMap" : {
+    "_type" : "map",
+    "value" : [ ]
+  },
+  "urlToSolutionMap" : {
+    "_type" : "map",
+    "value" : [ {
+      "key" : "http://localhost:8080/archiveA",
+      "value" : {
+        "_id" : "1",
+        "_type" : "com.braintribe.model.ravenhurst.Artifact",
+        "artifactId" : "B",
+        "globalId" : null,
+        "groupId" : "com.braintribe.test.dependencies.updatePolicyTest",
+        "id" : null,
+        "partition" : null,
+        "parts" : {
+          "_type" : "set",
+          "value" : [ {
+            "_id" : "2",
+            "_type" : "com.braintribe.model.ravenhurst.Part",
+            "globalId" : null,
+            "id" : null,
+            "name" : "B-1.0.pom.md5",
+            "partition" : null,
+            "redeployedFlag" : false,
+            "source" : "http://localhost:8080/archiveA/com/braintribe/test/dependencies/updatePolicyTest/B/1.0/B-1.0.pom.md5"
+          }, {
+            "_id" : "3",
+            "_type" : "com.braintribe.model.ravenhurst.Part",
+            "globalId" : null,
+            "id" : null,
+            "name" : "B-1.0-sources.jar",
+            "partition" : null,
+            "redeployedFlag" : false,
+            "source" : "http://localhost:8080/archiveA/com/braintribe/test/dependencies/updatePolicyTest/B/1.0/B-1.0-sources.jar"
+          }, {
+            "_id" : "4",
+            "_type" : "com.braintribe.model.ravenhurst.Part",
+            "globalId" : null,
+            "id" : null,
+            "name" : "B-1.0.jar",
+            "partition" : null,
+            "redeployedFlag" : false,
+            "source" : "http://localhost:8080/archiveA/com/braintribe/test/dependencies/updatePolicyTest/B/1.0/B-1.0.jar"
+          }, {
+            "_id" : "5",
+            "_type" : "com.braintribe.model.ravenhurst.Part",
+            "globalId" : null,
+            "id" : null,
+            "name" : "B-1.0.jar.sha1",
+            "partition" : null,
+            "redeployedFlag" : false,
+            "source" : "http://localhost:8080/archiveA/com/braintribe/test/dependencies/updatePolicyTest/B/1.0/B-1.0.jar.sha1"
+          }, {
+            "_id" : "6",
+            "_type" : "com.braintribe.model.ravenhurst.Part",
+            "globalId" : null,
+            "id" : null,
+            "name" : "B-1.0.jar.md5",
+            "partition" : null,
+            "redeployedFlag" : false,
+            "source" : "http://localhost:8080/archiveA/com/braintribe/test/dependencies/updatePolicyTest/B/1.0/B-1.0.jar.md5"
+          }, {
+            "_id" : "7",
+            "_type" : "com.braintribe.model.ravenhurst.Part",
+            "globalId" : null,
+            "id" : null,
+            "name" : "B-1.0-sources.jar.sha1",
+            "partition" : null,
+            "redeployedFlag" : false,
+            "source" : "http://localhost:8080/archiveA/com/braintribe/test/dependencies/updatePolicyTest/B/1.0/B-1.0-sources.jar.sha1"
+          }, {
+            "_id" : "8",
+            "_type" : "com.braintribe.model.ravenhurst.Part",
+            "globalId" : null,
+            "id" : null,
+            "name" : "B-1.0-sources.jar.md5",
+            "partition" : null,
+            "redeployedFlag" : false,
+            "source" : "http://localhost:8080/archiveA/com/braintribe/test/dependencies/updatePolicyTest/B/1.0/B-1.0-sources.jar.md5"
+          }, {
+            "_id" : "9",
+            "_type" : "com.braintribe.model.ravenhurst.Part",
+            "globalId" : null,
+            "id" : null,
+            "name" : "B-1.0.pom",
+            "partition" : null,
+            "redeployedFlag" : false,
+            "source" : "http://localhost:8080/archiveA/com/braintribe/test/dependencies/updatePolicyTest/B/1.0/B-1.0.pom"
+          }, {
+            "_id" : "10",
+            "_type" : "com.braintribe.model.ravenhurst.Part",
+            "globalId" : null,
+            "id" : null,
+            "name" : "B-1.0.pom.sha1",
+            "partition" : null,
+            "redeployedFlag" : false,
+            "source" : "http://localhost:8080/archiveA/com/braintribe/test/dependencies/updatePolicyTest/B/1.0/B-1.0.pom.sha1"
+          }, {
+            "_id" : "11",
+            "_type" : "com.braintribe.model.ravenhurst.Part",
+            "globalId" : null,
+            "id" : null,
+            "name" : "maven-metadata.xml",
+            "partition" : null,
+            "redeployedFlag" : false,
+            "source" : "http://localhost:8080/archiveA/com/braintribe/test/dependencies/updatePolicyTest/B/1.0/maven-metadata.xml"
+          } ]
+        },
+        "redeployedFlag" : false,
+        "snapshotFlag" : false,
+        "version" : "1.0"
+      }
+    } ]
+  }
+}

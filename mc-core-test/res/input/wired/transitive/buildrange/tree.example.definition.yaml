@@ -1,0 +1,74 @@
+# definition for the build-range tests based on the example in the documentation
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+
+    # terminal parent
+    { artifactId: "TerminalParent", groupId: "com.braintribe.terminal", version: "1.0.1"}, 
+
+    # terminal terminal
+   { artifactId: "Terminal", groupId: "com.braintribe.terminal", version: "1.0.1",
+       parent : { artifactId: "TerminalParent",  groupId: "com.braintribe.terminal", version: "1.0.1"}, 
+       dependencies: [                 
+            { artifactId: "A",  groupId: "com.braintribe.terminal", version: "1.0.1"}, 
+            { artifactId: "A",  groupId: "com.braintribe.grpOne", version: "1.0.1"}, 
+            { artifactId: "A",  groupId: "com.braintribe.grpOne.subOne", version: "1.0.1"},         
+       ],        
+    }, 
+
+   # terminal A
+   { artifactId: "A", groupId: "com.braintribe.terminal", version: "1.0.1",
+       parent : { artifactId: "TerminalParent",  groupId: "com.braintribe.terminal", version: "1.0.1"},        
+    }, 
+
+
+   # grpOne.subOne parent
+    { artifactId: "GrpOneSubOneParent", groupId: "com.braintribe.grpOne.subOne", version: "1.0.1"}, 
+
+    # A
+   { artifactId: "A",  groupId: "com.braintribe.grpOne.subOne", version: "1.0.1",         
+       parent : { artifactId: "GrpOneSubOneParent",  groupId: "com.braintribe.grpOne.subOne", version: "1.0.1"}, 
+       dependencies: [                 
+             { artifactId: "B",  groupId: "com.braintribe.grpOne.subOne", version: "1.0.1"},   
+             { artifactId: "A",  groupId: "com.braintribe.grpOne", version: "1.0.1"},   
+       ],        
+    }, 
+    
+    # B
+   { artifactId: "B",  groupId: "com.braintribe.grpOne.subOne", version: "1.0.1",         
+       parent : { artifactId: "GrpOneSubOneParent",  groupId: "com.braintribe.grpOne.subOne", version: "1.0.1"},       
+    }, 
+
+   # grpOne parent
+    { artifactId: "GrpOneParent", groupId: "com.braintribe.grpOne", version: "1.0.1", 
+      dependencies: [                 
+             { artifactId: "BaseDependency",  groupId: "com.braintribe.grpBase", version: "1.0.1"},   
+       ],        
+    },
+
+    # grpOne A
+   { artifactId: "A",  groupId: "com.braintribe.grpOne", version: "1.0.1",         
+       parent : { artifactId: "GrpOneParent",  groupId: "com.braintribe.grpOne", version: "1.0.1"},
+       dependencies: [                 
+             { artifactId: "C",  groupId: "com.braintribe.grpOne", version: "1.0.1"},   
+       ],        
+    }, 
+
+    # grpOne C
+   { artifactId: "C",  groupId: "com.braintribe.grpOne", version: "1.0.1",         
+       parent : { artifactId: "GrpOneParent",  groupId: "com.braintribe.grpOne", version: "1.0.1"},
+    }, 
+
+
+
+   # grpBase parent
+    { artifactId: "GrpBaseParent", groupId: "com.braintribe.grpBase", version: "1.0.1"},
+
+
+   # grpBase BaseDependency
+   { artifactId: "BaseDependency",  groupId: "com.braintribe.grpBase", version: "1.0.1",         
+       parent : { artifactId: "GrpBaseParent",  groupId: "com.braintribe.grpBase", version: "1.0.1"},       
+    }, 
+
+  ]
+
+}

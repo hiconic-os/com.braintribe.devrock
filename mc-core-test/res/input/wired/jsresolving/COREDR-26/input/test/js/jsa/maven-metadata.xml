@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+ <groupId>test.js</groupId>
+ <artifactId>jsa</artifactId>
+ <version>1.0</version>
+ <versioning>   
+   <versions>
+     <version>1.0</version>    
+   </versions>
+   <lastUpdated>20180320215539</lastUpdated>
+ </versioning>
+</metadata>

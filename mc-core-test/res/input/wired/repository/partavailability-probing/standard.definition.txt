@@ -1,0 +1,28 @@
+com.braintribe.devrock.test:x#1.0.1
+    -d 
+        com.braintribe.devrock.test:y#[1.0,1.1)
+    -c
+        :jar
+        sources:jar
+        javadoc:jar
+        asset:man
+    -x
+      
+com.braintribe.devrock.test:y#1.0.1
+    -d 
+        com.braintribe.devrock.test:z#[1.0,1.1)
+    -c
+        :jar
+        sources:jar
+        javadoc:jar
+        asset:man
+    -x
+    
+com.braintribe.devrock.test:z#1.0.1
+    -c
+        :jar
+        sources:jar
+        javadoc:jar
+        asset:man    
+    -x
+    

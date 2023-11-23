@@ -1,0 +1,17 @@
+!com.braintribe.devrock.model.repository.RepositoryConfiguration {        
+    localRepositoryPath: "${env.repo}",        
+    repositories: [
+     !com.braintribe.devrock.model.repository.MavenHttpRepository {
+           name: "third-party",           
+           url: "https://artifactory.example.com/artifactory/third-party/",
+           user: "${env.REPO_USER}",          
+           password: "{env.REPO_PASSWORD}",
+     },
+     !com.braintribe.devrock.model.repository.MavenHttpRepository {
+           name: "core-dev",           
+           url: "https://artifactory.example.com/artifactory/core-dev/",
+           user: "${env.REPO_USER}",          
+           password: "{env.REPO_PASSWORD}",
+     },   
+    ]
+}            

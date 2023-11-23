@@ -1,0 +1,11 @@
+<project>
+	<properties>
+		<maj>1</maj>
+		<min>0</min>
+		<rev>1</rev>
+		<version>${maj}.${min}</version>
+	</properties>
+	<groupId>foo.bar</groupId>
+	<artifactId>XParent</artifactId>
+	<version>${version}.${rev}</version>
+</project>

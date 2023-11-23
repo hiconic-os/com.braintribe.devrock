@@ -1,0 +1,20 @@
+# validation for the build range test based on the example as in documentation
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+
+    # terminal terminal
+   { artifactId: "Terminal", groupId: "com.braintribe.terminal", version: "1.0.1",
+       parent : { artifactId: "TerminalParent",  groupId: "com.braintribe.terminal", version: "1.0.1"}, 
+       dependencies: [                 
+            { artifactId: "A",  groupId: "com.braintribe.terminal", version: "1.0.1"}, 
+            { artifactId: "A",  groupId: "com.braintribe.grpOne", version: "1.0.1"}, 
+            { artifactId: "A",  groupId: "com.braintribe.grpOne.subOne", version: "1.0.1"},         
+            { artifactId: "TerminalParent",  groupId: "com.braintribe.terminal", version: "1.0.1", scope: "parent"},         
+       ],        
+    }, 
+
+   
+
+  ]
+
+}

@@ -1,0 +1,65 @@
+;
+; tree definition for com.braintribe.devrock.mc.core.wired.resolving.transitive.classpath.PackagingAndTypeCombinationsOnTerminalTest
+; tests the artifact-packaging / dependency-type combination introduced on the terminal
+;
+
+com.braintribe.devrock.test:t#1.0.1
+	-d 
+	   com.braintribe.devrock.test:bundle#1.0.1
+        com.braintribe.devrock.test:jar#1.0.1
+        com.braintribe.devrock.test:war#1.0.1-classes
+        com.braintribe.devrock.test:ear#1.0.1-classes
+	-c
+		:jar
+	-x
+	
+com.braintribe.devrock.test:war#1.0.1|war
+    -d     
+        com.braintribe.devrock.test:x-war#1.0.1
+    -c
+        :war
+        :jar
+    -x
+    
+com.braintribe.devrock.test:ear#1.0.1|ear
+    -d     
+        com.braintribe.devrock.test:x-ear#1.0.1
+    -c
+        :ear
+        :jar
+    -x  
+
+	
+com.braintribe.devrock.test:bundle#1.0.1|bundle
+    -d     
+        com.braintribe.devrock.test:x-bundle#1.0.1    
+	-c
+		:jar
+	-x	
+	
+com.braintribe.devrock.test:jar#1.0.1|jar
+    -d 
+        com.braintribe.devrock.test:x#1.0.1
+	-c
+		:jar
+	-x
+	
+com.braintribe.devrock.test:x#1.0.1
+	-c
+		:jar
+	-x
+	
+com.braintribe.devrock.test:x-war#1.0.1
+    -c
+        :jar
+    -x
+    
+com.braintribe.devrock.test:x-ear#1.0.1
+    -c
+        :jar
+    -x
+    
+com.braintribe.devrock.test:x-bundle#1.0.1
+    -c
+        :jar
+    -x

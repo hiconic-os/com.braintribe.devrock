@@ -1,0 +1,21 @@
+# definition for the maven snapshot crap
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+
+    # parent
+    { artifactId: "demo-module-parent", groupId: "tribefire.extension.enablement-maven.demo", version: "1.0.1", 
+      properties: [
+         {name: "V.tribefire.setup.classic.env", value: "1.0.1"},
+         {name: "V.this.project", value: "1.0.1"}
+      ]       
+    }, 
+   #
+   { artifactId: "env-aware-standard-setup", groupId: "tribefire.setup.classic.env", version: "1.0.1", parts:{":jar": null, "asset:man": null},
+    }, 
+   # b - first level child
+    { artifactId: "demo-aggregator", groupId: "tribefire.extension.enablement-maven.demo", version: "1.0.1", parts: {":jar": null, "asset:man": null},       
+    }, 
+
+  ]
+
+}

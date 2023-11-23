@@ -1,0 +1,5 @@
+com.braintribe.devrock.test.classifier.lookup:classifier-a
+com.braintribe.devrock.test.classifier.lookup:classifier-terminal-a
+com.braintribe.devrock.test.classifier.lookup:classifier-terminal-b
+com.braintribe.devrock.test.classifier.lookup:parent
+=res/param/classifierLookupTest/archive.zip

@@ -1,0 +1,19 @@
+;  inital stage, all 1.0.1
+com.braintribe.devrock.test:a#1.0.1
+    -d 
+        com.braintribe.devrock.test:b#1.0.1
+    -x
+    
+com.braintribe.devrock.test:b#1.0.1
+    -d 
+        com.braintribe.devrock.test:c#1.0.1
+    -x
+    
+com.braintribe.devrock.test:c#1.0.1    
+    -x
+
+com.braintribe.devrock.test:t#1.0.1    
+    -d
+	com.braintribe.devrock.test:a#1.0.1
+    -x
+    

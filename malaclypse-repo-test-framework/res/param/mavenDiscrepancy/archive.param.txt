@@ -1,0 +1,5 @@
+com.braintribe.test.dependencies.mavenDiscrepancyTest:MavenDiscrepancyTestTerminal
+com.braintribe.test.dependencies.mavenDiscrepancyTest:A
+com.braintribe.test.dependencies.mavenDiscrepancyTest:B
+com.braintribe.test.dependencies.mavenDiscrepancyTest:C
+=res/content/mavenDiscrepancy/archive.zip

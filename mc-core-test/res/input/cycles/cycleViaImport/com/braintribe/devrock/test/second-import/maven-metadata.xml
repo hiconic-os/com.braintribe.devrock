@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<metadata>
+    <groupId>com.braintribe.devrock.test</groupId>
+    <artifactId>second-import</artifactId>
+    <versioning>
+        <lastUpdated>20200615174103</lastUpdated>
+        <versions>
+            <version>1.0.1</version>
+        </versions>
+    </versioning>
+</metadata>

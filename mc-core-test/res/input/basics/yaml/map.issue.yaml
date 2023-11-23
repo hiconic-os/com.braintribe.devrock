@@ -1,0 +1,411 @@
+!com.braintribe.model.artifact.analysis.AnalysisArtifactResolution
+clashes:
+  - !com.braintribe.model.artifact.analysis.DependencyClash
+    artifactId: "c"
+    groupId: "com.braintribe.devrock.test"
+    involvedDependencies:
+      - &0 !com.braintribe.model.artifact.analysis.AnalysisDependency
+        artifactId: "c"
+        depender: &1 !com.braintribe.model.artifact.analysis.AnalysisArtifact
+          artifactId: "a"
+          dependencies:
+            - &2 !com.braintribe.model.artifact.analysis.AnalysisDependency
+              artifactId: "d"
+              depender: *1
+              groupId: "com.braintribe.devrock.test"
+              origin: &3 !com.braintribe.model.artifact.compiled.CompiledDependency
+                artifactId: "d"
+                groupId: "com.braintribe.devrock.test"
+                origin: &4 !com.braintribe.model.artifact.compiled.CompiledArtifact
+                  artifactId: "a"
+                  dependencies:
+                    - *3
+                    - &5 !com.braintribe.model.artifact.compiled.CompiledDependency
+                      artifactId: "c"
+                      groupId: "com.braintribe.devrock.test"
+                      origin: *4
+                      scope: "compile"
+                      type: "jar"
+                      version: !com.braintribe.model.version.Version
+                        major: 1
+                        minor: 0
+                        revision: 2
+                  groupId: "com.braintribe.devrock.test"
+                  origin: &6 !com.braintribe.model.artifact.declared.DeclaredArtifact
+                    artifactId: "a"
+                    dependencies:
+                      - !com.braintribe.model.artifact.declared.DeclaredDependency
+                        artifactId: "d"
+                        groupId: "com.braintribe.devrock.test"
+                        origin: *6
+                        version: "1.0.1"
+                      - !com.braintribe.model.artifact.declared.DeclaredDependency
+                        artifactId: "c"
+                        groupId: "com.braintribe.devrock.test"
+                        origin: *6
+                        version: "1.0.2"
+                    groupId: "com.braintribe.devrock.test"
+                    resource: &7 !com.braintribe.model.resource.FileResource
+                      name: "a-1.0.1.pom"
+                      path: "F:\\works\\dev-envs\\standard\\git\\com.braintribe.devrock\\mc-core-test\\res\\output\\wired\\transitive\\classpath\\repo\\com\\braintribe\\devrock\\test\\a\\1.0.1\\a-1.0.1.pom"
+                    version: "1.0.1"
+                  packaging: "jar"
+                  version: !com.braintribe.model.version.Version
+                    major: 1
+                    minor: 0
+                    revision: 1
+                scope: "compile"
+                type: "jar"
+                version: !com.braintribe.model.version.Version
+                  major: 1
+                  minor: 0
+                  revision: 1
+              scope: "compile"
+              solution: &8 !com.braintribe.model.artifact.analysis.AnalysisArtifact
+                artifactId: "d"
+                dependers: !!set
+                  ? *2
+                  ? &9 !com.braintribe.model.artifact.analysis.AnalysisDependency
+                    artifactId: "d"
+                    depender: &10 !com.braintribe.model.artifact.analysis.AnalysisArtifact
+                      artifactId: "c"
+                      dependencies:
+                        - *9
+                      dependencyOrder: 1
+                      dependers: !!set
+                        ? *0
+                        ? &11 !com.braintribe.model.artifact.analysis.AnalysisDependency
+                          artifactId: "c"
+                          depender: &12 !com.braintribe.model.artifact.analysis.AnalysisArtifact
+                            artifactId: "b"
+                            dependencies:
+                              - *11
+                            dependencyOrder: 3
+                            dependers: !!set
+                              ? &13 !com.braintribe.model.artifact.analysis.AnalysisDependency
+                                artifactId: "b"
+                                depender: &14 !com.braintribe.model.artifact.analysis.AnalysisArtifact
+                                  artifactId: "t"
+                                  dependencies:
+                                    - &15 !com.braintribe.model.artifact.analysis.AnalysisDependency
+                                      artifactId: "a"
+                                      depender: *14
+                                      groupId: "com.braintribe.devrock.test"
+                                      origin: &16 !com.braintribe.model.artifact.compiled.CompiledDependency
+                                        artifactId: "a"
+                                        groupId: "com.braintribe.devrock.test"
+                                        origin: &17 !com.braintribe.model.artifact.compiled.CompiledArtifact
+                                          artifactId: "t"
+                                          dependencies:
+                                            - *16
+                                            - &18 !com.braintribe.model.artifact.compiled.CompiledDependency
+                                              artifactId: "b"
+                                              groupId: "com.braintribe.devrock.test"
+                                              origin: *17
+                                              scope: "compile"
+                                              type: "jar"
+                                              version: !com.braintribe.model.version.Version
+                                                major: 1
+                                                minor: 0
+                                                revision: 1
+                                          groupId: "com.braintribe.devrock.test"
+                                          origin: &19 !com.braintribe.model.artifact.declared.DeclaredArtifact
+                                            artifactId: "t"
+                                            dependencies:
+                                              - !com.braintribe.model.artifact.declared.DeclaredDependency
+                                                artifactId: "a"
+                                                groupId: "com.braintribe.devrock.test"
+                                                origin: *19
+                                                version: "1.0.1"
+                                              - !com.braintribe.model.artifact.declared.DeclaredDependency
+                                                artifactId: "b"
+                                                groupId: "com.braintribe.devrock.test"
+                                                origin: *19
+                                                version: "1.0.1"
+                                            groupId: "com.braintribe.devrock.test"
+                                            resource: &20 !com.braintribe.model.resource.FileResource
+                                              name: "t-1.0.1.pom"
+                                              path: "F:\\works\\dev-envs\\standard\\git\\com.braintribe.devrock\\mc-core-test\\res\\output\\wired\\transitive\\classpath\\repo\\com\\braintribe\\devrock\\test\\t\\1.0.1\\t-1.0.1.pom"
+                                            version: "1.0.1"
+                                          packaging: "jar"
+                                          version: !com.braintribe.model.version.Version
+                                            major: 1
+                                            minor: 0
+                                            revision: 1
+                                        scope: "compile"
+                                        type: "jar"
+                                        version: !com.braintribe.model.version.Version
+                                          major: 1
+                                          minor: 0
+                                          revision: 1
+                                      scope: "compile"
+                                      solution: *1
+                                      type: "jar"
+                                      version: "1.0.1"
+                                    - *13
+                                  dependencyOrder: 4
+                                  dependers: !!set
+                                    ? &21 !com.braintribe.model.artifact.analysis.AnalysisDependency
+                                      artifactId: "t"
+                                      groupId: "com.braintribe.devrock.test"
+                                      origin: !com.braintribe.model.artifact.compiled.CompiledDependency
+                                        artifactId: "t"
+                                        groupId: "com.braintribe.devrock.test"
+                                        scope: "compile"
+                                        version: !com.braintribe.model.version.FuzzyVersion
+                                          major: 1
+                                          minor: 0
+                                      scope: "compile"
+                                      solution: *14
+                                      version: "[1.0,1.1)"
+                                  groupId: "com.braintribe.devrock.test"
+                                  origin: *17
+                                  packaging: "jar"
+                                  parts:
+                                    ":pom": !com.braintribe.model.artifact.consumable.Part
+                                      repositoryOrigin: "archive"
+                                      resource: *20
+                                      type: "pom"
+                                    ":jar": !com.braintribe.model.artifact.consumable.Part
+                                      repositoryOrigin: "archive"
+                                      resource: !com.braintribe.model.resource.FileResource
+                                        name: "t-1.0.1.jar"
+                                        path: "F:\\works\\dev-envs\\standard\\git\\com.braintribe.devrock\\mc-core-test\\res\\output\\wired\\transitive\\classpath\\repo\\com\\braintribe\\devrock\\test\\t\\1.0.1\\t-1.0.1.jar"
+                                      type: "jar"
+                                  version: "1.0.1"
+                                groupId: "com.braintribe.devrock.test"
+                                origin: *18
+                                scope: "compile"
+                                solution: *12
+                                type: "jar"
+                                version: "1.0.1"
+                            groupId: "com.braintribe.devrock.test"
+                            origin: &22 !com.braintribe.model.artifact.compiled.CompiledArtifact
+                              artifactId: "b"
+                              dependencies:
+                                - &23 !com.braintribe.model.artifact.compiled.CompiledDependency
+                                  artifactId: "c"
+                                  groupId: "com.braintribe.devrock.test"
+                                  origin: *22
+                                  scope: "compile"
+                                  type: "jar"
+                                  version: !com.braintribe.model.version.Version
+                                    major: 1
+                                    minor: 0
+                                    revision: 1
+                              groupId: "com.braintribe.devrock.test"
+                              origin: &24 !com.braintribe.model.artifact.declared.DeclaredArtifact
+                                artifactId: "b"
+                                dependencies:
+                                  - !com.braintribe.model.artifact.declared.DeclaredDependency
+                                    artifactId: "c"
+                                    groupId: "com.braintribe.devrock.test"
+                                    origin: *24
+                                    version: "1.0.1"
+                                groupId: "com.braintribe.devrock.test"
+                                resource: &25 !com.braintribe.model.resource.FileResource
+                                  name: "b-1.0.1.pom"
+                                  path: "F:\\works\\dev-envs\\standard\\git\\com.braintribe.devrock\\mc-core-test\\res\\output\\wired\\transitive\\classpath\\repo\\com\\braintribe\\devrock\\test\\b\\1.0.1\\b-1.0.1.pom"
+                                version: "1.0.1"
+                              packaging: "jar"
+                              version: !com.braintribe.model.version.Version
+                                major: 1
+                                minor: 0
+                                revision: 1
+                            packaging: "jar"
+                            parts:
+                              ":pom": !com.braintribe.model.artifact.consumable.Part
+                                repositoryOrigin: "archive"
+                                resource: *25
+                                type: "pom"
+                              ":jar": !com.braintribe.model.artifact.consumable.Part
+                                repositoryOrigin: "archive"
+                                resource: !com.braintribe.model.resource.FileResource
+                                  name: "b-1.0.1.jar"
+                                  path: "F:\\works\\dev-envs\\standard\\git\\com.braintribe.devrock\\mc-core-test\\res\\output\\wired\\transitive\\classpath\\repo\\com\\braintribe\\devrock\\test\\b\\1.0.1\\b-1.0.1.jar"
+                                type: "jar"
+                            version: "1.0.1"
+                            visitOrder: 4
+                          groupId: "com.braintribe.devrock.test"
+                          origin: *23
+                          scope: "compile"
+                          solution: *10
+                          type: "jar"
+                          version: "1.0.1"
+                      groupId: "com.braintribe.devrock.test"
+                      origin: &26 !com.braintribe.model.artifact.compiled.CompiledArtifact
+                        artifactId: "c"
+                        dependencies:
+                          - &27 !com.braintribe.model.artifact.compiled.CompiledDependency
+                            artifactId: "d"
+                            groupId: "com.braintribe.devrock.test"
+                            origin: *26
+                            scope: "compile"
+                            type: "jar"
+                            version: !com.braintribe.model.version.Version
+                              major: 1
+                              minor: 0
+                              revision: 1
+                        groupId: "com.braintribe.devrock.test"
+                        origin: &28 !com.braintribe.model.artifact.declared.DeclaredArtifact
+                          artifactId: "c"
+                          dependencies:
+                            - !com.braintribe.model.artifact.declared.DeclaredDependency
+                              artifactId: "d"
+                              groupId: "com.braintribe.devrock.test"
+                              origin: *28
+                              version: "1.0.1"
+                          groupId: "com.braintribe.devrock.test"
+                          resource: &29 !com.braintribe.model.resource.FileResource
+                            name: "c-1.0.2.pom"
+                            path: "F:\\works\\dev-envs\\standard\\git\\com.braintribe.devrock\\mc-core-test\\res\\output\\wired\\transitive\\classpath\\repo\\com\\braintribe\\devrock\\test\\c\\1.0.2\\c-1.0.2.pom"
+                          version: "1.0.2"
+                        packaging: "jar"
+                        version: !com.braintribe.model.version.Version
+                          major: 1
+                          minor: 0
+                          revision: 2
+                      packaging: "jar"
+                      parts:
+                        ":pom": !com.braintribe.model.artifact.consumable.Part
+                          repositoryOrigin: "archive"
+                          resource: *29
+                          type: "pom"
+                        ":jar": !com.braintribe.model.artifact.consumable.Part
+                          repositoryOrigin: "archive"
+                          resource: !com.braintribe.model.resource.FileResource
+                            name: "c-1.0.2.jar"
+                            path: "F:\\works\\dev-envs\\standard\\git\\com.braintribe.devrock\\mc-core-test\\res\\output\\wired\\transitive\\classpath\\repo\\com\\braintribe\\devrock\\test\\c\\1.0.2\\c-1.0.2.jar"
+                          type: "jar"
+                      version: "1.0.2"
+                      visitOrder: 3
+                    groupId: "com.braintribe.devrock.test"
+                    origin: *27
+                    scope: "compile"
+                    solution: *8
+                    type: "jar"
+                    version: "1.0.1"
+                groupId: "com.braintribe.devrock.test"
+                origin: !com.braintribe.model.artifact.compiled.CompiledArtifact
+                  artifactId: "d"
+                  groupId: "com.braintribe.devrock.test"
+                  origin: !com.braintribe.model.artifact.declared.DeclaredArtifact
+                    artifactId: "d"
+                    groupId: "com.braintribe.devrock.test"
+                    resource: &30 !com.braintribe.model.resource.FileResource
+                      name: "d-1.0.1.pom"
+                      path: "F:\\works\\dev-envs\\standard\\git\\com.braintribe.devrock\\mc-core-test\\res\\output\\wired\\transitive\\classpath\\repo\\com\\braintribe\\devrock\\test\\d\\1.0.1\\d-1.0.1.pom"
+                    version: "1.0.1"
+                  packaging: "jar"
+                  version: !com.braintribe.model.version.Version
+                    major: 1
+                    minor: 0
+                    revision: 1
+                packaging: "jar"
+                parts:
+                  ":pom": !com.braintribe.model.artifact.consumable.Part
+                    repositoryOrigin: "archive"
+                    resource: *30
+                    type: "pom"
+                  ":jar": !com.braintribe.model.artifact.consumable.Part
+                    repositoryOrigin: "archive"
+                    resource: !com.braintribe.model.resource.FileResource
+                      name: "d-1.0.1.jar"
+                      path: "F:\\works\\dev-envs\\standard\\git\\com.braintribe.devrock\\mc-core-test\\res\\output\\wired\\transitive\\classpath\\repo\\com\\braintribe\\devrock\\test\\d\\1.0.1\\d-1.0.1.jar"
+                    type: "jar"
+                version: "1.0.1"
+                visitOrder: 2
+              type: "jar"
+              version: "1.0.1"
+            - *0
+          dependencyOrder: 2
+          dependers: !!set
+            ? *15
+          groupId: "com.braintribe.devrock.test"
+          origin: *4
+          packaging: "jar"
+          parts:
+            ":pom": !com.braintribe.model.artifact.consumable.Part
+              repositoryOrigin: "archive"
+              resource: *7
+              type: "pom"
+            ":jar": !com.braintribe.model.artifact.consumable.Part
+              repositoryOrigin: "archive"
+              resource: !com.braintribe.model.resource.FileResource
+                name: "a-1.0.1.jar"
+                path: "F:\\works\\dev-envs\\standard\\git\\com.braintribe.devrock\\mc-core-test\\res\\output\\wired\\transitive\\classpath\\repo\\com\\braintribe\\devrock\\test\\a\\1.0.1\\a-1.0.1.jar"
+              type: "jar"
+          version: "1.0.1"
+          visitOrder: 1
+        groupId: "com.braintribe.devrock.test"
+        origin: *5
+        scope: "compile"
+        solution: *10
+        type: "jar"
+        version: "1.0.2"
+      - *11
+    replacedSolutions:
+      ? *11
+      : &31 !com.braintribe.model.artifact.analysis.AnalysisArtifact
+        artifactId: "c"
+        dependencies:
+          - !com.braintribe.model.artifact.analysis.AnalysisDependency
+            artifactId: "x"
+            depender: *31
+            groupId: "com.braintribe.devrock.test"
+            origin: &32 !com.braintribe.model.artifact.compiled.CompiledDependency
+              artifactId: "x"
+              groupId: "com.braintribe.devrock.test"
+              origin: &33 !com.braintribe.model.artifact.compiled.CompiledArtifact
+                artifactId: "c"
+                dependencies:
+                  - *32
+                groupId: "com.braintribe.devrock.test"
+                origin: &34 !com.braintribe.model.artifact.declared.DeclaredArtifact
+                  artifactId: "c"
+                  dependencies:
+                    - !com.braintribe.model.artifact.declared.DeclaredDependency
+                      artifactId: "x"
+                      groupId: "com.braintribe.devrock.test"
+                      origin: *34
+                      version: "1.0.1"
+                  groupId: "com.braintribe.devrock.test"
+                  resource: &35 !com.braintribe.model.resource.FileResource
+                    name: "c-1.0.1.pom"
+                    path: "F:\\works\\dev-envs\\standard\\git\\com.braintribe.devrock\\mc-core-test\\res\\output\\wired\\transitive\\classpath\\repo\\com\\braintribe\\devrock\\test\\c\\1.0.1\\c-1.0.1.pom"
+                  version: "1.0.1"
+                packaging: "jar"
+                version: !com.braintribe.model.version.Version
+                  major: 1
+                  minor: 0
+                  revision: 1
+              scope: "compile"
+              type: "jar"
+              version: !com.braintribe.model.version.Version
+                major: 1
+                minor: 0
+                revision: 1
+            scope: "compile"
+            type: "jar"
+            version: "1.0.1"
+        dependencyOrder: 5
+        groupId: "com.braintribe.devrock.test"
+        origin: *33
+        packaging: "jar"
+        parts:
+          ":pom": !com.braintribe.model.artifact.consumable.Part
+            repositoryOrigin: "archive"
+            resource: *35
+            type: "pom"
+        version: "1.0.1"
+        visitOrder: 5
+    selectedDependency: *0
+    solution: *10
+solutions:
+  - *1
+  - *12
+  - *10
+  - *8
+  - *14
+terminals:
+  - *21

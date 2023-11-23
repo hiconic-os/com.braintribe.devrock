@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+	<groupId>com.braintribe.model</groupId>
+	<artifactId>WorkbenchModel</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<versioning>
+		<snapshot>
+			<buildNumber>3</buildNumber>
+			<timestamp>20080630.091539</timestamp>
+		</snapshot>
+		<lastUpdated>20080630131029</lastUpdated>
+	</versioning>
+</metadata>

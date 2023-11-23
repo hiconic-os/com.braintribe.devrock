@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- 
+ ============================================================================
+ Braintribe IT-Technologies GmbH - www.braintribe.com
+ Copyright Braintribe IT-Technologies GmbH, Austria, 2002-2015 - All Rights Reserved
+ It is strictly forbidden to copy, modify, distribute or use this code without written permission
+ To this file the Braintribe License Agreement applies.
+ ============================================================================
+ $LastChangedDate: 2015-05-26 17:59:34 +0200 (Di, 26 Mai 2015) $ // $LastChangedBy: roman.kurmanowytsch $
+ ============================================================================
+--><project xmlns:artifact="antlib:org.apache.maven.artifact.ant" xmlns:bt="antlib:com.braintribe.build.ant.tasks" basedir="." default="dist" name="A">
+
+	<property environment="env"/>
+	<property location="src" name="src"/>
+	<property location="build" name="build"/>
+	<property location="dist" name="dist"/>
+
+	<target name="init">
+		<artifact:pom file="pom.xml" id="maven.project">
+		</artifact:pom>
+		<property name="versionedName" value="${maven.project.artifactId}-${maven.project.version}"/>
+		<tstamp/>
+		<mkdir dir="${build}"/>
+	</target>
+
+	<target depends="init" name="download-deps">
+		<artifact:dependencies filesetId="compile.fileset" pathId="compile.classpath" sourcesFilesetId="compile.sources.fileset" useScope="compile">
+			<artifact:pom refid="maven.project"/>
+		</artifact:dependencies>
+	</target>
+
+	<target depends="download-deps" name="update-classpath">
+		<bt:update-classpath fileSetId="compile.fileset" sourceFileSetId="compile.sources.fileset" sourcesNeeded="true"/>
+	</target>
+
+	<target depends="init" description="does nothing, since there are no sources to compile" name="compile">
+		<!-- nothing to do -->
+	</target>
+
+	<target depends="clean, compile" description="generate the distribution" name="dist">
+		<mkdir dir="${dist}"/>
+		<jar jarfile="${dist}/lib/${versionedName}.jar">
+			<fileset dir="${build}"/>
+			<fileset dir="${src}">
+				<exclude name="**/*.java"/>
+			</fileset>
+		</jar>
+		<jar basedir="${src}" jarfile="${dist}/${versionedName}-sources.jar"/>
+	</target>
+
+	<target depends="dist" description="install to local maven repository" name="install">
+		<artifact:install file="dist/lib/${versionedName}.jar">
+			<pom refid="maven.project"/>
+			<attach classifier="sources" file="${dist}/${versionedName}-sources.jar"/>
+		</artifact:install>
+	</target>
+
+	<target description="clean up" name="clean">
+		<delete dir="${build}"/>
+		<delete dir="${dist}"/>
+	</target>
+
+</project>

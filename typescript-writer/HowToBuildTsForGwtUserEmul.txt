@@ -1,0 +1,1 @@
+Use typescript-writer-test artifact, which also contains a manual on how to do that.

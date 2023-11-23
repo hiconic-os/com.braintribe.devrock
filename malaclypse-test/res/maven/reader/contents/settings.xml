@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<settings>
+
+ <localRepository>${env.M2_REPO}/</localRepository>
+
+ <servers>
+    <server>
+      <id>central.mirror</id>
+      <username>${env.DEVROCK_TESTS_READ_USERNAME}</username>
+      <password>${env.DEVROCK_TESTS_READ_PASSWORD}</password>
+      <filePermissions>664</filePermissions>
+      <directoryPermissions>775</directoryPermissions>
+    </server>
+    <server>
+      <id>central</id>
+      <username>${env.DEVROCK_TESTS_READ_USERNAME}</username>
+      <password>${env.DEVROCK_TESTS_READ_PASSWORD}</password>
+      <filePermissions>664</filePermissions>
+      <directoryPermissions>775</directoryPermissions>
+    </server>
+    <server>
+      <id>devrock</id>
+      <username>${env.DEVROCK_TESTS_READ_USERNAME}</username>
+      <password>${env.DEVROCK_TESTS_READ_PASSWORD}</password>
+      <filePermissions>664</filePermissions>
+      <directoryPermissions>775</directoryPermissions>
+    </server>
+    <server>
+      <id>core-dev</id>
+      <username>${env.DEVROCK_TESTS_READ_USERNAME}</username>
+      <password>${env.DEVROCK_TESTS_READ_PASSWORD}</password>
+      <filePermissions>664</filePermissions>
+      <directoryPermissions>775</directoryPermissions>
+    </server>
+  </servers>
+  <mirrors>
+    <mirror>
+      <id>central.mirror</id>
+      <url>https://DEVROCK_TESTS_REPOSITORY_BASE_URL/third-party/</url>
+      <mirrorOf>*,!devrock,!core-dev</mirrorOf>
+    </mirror>
+     <mirror>
+      <id>central</id>
+      <url>https://DEVROCK_TESTS_REPOSITORY_BASE_URL/third-party/</url>
+      <mirrorOf>*,!devrock,!core-dev</mirrorOf>
+    </mirror>
+    <mirror>
+      <id>devrock</id>
+      <url>https://DEVROCK_TESTS_REPOSITORY_BASE_URL/devrock/</url>
+      <mirrorOf>devrock</mirrorOf>
+    </mirror>
+    <mirror>
+      <id>core-dev</id>
+      <url>https://DEVROCK_TESTS_REPOSITORY_BASE_URL/core-dev/</url>
+      <mirrorOf>core-dev</mirrorOf>
+    </mirror>
+  </mirrors>
+  
+	<profiles>
+		<profile>
+			<id>braintribe</id>
+			<repositories>
+				<repository>
+					<id>third-party</id>
+					<layout>default</layout>
+					<url>https://DEVROCK_TESTS_REPOSITORY_BASE_URL/third-party/</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>never</updatePolicy>
+					</releases>
+				</repository>
+				<repository>
+					<id>devrock</id>
+					<layout>default</layout>
+					<url>https://DEVROCK_TESTS_REPOSITORY_BASE_URL/devrock/</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>never</updatePolicy>
+					</releases>
+				</repository>
+				<repository>
+					<id>core-dev</id>
+					<layout>default</layout>
+					<url>https://DEVROCK_TESTS_REPOSITORY_BASE_URL/core-dev/</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>never</updatePolicy>
+					</releases>
+				</repository>
+			</repositories>
+			<properties>
+	    		<!-- ravenhurst settings -->
+    			<updateReflectingRepositories>third-party,devrock,core-dev</updateReflectingRepositories>
+    		
+    			<ravenhurst-context-third-party>/</ravenhurst-context-third-party>
+    			<ravenhurst-url-third-party>https://DEVROCK_TESTS_RAVENHURST_BASE_URL/third-party</ravenhurst-url-third-party>
+    			<ravenhurst-context-devrock>/</ravenhurst-context-devrock>
+    			<ravenhurst-url-devrock>https://DEVROCK_TESTS_RAVENHURST_BASE_URL/devrock</ravenhurst-url-devrock>
+    			<ravenhurst-context-core-dev>/</ravenhurst-context-core-dev>
+    			<ravenhurst-url-core-dev>https://DEVROCK_TESTS_RAVENHURST_BASE_URL/core-dev</ravenhurst-url-core-dev>
+    		
+    			<trustworthyRepositories>*</trustworthyRepositories>
+    			<testPomGroup>com.braintribe.test.pom.group</testPomGroup>
+    			<testPomArtifact>TestPomArtifact</testPomArtifact>
+    			<testPomVersion>1.0-TestPomVersion</testPomVersion>
+   			</properties>				
+		</profile>
+	</profiles>
+
+	<activeProfiles>
+		<activeProfile>braintribe</activeProfile>
+	</activeProfiles>
+	
+
+</settings>

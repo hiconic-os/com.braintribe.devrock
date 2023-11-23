@@ -1,0 +1,23 @@
+!com.braintribe.doc.meta.CustomFolderMetaData
+files:
+  howToSetupADevEnvironment.md:
+    displayTitle: "Setting-up a 'dev-env'"
+  howToReadPoms.md:
+    displayTitle: "Reading artifacts (pom)"
+  howToFindPartsOfArtifacts.md:
+    displayTitle: "Finding parts of artifacts"  
+  howToDownload.md:  
+      displayTitle: "Downloading artifacts"  
+  howToUpload.md:
+      displayTitle: "Uploading artifacts"
+  theThingWithTheTerminals.md:
+    displayTitle: "Resolution Entry-points (terminals)"
+  howToResolveClasspaths.md:
+    displayTitle: "Resolve classpaths"
+  howToRunRepositoryExtractions.md:
+    displayTitle: "Resolve repository extracts"
+  howToUseThePlatformAssetResolver.md:
+    displayTitle: "Resolve platform assets"  
+  howToAnalyzeResolutions.md:
+      displayTitle: "Analysing resolver resolutions"
+  

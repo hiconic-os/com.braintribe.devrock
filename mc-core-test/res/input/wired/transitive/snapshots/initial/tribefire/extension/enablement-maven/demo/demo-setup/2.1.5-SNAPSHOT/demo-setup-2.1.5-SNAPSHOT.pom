@@ -1,0 +1,40 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>tribefire.extension.enablement-maven.demo</groupId>
+		<artifactId>demo-module-parent</artifactId>
+		<version>1.0.1</version>
+	</parent>
+	<artifactId>demo-setup</artifactId>
+	<packaging>pom</packaging>
+	<version>2.1.5-SNAPSHOT</version>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<!-- This provides standard tribefire core components (e.g. tribefire-services, tribefire-control-center, tribefire-explorer)
+		and it is environment aware. Meaning that different assets could be resolved based on the passed environment. -->
+		<dependency>
+			<groupId>tribefire.setup.classic.env</groupId>
+			<artifactId>env-aware-standard-setup</artifactId>
+			<version>${V.tribefire.setup.classic.env}</version>
+			<classifier>asset</classifier>
+			<type>man</type>
+			<?tag asset?>
+		</dependency>
+		<dependency>
+			<groupId>tribefire.extension.enablement-maven.demo</groupId>
+			<artifactId>demo-aggregator</artifactId>
+			<version>${V.this.project}</version>
+			<classifier>asset</classifier>
+			<type>man</type>
+			<?tag asset?>
+		</dependency>
+	</dependencies>
+</project>

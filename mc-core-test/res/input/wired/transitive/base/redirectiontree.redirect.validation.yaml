@@ -1,0 +1,86 @@
+!com.braintribe.devrock.model.repolet.content.RepoletContent
+artifacts:
+  - !com.braintribe.devrock.model.repolet.content.Artifact
+    artifactId: "a"
+    dependencies:
+      - !com.braintribe.devrock.model.repolet.content.Dependency
+        artifactId: "b"
+        groupId: "com.braintribe.devrock.test"
+        version: "1.0.1"
+      - !com.braintribe.devrock.model.repolet.content.Dependency
+        artifactId: "c"
+        groupId: "com.braintribe.devrock.test"
+        version: "1.0.1"
+    groupId: "com.braintribe.devrock.test"
+    parts:
+      ":jar": &0 !com.braintribe.model.resource.Resource
+        resourceSource: !com.braintribe.model.resource.source.TransientSource
+          globalId: "219b4162-dde0-43ef-b9d2-56da43382791"
+          owner: *0
+    version: "1.0.1"
+    
+  - !com.braintribe.devrock.model.repolet.content.Artifact
+    artifactId: "b"
+    dependencies:
+      - !com.braintribe.devrock.model.repolet.content.Dependency
+        artifactId: "d"
+        groupId: "com.braintribe.devrock.test"
+        version: "1.0.1"
+    groupId: "com.braintribe.devrock.test"
+    parts:
+      ":jar": &1 !com.braintribe.model.resource.Resource
+        resourceSource: !com.braintribe.model.resource.source.TransientSource
+          globalId: "b34833b6-b8ee-4fed-a476-d9eea647a943"
+          owner: *1
+    version: "1.0.1"
+    
+  - !com.braintribe.devrock.model.repolet.content.Artifact
+    artifactId: "c"
+    dependencies:
+      - !com.braintribe.devrock.model.repolet.content.Dependency
+        artifactId: "e"
+        groupId: "com.braintribe.devrock.test"
+        version: "1.0.1"
+    groupId: "com.braintribe.devrock.test"
+    parts:
+      ":jar": &2 !com.braintribe.model.resource.Resource
+        resourceSource: !com.braintribe.model.resource.source.TransientSource
+          globalId: "42129607-03a1-429f-849e-ab9615f16861"
+          owner: *2
+    version: "1.0.1"
+    
+  - !com.braintribe.devrock.model.repolet.content.Artifact
+    artifactId: "d"
+    dependencies:
+      - !com.braintribe.devrock.model.repolet.content.Dependency
+        artifactId: "f"
+        groupId: "com.braintribe.devrock.test"
+        version: "1.0.1"
+        scope: "relocation"
+    groupId: "com.braintribe.devrock.test"
+    parts:
+      ":jar": &3 !com.braintribe.model.resource.Resource
+        resourceSource: !com.braintribe.model.resource.source.TransientSource
+          globalId: "30574e75-0c5b-460d-8e11-31718c432216"
+          owner: *3
+    version: "1.0.1"
+    
+  - !com.braintribe.devrock.model.repolet.content.Artifact
+    artifactId: "e"
+    groupId: "com.braintribe.devrock.test"
+    parts:
+      ":jar": &4 !com.braintribe.model.resource.Resource
+        resourceSource: !com.braintribe.model.resource.source.TransientSource
+          globalId: "9e68228e-dac8-464a-b113-b175e56ea76b"
+          owner: *4
+    version: "1.0.1"
+    
+  - !com.braintribe.devrock.model.repolet.content.Artifact
+    artifactId: "f"
+    groupId: "com.braintribe.devrock.test"
+    parts:
+      ":jar": &5 !com.braintribe.model.resource.Resource
+        resourceSource: !com.braintribe.model.resource.source.TransientSource
+          globalId: "e8386e52-9e31-4560-8958-56def7b01f89"
+          owner: *5
+    version: "1.0.1"

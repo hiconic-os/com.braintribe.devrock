@@ -1,0 +1,9 @@
+; archiveA has only revision 3
+com.braintribe.devrock.test:a#1.0.3
+    -x
+
+com.braintribe.devrock.test:b#1.0.3
+    -x
+    
+com.braintribe.devrock.test:c#1.0.3
+    -x

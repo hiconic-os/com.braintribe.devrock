@@ -1,0 +1,24 @@
+!com.braintribe.doc.meta.CustomFolderMetaData
+files:
+  multilevel.md:
+    displayTitle: "About the multi-tier architecture of mc-core"
+  ravenhurst.md:
+    displayTitle: "About the Ravenhurst tool (RH)"
+  reasons.md:
+    displayTitle: "Reasoning in mc-core"
+  versions.md:
+    displayTitle: "Version representation in mc-core"
+  validity.md:
+    displayTitle: "Artifact validation in mc-core"
+  identifications.md:
+    displayTitle: "Artifact identifications in mc-core"
+  footprint.md:
+    displayTitle: "Index files in mc-core"
+  howToAnalyzeResolutions.md:
+    displayTitle: "How to working with resolutions"
+  cycles.md:
+    displayTitle: Cycles in dependency trees
+  why.not.maven.md:
+    displayTitle: "Why mc-core in the first place"
+  
+  

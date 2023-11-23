@@ -1,0 +1,2 @@
+com.braintribe.test.dependencies.repositoryRoleTest:RepositoryRoleTestTerminal
+=res/content/repositoryRole/archiveBase.zip

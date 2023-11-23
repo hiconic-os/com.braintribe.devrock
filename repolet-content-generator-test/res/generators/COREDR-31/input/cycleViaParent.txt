@@ -1,0 +1,16 @@
+;
+; COREDR-31 : cycle via parent dependency
+;
+com.braintribe.devrock.test:terminal#1.0.1
+	-r
+		com.braintribe.devrock.test:first-parent#1.0.1
+		
+		
+com.braintribe.devrock.test:first-parent#1.0.1
+	-r 
+		com.braintribe.devrock.test:second-parent#1.0.1
+		
+		
+com.braintribe.devrock.test:second-parent#1.0.1
+	-r 
+		com.braintribe.devrock.test:first-parent#1.0.1		

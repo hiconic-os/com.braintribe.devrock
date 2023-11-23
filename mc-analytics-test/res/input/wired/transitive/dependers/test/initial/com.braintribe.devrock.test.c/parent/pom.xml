@@ -1,0 +1,26 @@
+<!--
+ ============================================================================
+ BRAINTRIBE TECHNOLOGY GMBH - www.braintribe.com
+ Copyright BRAINTRIBE TECHNOLOGY GMBH, Austria, 2002-2022 - All Rights Reserved
+ It is strictly forbidden to copy, modify, distribute or use this code without written permission
+ To this file the Braintribe License Agreement applies.
+ ============================================================================
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.braintribe.devrock.test.c</groupId>
+	<artifactId>parent</artifactId>
+	<version>1.0.1</version>
+	<packaging>pom</packaging>
+	<properties>
+		<c.group>1.0.1</c.group>
+	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<artifactId>cc</artifactId>
+				<groupId>com.braintribe.devrock.test.c</groupId>
+				<version>${c.group}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+</project>

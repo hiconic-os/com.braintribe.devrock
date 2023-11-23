@@ -1,0 +1,7 @@
+com.braintribe.test.dependencies.exclusionTest:A
+com.braintribe.test.dependencies.exclusionTest:B
+com.braintribe.test.dependencies.exclusionTest:C
+com.braintribe.test.dependencies.exclusionTest:D
+com.braintribe.test.dependencies.exclusionTest:T
+com.braintribe.test.dependencies.exclusionTest:ExclusionTestTerminal
+=res/param/exclusiontest/archive.zip

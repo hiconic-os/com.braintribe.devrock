@@ -1,0 +1,35 @@
+
+# simple definition for hash download test
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+
+
+    # artifact that references an existing parent with a 'null'-range
+   { artifactId: "wrong-parent-range-child", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},
+        parent : { artifactId: "parent",  groupId: "com.braintribe.devrock.test", version: "[1.0,1.0)"}, 
+       dependencies: [                 
+       ],        
+    }, 
+
+    { artifactId: "positive-parent-child", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},
+        parent : { artifactId: "parent",  groupId: "com.braintribe.devrock.test", version: "[1.1,1.2)"}, 
+       dependencies: [                 
+       ],        
+    }, 
+
+   # artifact that references a non-existing parent
+    { artifactId: "non-existing-parent-child", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},
+       parent : { artifactId: "nonexisting-parent",  groupId: "com.braintribe.devrock.test", version: "1.1"}, 
+       dependencies: [           
+       ],        
+    }, 
+
+   # artifact that references a parent that has missing properties 
+    { artifactId: "missing-property-parent-child", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},
+       parent : { artifactId: "missing-property-parent",  groupId: "com.braintribe.devrock.test", version: "[1.1,1.2)"}, 
+       dependencies: [           
+       ],        
+    },
+    
+  ]
+}

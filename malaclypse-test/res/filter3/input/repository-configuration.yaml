@@ -1,0 +1,11 @@
+!com.braintribe.devrock.model.repository.RepositoryConfiguration
+repositories:
+  - !com.braintribe.devrock.model.repository.MavenHttpRepository
+    artifactFilter: &0 !com.braintribe.devrock.model.repository.filters.LockArtifactFilter
+      locks: !!set        
+        ? "com.braintribe.devrock.test:t#1.0.1"
+        ? "com.braintribe.devrock.test:a#1.0.1"
+        ? "com.braintribe.devrock.test:b#1.0.1"
+    cachable: true
+    name: "archive"
+    url: "http://localhost:${env.port}/archive"  

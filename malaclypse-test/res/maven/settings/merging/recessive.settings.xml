@@ -1,0 +1,156 @@
+<?xml version="1.0"?>
+<settings>
+	<!-- singletons -->
+	<localRepository>recessive.repository</localRepository>
+	<interactiveMode>true</interactiveMode>
+	<offline>true</offline>
+	<usePluginRegistry>true</usePluginRegistry>
+	
+  <servers>
+    <server>
+      <id>central.mirror</id>
+      <username>recessive.user</username>
+      <password>recessive.pwd</password>
+      <filePermissions>664</filePermissions>
+      <directoryPermissions>775</directoryPermissions>
+    </server>  
+   <server>
+      <id>recessive.mirror</id>
+      <username>recessive.user</username>
+      <password>recessive.pwd</password>
+      <filePermissions>664</filePermissions>
+      <directoryPermissions>775</directoryPermissions>
+    </server>
+  </servers>  
+  
+  
+  <mirrors>
+    <mirror>
+      <id>central.mirror</id>
+      <url>http://archiva.kwaqwagga.ch/repository/standalone/</url>
+      <mirrorOf>central</mirrorOf>
+    </mirror>
+    <mirror>
+      <id>recessive.mirror</id>
+      <url>http://archiva.kwaqwagga.ch/repository/standalone/</url>
+      <mirrorOf>central</mirrorOf>
+    </mirror>
+  </mirrors>
+  
+  
+  <pluginGroups>
+    <pluginGroup>org.mortbay.jetty</pluginGroup>
+    <pluginGroup>recessive.org.mortbay.jetty</pluginGroup>
+  </pluginGroups>
+  
+  <proxies>
+    <proxy>
+      <id>myProxy</id>
+      <active>true</active>
+      <protocol>http</protocol>
+      <host>recessive.proxy.somewhere.com</host>
+      <port>8080</port>
+      <username>recessive.proxyuser</username>
+      <password>recessive.somepassword</password>
+      <nonProxyHosts>*.google.com,ibiblio.org</nonProxyHosts>
+    </proxy>
+    <proxy>
+      <id>recessive.myProxy</id>
+      <active>true</active>
+      <protocol>http</protocol>
+      <host>recessive.proxy.somewhere.com</host>
+      <port>8080</port>
+      <username>recessive.proxyuser</username>
+      <password>recessive.somepassword</password>
+      <nonProxyHosts>*.recessive.com,*.recessive.ch</nonProxyHosts>
+    </proxy>
+    
+  </proxies>
+
+  <profiles>
+    <profile>
+      <id>myProfile</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+        <jdk>1.5</jdk>
+        <os>
+          <name>recessive.Windows XP</name>
+          <family>recessive.Windows</family>
+          <arch>recessive.x86</arch>
+          <version>recessive.5.1.2600</version>
+        </os>
+        <property>
+          <name>mavenVersion</name>
+          <value>recessive.2.0.3</value>
+        </property>
+        <file>
+          <exists>${basedir}/file2.recessive.properties</exists>
+          <missing>${basedir}/file1.recessive.properties</missing>
+        </file>
+      </activation>
+      <properties>
+      	<property_one>recessive_value</property_one>
+      	<property_two>recessive_value</property_two>
+      	<property_three>recessive_value</property_three>
+      	<property_four>recessive_value</property_four>
+       </properties>
+       <repositories>
+			<repository>
+				<id>active</id>
+				<layout>default</layout>
+				<url>http://localhost:8080/archiveB</url>
+				<snapshots>
+					<updatePolicy>always</updatePolicy>
+					<checksumPolicy>warn</checksumPolicy>
+					<enabled>true</enabled>
+				</snapshots>
+				<releases>
+					<enabled>false</enabled>
+				</releases>
+			</repository>				
+			<repository>
+				<id>recessive.active</id>
+				<layout>default</layout>
+				<url>http://localhost:8080/archiveC</url>
+				<snapshots>
+					<enabled>true</enabled>
+				</snapshots>
+				<releases>
+					<enabled>false</enabled>
+					<updatePolicy>always</updatePolicy>
+					<checksumPolicy>warn</checksumPolicy>
+				</releases>
+			</repository>				
+		</repositories>
+    </profile>
+    <profile>
+      <id>recessive.myProfile</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <jdk>1.5</jdk>
+        <os>
+          <name>recessive.Windows XP</name>
+          <family>recessive.Windows</family>
+          <arch>recessive.x86</arch>
+          <version>recessive.5.1.2600</version>
+        </os>
+        <property>
+          <name>recessive.mavenVersion</name>
+          <value>recessive.2.0.3</value>
+        </property>
+        <file>
+          <exists>${basedir}/file2.recessive.properties</exists>
+          <missing>${basedir}/file1.recessive.properties</missing>
+        </file>
+      </activation>
+      <properties>
+      	<recessive_property_one>recessive_value</recessive_property_one>
+      	<recessive_property_two>recessive_value</recessive_property_two>
+      </properties>
+       
+    </profile>        
+  </profiles>
+  	<activeProfiles>
+		<activeProfile>recessive.myProfile</activeProfile>
+	</activeProfiles>
+</settings>

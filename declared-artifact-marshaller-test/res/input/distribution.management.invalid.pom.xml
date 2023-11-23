@@ -1,0 +1,62 @@
+<!--
+ ============================================================================
+ BRAINTRIBE TECHNOLOGY GMBH - www.braintribe.com
+ Copyright BRAINTRIBE TECHNOLOGY GMBH, Austria, 2002-2018 - All Rights Reserved
+ It is strictly forbidden to copy, modify, distribute or use this code without written permission
+ To this file the Braintribe License Agreement applies.
+ ============================================================================
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.braintribe.devrock</groupId>
+        <artifactId>parent</artifactId>
+        <version>[${major}.${minor},${major}.${nextMinor})</version>
+    </parent>
+    <artifactId>declared-artifact-marshaller-test</artifactId>
+    <version>${major}.${minor}.${revision}</version>
+    <properties>
+        <major>1</major>
+        <minor>0</minor>
+        <nextMinor>1</nextMinor>
+        <revision>6-pc</revision>
+        <archetype>test</archetype>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.braintribe.devrock</groupId>
+            <artifactId>declared-artifact-marshaller</artifactId>
+            <version>${V.com.braintribe.devrock}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.braintribe.gm</groupId>
+            <artifactId>gm-core4-jvm</artifactId>
+            <version>${V.com.braintribe.gm}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.braintribe.gm</groupId>
+            <artifactId>basic-marshallers</artifactId>
+            <version>${V.com.braintribe.gm}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+             <version>${V.junit}</version>
+        </dependency>
+    </dependencies>
+    <distributionManagement>
+        <relocation>
+            <groupId>com.braintribe.test</groupId>
+            <artifactId>Redirect</artifactId>
+            <version>1.0</version>
+        </relocation>
+    </distributionManagement>
+    <!-- duplicate distribution manangement -->
+    <distributionManagement>
+        <relocation>
+            <groupId>com.braintribe.test</groupId>
+            <artifactId>Redirect</artifactId>
+            <version>1.0</version>
+        </relocation>
+    </distributionManagement>
+    
+</project>

@@ -1,0 +1,2 @@
+com.braintribe.devrock.test:a;local
+com.braintribe.devrock.test:b;!archive

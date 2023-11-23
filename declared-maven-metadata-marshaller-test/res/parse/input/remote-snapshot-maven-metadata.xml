@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<metadata>
+    <groupId>com.braintribe.devrock.test</groupId>
+    <artifactId>snapshot-one</artifactId>
+    <version>1.0.1-SNAPSHOT</version>
+    <versioning>
+        <lastUpdated>20210702141146</lastUpdated>
+        <snapshot>
+            <timestamp>20210702.141146</timestamp>
+            <buildNumber>10815</buildNumber>
+        </snapshot>
+        <snapshotVersions>
+            <snapshotVersion>
+                <extension>jar</extension>
+                <value>1.0.1-20210702.141146-10815</value>
+                <updated>20210702141146</updated>
+            </snapshotVersion>
+            <snapshotVersion>
+                <extension>pom</extension>
+                <value>1.0.1-20210702.141146-10815</value>
+                <updated>20210702141146</updated>
+            </snapshotVersion>
+            <snapshotVersion>
+                <classifier>asset</classifier>
+                <extension>man</extension>
+                <value>1.0.1-20210702.141146-10815</value>
+                <updated>20210702141146</updated>
+            </snapshotVersion>
+        </snapshotVersions>
+    </versioning>
+</metadata>

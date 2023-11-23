@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<settings>
+	<localRepository>${localrepo}</localRepository>
+	<servers>
+#foreach($repo in $repos)
+#if ($repo.user)
+		<server>
+			<id>$tools.esc($repo.name)</id>
+			<username>$tools.esc($repo.user)</username>
+			<password>$tools.esc($repo.password)</password>
+			<filePermissions>664</filePermissions>
+			<directoryPermissions>775</directoryPermissions>
+		</server>
+#end
+#end
+	</servers>
+	<mirrors>
+		<mirror>
+			<id>central.mirror</id>
+			<url>$tools.esc($centralMirrorUrl)</url>
+			<mirrorOf>central</mirrorOf>
+		</mirror>
+	</mirrors>
+	<profiles>
+		<profile>
+			<id>publish</id>
+			<repositories>
+#foreach($repo in $repos)
+				<repository>
+					<id>$tools.esc($repo.name)</id>
+					<layout>default</layout>
+					<url>$tools.esc($repo.repoUrl)</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>always</updatePolicy>
+					</releases>
+				</repository>
+#end
+			</repositories>
+			
+			<properties>
+				<!-- ravenhurst settings -->
+				<updateReflectingRepositories>$tools.esc($updateReflectionRepositories)</updateReflectingRepositories>
+#foreach($repo in $repos)
+#if($repo.updateReflectionUrl)
+				<ravenhurst-context-$repo.name>ravenhurst</ravenhurst-context-$repo.name>
+				<ravenhurst-url-$repo.name>$tools.esc($repo.updateReflectionUrl)</ravenhurst-url-$repo.name>
+#end
+#end	
+			</properties>
+		</profile>
+	</profiles>
+	<activeProfiles>
+		<activeProfile>publish</activeProfile>
+	</activeProfiles>
+</settings>

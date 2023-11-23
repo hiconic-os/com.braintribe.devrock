@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	============================================================================
+	Braintribe IT-Technologies GmbH - www.braintribe.com
+	Copyright Braintribe IT-Technologies GmbH, Austria, 2002-2017 - All Rights Reserved
+	It is strictly forbidden to copy, modify, distribute or use this code without written permission
+	To this file the Braintribe License Agreement applies.
+	============================================================================
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.tribefire.ignition.googlecloud.storage</groupId>
+		<artifactId>google-cloud-storage</artifactId>
+		<version>1.0.2</version>
+	</parent>
+
+	<artifactId>google-cloud-storage-deployable-experts</artifactId>
+	<description>This artifact provides the experts used by the simple-cartridge.
+		These are the implementations of their associated denotation-types.</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>tribefire.cortex</groupId>
+			<artifactId>tribefire-cartridge-default-deps</artifactId>
+		</dependency>
+		<!-- The servlet-api is provided by the app server! -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+		</dependency>
+		<!-- This is used mainly to demonstrate that a cartridge may depend on 
+			any number of custom implementation artifacts. This is especially useful 
+			when sharing code between multiple cartridges. -->
+		<dependency>
+			<groupId>com.tribefire.ignition.googlecloud.storage</groupId>
+			<artifactId>${project.parent.artifactId}-commons</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.cloud</groupId>
+			<artifactId>google-cloud-storage</artifactId>
+			<version>1.24.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.10.19</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+</project>

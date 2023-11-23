@@ -1,0 +1,8 @@
+# validation for the build range test based on the example as in documentation
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+
+
+  ]
+
+}

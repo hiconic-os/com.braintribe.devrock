@@ -1,0 +1,31 @@
+
+# simple definition for first stage
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+
+    # terminal
+    { artifactId: "t", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},       
+       dependencies: [                
+          { artifactId: "a",  groupId: "com.braintribe.devrock.test", version: "[1.0,1.1)"}, 
+          { artifactId: "b",  groupId: "com.braintribe.devrock.test", version: "[1.0,1.1)"}, 
+
+       ],        
+    }, 
+    # a - first level child      
+   { artifactId: "a", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},
+       dependencies: [                 
+       ],        
+    }, 
+
+    { artifactId: "b", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},
+       dependencies: [           
+       ],        
+    }, 
+
+     { artifactId: "artifact-index", groupId: "meta", version: "1.0.1", parts: {":gz": !com.braintribe.model.resource.FileResource "artifact-index-content.one.txt.gz"},
+       dependencies: [           
+       ],        
+    }, 
+    
+  ]
+}

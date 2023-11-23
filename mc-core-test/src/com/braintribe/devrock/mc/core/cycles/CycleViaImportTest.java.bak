@@ -1,0 +1,46 @@
+package com.braintribe.devrock.mc.core.cycles;
+
+import java.io.File;
+
+import org.junit.Assert;
+
+import com.braintribe.devrock.mc.api.resolver.CompiledArtifactResolver;
+import com.braintribe.devrock.mc.core.wirings.resolver.contract.ArtifactDataResolverContract;
+import com.braintribe.gm.model.reason.Maybe;
+import com.braintribe.gm.model.reason.Reason;
+import com.braintribe.model.artifact.compiled.CompiledArtifact;
+import com.braintribe.model.artifact.compiled.CompiledArtifactIdentification;
+
+public class CycleViaImportTest extends AbstractCycleTest {
+
+	
+	@Override
+	protected File archiveContentDirectory() {
+		return new File( input, "cycleViaImport");
+	}
+
+	@Override
+	protected void runTest(ArtifactDataResolverContract contract) {
+		boolean exceptionThrown = false;
+		boolean resolutionMarkedAsInvalid = false;
+		// TODO: we should get an invalid artifact because of access to managed dependency via an incomplete dependency but we don't get it
+		try {
+			CompiledArtifactResolver compiledArtifactResolver = contract.redirectAwareCompiledArtifactResolver();
+			Maybe<CompiledArtifact> resolved = compiledArtifactResolver.resolve( CompiledArtifactIdentification.parse(TERMINAL));
+			if (resolved.isUnsatisfied()) {
+				System.out.println( "nothing's found");
+			}
+			resolutionMarkedAsInvalid = resolved.get().getInvalid();
+			
+			Reason dependencyManagementFailure = resolved.get().getDependencyManagementFailure();
+			if (dependencyManagementFailure != null)
+				System.out.println(dependencyManagementFailure.stringify());
+		}
+		catch (Exception e) {
+			exceptionThrown = true;
+			System.out.println("as expected [" + e.getMessage() + "] thrown");
+		}
+		Assert.assertTrue("errors weren't detected", exceptionThrown || resolutionMarkedAsInvalid);
+	}
+	
+}

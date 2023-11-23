@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<settings>
+	
+	<localRepository>${user.home}/.m2/repository-groups/</localRepository>
+	
+	<servers>
+
+		<!-- core profile servers -->
+		<server>
+			<id>central.mirror</id>
+			<username>${env.DEVROCK_TESTS_READ_USERNAME}</username>
+			<password>${env.DEVROCK_TESTS_READ_PASSWORD}</password>
+			<filePermissions>664</filePermissions>
+			<directoryPermissions>775</directoryPermissions>
+		</server>
+
+		<server>
+			<id>beurk</id>
+			<username>${env.DEVROCK_TESTS_READ_USERNAME}</username>
+			<password>${env.DEVROCK_TESTS_READ_PASSWORD}</password>
+			<filePermissions>664</filePermissions>
+			<directoryPermissions>775</directoryPermissions>
+		</server>		
+
+		<server>
+			<id>central</id>
+			<username>${env.DEVROCK_TESTS_READ_USERNAME}</username>
+			<password>${env.DEVROCK_TESTS_READ_PASSWORD}</password>
+			<filePermissions>664</filePermissions>
+			<directoryPermissions>775</directoryPermissions>
+		</server>		
+
+		<!-- devrock server -->
+		<server>
+			<id>devrock</id>
+			<username>${env.DEVROCK_TESTS_READ_USERNAME}</username>
+			<password>${env.DEVROCK_TESTS_READ_PASSWORD}</password>
+			<filePermissions>664</filePermissions>
+			<directoryPermissions>775</directoryPermissions>
+		</server>
+	</servers>
+
+	<mirrors>
+		<!-- core mirrors -->
+		<mirror>
+			<id>central.mirror</id>
+			<url>https://DEVROCK_TESTS_REPOSITORY_BASE_URL/third-party/</url>
+			<mirrorOf>*,!devrock,!core-dev</mirrorOf>
+		</mirror>
+		<mirror>
+			<id>central</id>
+			<url>https://DEVROCK_TESTS_REPOSITORY_BASE_URL/third-party/</url>
+			<mirrorOf>*,!devrock,!core-dev</mirrorOf>
+		</mirror>
+	</mirrors>
+
+	<profiles>
+		
+		<!-- core profile -->
+		<profile>
+			<id>core</id>
+			<repositories>
+			<repository>
+					<id>beurk</id>
+					<layout>default</layout>
+					<url>https://DEVROCK_TESTS_REPOSITORY_BASE_URL/devrock/</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>never</updatePolicy>
+					</releases>
+				</repository>			
+			</repositories>
+			
+			<properties>
+				<!-- ravenhurst settings -->
+				<updateReflectingRepositories>beurk</updateReflectingRepositories>
+				<ravenhurst-context>/</ravenhurst-context>
+				<!-- ravenhurst url for third pary repository -->
+				<ravenhurst-url-beurk>https://DEVROCK_TESTS_RAVENHURST_BASE_URL/devrock</ravenhurst-url-beurk>
+				<!-- ravenhurst url for core-dev repository -->				
+				<!-- trustworthy repositories of this profile -->
+				<trustworthyRepositories>beurk</trustworthyRepositories>
+				<!-- automatic deploy target -->
+				<target-repository>beurk</target-repository>
+			</properties>
+		</profile>
+		
+	</profiles>
+	<activeProfiles>
+		<activeProfile>core</activeProfile>	
+	</activeProfiles>
+</settings>

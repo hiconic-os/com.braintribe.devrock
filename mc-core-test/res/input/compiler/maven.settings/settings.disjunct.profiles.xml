@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<settings>
+	
+	<localRepository>${user.home}/.m2/repository-groups/</localRepository>
+	
+	<servers>
+
+		<!-- core profile servers -->
+		<server>
+			<id>central.mirror</id>
+			<username>devrock-tests-dummy</username>
+			<password>nonewhatsoever</password>
+			<filePermissions>664</filePermissions>
+			<directoryPermissions>775</directoryPermissions>
+		</server>
+
+		<server>
+			<id>core-dev</id>
+			<username>devrock-tests-dummy</username>
+			<password>nonewhatsoever</password>
+			<filePermissions>664</filePermissions>
+			<directoryPermissions>775</directoryPermissions>
+		</server>		
+		
+		<server>
+			<id>core-dev-alternative</id>
+			<username>devrock-tests-dummy</username>
+			<password>nonewhatsoever</password>
+			<filePermissions>664</filePermissions>
+			<directoryPermissions>775</directoryPermissions>
+		</server>		
+
+		<server>
+			<id>central</id>
+			<username>devrock-tests-dummy</username>
+			<password>nonewhatsoever</password>
+			<filePermissions>664</filePermissions>
+			<directoryPermissions>775</directoryPermissions>
+		</server>		
+
+		<!-- devrock server -->
+		<server>
+			<id>devrock</id>
+			<username>devrock-tests-dummy</username>
+			<password>nonewhatsoever</password>
+			<filePermissions>664</filePermissions>
+			<directoryPermissions>775</directoryPermissions>
+		</server>
+	</servers>
+
+	<mirrors>
+		<!-- core mirrors -->
+		<mirror>
+			<id>central.mirror</id>
+			<url>https://declared_url/third-party/</url>
+			<mirrorOf>*,!devrock,!core-dev,!core-dev-alternative</mirrorOf>
+		</mirror>
+		<mirror>
+			<id>central</id>
+			<url>https://declared_url/third-party/</url>
+			<mirrorOf>*,!devrock,!core-dev,!core-dev-alternative</mirrorOf>
+		</mirror>
+	</mirrors>
+
+	<profiles>
+		
+		<!-- core profile -->
+		<profile>
+			<id>core</id>
+			<repositories>				
+				<repository>
+					<id>core-dev</id>
+					<layout>default</layout>
+					<url>${url}</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>never</updatePolicy>
+					</releases>
+				</repository>			
+			</repositories>
+			
+		
+			<properties>
+				<url>https://declared_url/core-dev/</url>
+			</properties>
+		</profile>
+
+		<!-- devrock profile -->
+		<profile>
+			<id>devrock</id>
+			<repositories>				
+				<repository>
+					<id>core-dev-alternative</id>
+					<layout>default</layout>
+					<url>${url}</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>never</updatePolicy>
+					</releases>
+				</repository>			
+			</repositories>
+			<properties>
+				<url>https://declared_url/core-dev-alternative/</url>
+			</properties>
+			
+		</profile>	
+	</profiles>
+	<activeProfiles>
+		<activeProfile>core</activeProfile>
+		<activeProfile>devrock</activeProfile>
+	</activeProfiles>
+</settings>

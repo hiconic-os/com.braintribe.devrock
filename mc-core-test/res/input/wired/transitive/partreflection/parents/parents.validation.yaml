@@ -1,0 +1,45 @@
+
+# simple definition for hash download test
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+    # parent
+    { artifactId: "p", groupId: "com.braintribe.devrock.test", version: "1.0.1", disregardAsSolutionInResolution: "true",        
+      packaging: "pom",
+      managedDependencies: [
+          { artifactId: "i",  groupId: "com.braintribe.devrock.test", version: "1.0.1", scope: "import"},           
+      ]
+    },
+    # import
+    { artifactId: "i", groupId: "com.braintribe.devrock.test", version: "1.0.1",  disregardAsSolutionInResolution: "true",       
+      packaging: "pom",
+      managedDependencies: [
+          { artifactId: "a",  groupId: "com.braintribe.devrock.test", version: "1.0.1"},           
+      ]
+    },
+    # terminal t
+    { artifactId: "t", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},       
+       parent:  { artifactId: "p",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+       dependencies: [                
+          { artifactId: "a",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+          { artifactId: "b",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+       ],        
+    }, 
+    # a - first level child      
+   { artifactId: "a", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},
+       dependencies: [                 
+       ],        
+    }, 
+
+    { artifactId: "b", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},
+       dependencies: [           
+          { artifactId: "c",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+       ],        
+    }, 
+
+   # a - first level child      
+   { artifactId: "c", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},
+       dependencies: [                 
+       ],        
+    }
+  ]
+}

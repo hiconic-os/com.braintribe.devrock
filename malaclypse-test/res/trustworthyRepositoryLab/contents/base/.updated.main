@@ -1,0 +1,21 @@
+{
+  "_id" : "0",
+  "_type" : "com.braintribe.model.ravenhurst.data.RavenhurstMainDataContainer",
+  "globalId" : null,
+  "id" : null,
+  "lastAccess" : {
+    "_type" : "date",
+    "value" : "2017-08-10T15:20:38.718+0200"
+  },
+  "partition" : null,
+  "urlToLastAccessMap" : {
+    "_type" : "map",
+    "value" : [ {
+      "key" : "http://localhost:8080/archiveA",
+      "value" : {
+        "_type" : "date",
+        "value" : "2017-08-10T15:20:38.705+0200"
+      }
+    } ]
+  }
+}

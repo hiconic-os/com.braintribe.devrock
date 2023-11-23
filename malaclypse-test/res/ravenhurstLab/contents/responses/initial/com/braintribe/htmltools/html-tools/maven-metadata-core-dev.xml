@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+	<groupId>com.braintribe.htmltools</groupId>
+	<artifactId>html-tools</artifactId>
+	<version>1.0.10</version>
+	<versioning>
+		<latest>1.0.10</latest>
+		<release>1.0.9</release>
+		<lastUpdated>20190114134430</lastUpdated>
+		<versions>
+			<version>1.0.9</version>
+			<version>1.0.10</version>
+		</versions>
+	</versioning>
+</metadata>

@@ -1,0 +1,46 @@
+!com.braintribe.devrock.model.repolet.content.RepoletContent
+artifacts:
+  - !com.braintribe.devrock.model.repolet.content.Artifact
+    artifactId: "a"
+    dependencies:
+      - !com.braintribe.devrock.model.repolet.content.Dependency
+        artifactId: "b"
+        groupId: "com.braintribe.devrock.test"
+        version: "1.0.1"
+      - !com.braintribe.devrock.model.repolet.content.Dependency
+        artifactId: "c"
+        groupId: "com.braintribe.devrock.test"
+        version: "1.0.1"
+    groupId: "com.braintribe.devrock.test"
+    order: 4
+    version: "1.0.1"
+  - !com.braintribe.devrock.model.repolet.content.Artifact
+    artifactId: "b"
+    dependencies:
+      - !com.braintribe.devrock.model.repolet.content.Dependency
+        artifactId: "d"
+        groupId: "com.braintribe.devrock.test"
+        version: "1.0.1"
+    groupId: "com.braintribe.devrock.test"
+    order: 1
+    version: "1.0.1"
+  - !com.braintribe.devrock.model.repolet.content.Artifact
+    artifactId: "c"
+    dependencies:
+      - !com.braintribe.devrock.model.repolet.content.Dependency
+        artifactId: "e"
+        groupId: "com.braintribe.devrock.test"
+        version: "1.0.1"
+    groupId: "com.braintribe.devrock.test"
+    order: 3
+    version: "1.0.1"
+  - !com.braintribe.devrock.model.repolet.content.Artifact
+    artifactId: "d"
+    groupId: "com.braintribe.devrock.test"
+    order: 0
+    version: "1.0.1"
+  - !com.braintribe.devrock.model.repolet.content.Artifact
+    artifactId: "e"
+    groupId: "com.braintribe.devrock.test"
+    order: 2
+    version: "1.0.1"

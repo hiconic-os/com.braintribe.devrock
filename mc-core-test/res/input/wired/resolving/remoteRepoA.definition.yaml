@@ -1,0 +1,11 @@
+!com.braintribe.devrock.model.repolet.content.RepoletContent
+artifacts:
+  - !com.braintribe.devrock.model.repolet.content.Artifact
+    artifactId: "artifact"
+    groupId: "com.braintribe.devrock.test"
+    parts:
+      "sources:jar": null
+      ":jar": null
+      ":pom": null
+    version: "1.0"
+    versionOverride: "1.0"

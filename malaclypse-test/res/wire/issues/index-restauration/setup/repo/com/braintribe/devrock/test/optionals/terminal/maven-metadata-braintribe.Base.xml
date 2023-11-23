@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<metadata>
+	<!-- explicitly for test -->
+    <groupId>com.braintribe.devrock.test.optionals</groupId>
+    <artifactId>terminal</artifactId>
+    <versioning>     
+        <lastUpdated>20180209151953</lastUpdated>
+    </versioning>
+</metadata>

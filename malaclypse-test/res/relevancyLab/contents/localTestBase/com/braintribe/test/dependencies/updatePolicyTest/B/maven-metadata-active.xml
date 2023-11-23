@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<metadata>
+    <groupId>com.braintribe.test.dependencies.updatePolicyTest</groupId>
+    <artifactId>B</artifactId>
+    <versioning>
+        <versions>
+            <version>1.0</version>         
+        </versions>
+        <lastUpdated>20160930135030</lastUpdated>
+    </versioning>
+</metadata>

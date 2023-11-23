@@ -1,0 +1,4 @@
+287be41d-fbf8-4cca-adb4-6acf097f761a
++:pom
++:jar
++sources:jar

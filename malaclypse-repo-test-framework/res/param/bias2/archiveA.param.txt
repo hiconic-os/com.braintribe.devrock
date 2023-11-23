@@ -1,0 +1,4 @@
+com.braintribe.devrock.test.bias:parent
+com.braintribe.devrock.test.bias:b
+com.braintribe.devrock.test.bias:bias-terminal
+=res/param/bias2/archiveA.zip

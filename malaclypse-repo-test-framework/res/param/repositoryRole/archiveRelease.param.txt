@@ -1,0 +1,3 @@
+com.braintribe.test.dependencies.repositoryRoleTest:A#1.0
+com.braintribe.test.dependencies.repositoryRoleTest:B#1.0
+=res/content/repositoryRole/archiveRelease.zip

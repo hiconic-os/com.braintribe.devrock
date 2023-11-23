@@ -1,0 +1,6 @@
+com.braintribe.devrock.test:parent
+com.braintribe.devrock.test:provided-scope-test-a
+com.braintribe.devrock.test:provided-scope-test-b
+com.braintribe.devrock.test:provided-scope-test-provided
+com.braintribe.devrock.test:provided-scope-test-terminal
+=res/param/providedScopeTest/archive.zip

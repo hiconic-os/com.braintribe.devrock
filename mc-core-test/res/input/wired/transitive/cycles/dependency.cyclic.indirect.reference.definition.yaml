@@ -1,0 +1,39 @@
+# definition for an indirect cycle : t -> a -> b -> t
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+
+    # terminal
+    { artifactId: "t", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},       
+       dependencies: [      
+          { artifactId: "a",  groupId: "com.braintribe.devrock.test", version: "1.0.1"},                                  
+          
+       ],  
+       parts: {
+         "jar" : null,                
+      }
+    }, 
+
+  { artifactId: "a", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},       
+       dependencies: [      
+          { artifactId: "b",  groupId: "com.braintribe.devrock.test", version: "1.0.1"},                                  
+          
+       ],  
+       parts: {
+         "jar" : null,                
+      }
+    }, 
+  { artifactId: "b", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},       
+       dependencies: [      
+          { artifactId: "t",  groupId: "com.braintribe.devrock.test", version: "1.0.1"},                                  
+          
+       ],  
+       parts: {
+         "jar" : null,                
+      }
+    }, 
+
+
+
+
+  ]
+}

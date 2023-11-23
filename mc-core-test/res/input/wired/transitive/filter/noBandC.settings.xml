@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!-- simple settings for a test with the local repository and two repolet backed remote repositories : NO FILTER aka AllMatchingFilter -->
+<settings>	
+	<localRepository>${env.M2_REPO}</localRepository>		
+	<profiles>		
+		<profile>
+			<id>default</id>
+			<repositories>
+				<!-- repolet backed repository 'archiveA' -->
+				<repository>
+					<id>archiveA</id>
+					<layout>default</layout>
+					<url>http://localhost:${env.port}/archiveA/</url>					
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>never</updatePolicy>
+					</releases>
+				</repository>
+				<repository>
+                    <id>archiveB</id>
+                    <layout>default</layout>
+                    <url>http://localhost:${env.port}/archiveB/</url>                    
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                </repository>	
+                <repository>
+                    <id>archiveC</id>
+                    <layout>default</layout>
+                    <url>http://localhost:${env.port}/archiveC/</url>                    
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                </repository>                					
+			</repositories>	
+			<properties>            
+                <mc-config>
+                        !com.braintribe.devrock.model.repository.RepositoryConfiguration {                                            
+                            repositories: [
+                                !com.braintribe.devrock.model.repository.MavenHttpRepository {
+                                   name: 'archiveB',
+                                    artifactFilter :  !com.braintribe.devrock.model.repository.filters.NegationArtifactFilter {
+                                        operand : !com.braintribe.devrock.model.repository.filters.QualifiedArtifactFilter { 
+                                            groupId : 'com.braintribe.devrock.test',
+                                        }
+                                    }
+                                },
+                                !com.braintribe.devrock.model.repository.MavenHttpRepository {
+                                   name: 'archiveC',
+                                    artifactFilter :  !com.braintribe.devrock.model.repository.filters.NegationArtifactFilter {
+                                        operand : !com.braintribe.devrock.model.repository.filters.QualifiedArtifactFilter { 
+                                            groupId : 'com.braintribe.devrock.test',
+                                        }
+                                    }
+                                }                              
+                            ]
+                        }        
+                </mc-config>            
+            </properties>   					
+		</profile>		
+	</profiles>
+	<activeProfiles>
+		<activeProfile>default</activeProfile>
+	</activeProfiles>
+</settings>

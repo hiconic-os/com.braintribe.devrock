@@ -1,0 +1,5 @@
+com.braintribe.devrock.test.lenient:parent
+com.braintribe.devrock.test.lenient:a#1.0
+com.braintribe.devrock.test.lenient:b#1.0
+com.braintribe.devrock.test.lenient:lenient-test-terminal-one#1.0
+=res/param/lenientRepo/archive.zip

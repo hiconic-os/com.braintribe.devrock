@@ -1,0 +1,58 @@
+This artifact provides a way how to "manually" create the typescript denotation file for java classes like List, Set, Map, Byte, Float and so on.
+
+1. Copy files gwt specific java files into the `gwt-user-emul` directory. There are two sources:
+	tribefire.js:browser-features-module/emul/com/braintribe/gwt-browserfeatures/jre/
+	com.google.gwt:gwt-user/com/gooogle/gwt/emul/
+
+Getting something like:
+
+	typescript-writer-test
+		gwt-user-emul
+			java
+				lang
+					Byte
+					Character
+					...
+				util
+					Collection
+					List
+					...
+
+2. Make sure the JsAnnotationsPackageNames class, located in tribefire.js:browser-features-module/emul/java is placed here in gwt-user-emul/java.
+
+3. Annotate classes from step 1 with:
+		@JsType(namespace = JsAnnotationsPackageNames.JAVA_LANG)
+	
+	Don't forget to add the import:
+		import java.JsAnnotationsPackageNames;
+
+4. Run GwtUserEmul_CodeMover
+	This moves the classes from gwt-user-emul to the src folder under the "fake" package, adapts their packages and does other changes to make sure the code actually compiles.
+	
+	This is needed so we can process the classes by out tool, which works against loaded Classes, not source code.
+
+5. Run GwtUserEmul_TypeScriptGenerator
+	This finds all the fake classes, runs our tool for them and in the end adapts the comments referencing the original package (i.e. removes the "fake" prefix from there)
+
+-------
+
+6. Place the generated [jsinterop-base.d.ts] file into [com.braintribe.common:jsinterop-base/res] folder
+
+#########################################################
+MAKE SURE METHOD PARAMETER NAMES ARE WRITTEN OUT PROPERLY
+#########################################################
+
+The code generator result depends on whether the java compiler also includes method parameter names in the output.
+
+This is not on by default in a java compiler, but our build scripts pass the proper parameter. 
+
+As Eclipse uses it's own compiler, it has to be turned on at least for this project (and maybe other projects in your Workspace with relevant classes, e.g. jsinterop-base with Lambdas).
+
+I recommend to simply turn this on for the entire workspace:
+	Window -> Preferences -> Java -> Compiler 
+		[x] Store information about method parameter names (usable via reflection)
+		
+		
+
+
+ 

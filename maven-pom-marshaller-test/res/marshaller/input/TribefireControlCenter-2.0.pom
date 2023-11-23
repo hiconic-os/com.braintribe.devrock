@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- 
+ ============================================================================
+ Braintribe IT-Technologies GmbH - www.braintribe.com
+ Copyright Braintribe IT-Technologies GmbH, Austria, 2002-2015 - All Rights Reserved
+ It is strictly forbidden to copy, modify, distribute or use this code without written permission
+ To this file the Braintribe License Agreement applies.
+ ============================================================================
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.braintribe.product.tribefire</groupId>
+  <artifactId>TribefireControlCenter</artifactId>
+  <version>2.0</version>
+  
+  <properties>
+    <codebase>braintribe-dev</codebase>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>com.braintribe.gwt.ioc</groupId>
+      <artifactId>BasicIocSetForGME</artifactId>
+      <version>1.2</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-dev</artifactId>
+      <version>2.8.0</version>
+      <scope>compile</scope>
+      <exclusions>
+      	<exclusion>
+      		<groupId>xerces</groupId>
+      		<artifactId>xercesImpl</artifactId>
+      	</exclusion>
+      </exclusions>
+    </dependency>
+	<dependency>
+      <groupId>com.braintribe.product.tribefire</groupId>
+      <artifactId>TribefireGwtServers</artifactId>
+      <version>2.0</version>
+      <type>war</type>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+</project>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+																				
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.braintribe.custom.cs.ncc.processing</groupId>
+	<artifactId>FormatTests</artifactId>
+	<version>1.0</version>
+	
+	<repositories>
+        <repository>
+          <id>braintribe</id>
+          <name>braintribe</name>
+          <layout>default</layout>
+          <url>http://archiva.braintribe.com/repository/standalone/</url>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+    </repositories>
+	
+	<properties>
+		<malaclypse-exclusions>
+			bla:blue
+			stuss:rubbish
+		</malaclypse-exclusions>
+		<malaclypse-dominants>
+			bla:blue
+			stuss:rubbish
+			fok:maven
+		</malaclypse-dominants>
+		<malaclypse-flattener>
+			com.braintribe.model:Stuss#1.0
+		</malaclypse-flattener>
+	</properties>
+	
+	<dependencies>
+	<dependency>
+			<groupId>com.braintribe.build</groupId>
+			<artifactId>BtBuildCommands</artifactId>
+			<version>1.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.braintribe.build</groupId>
+			<artifactId>GmXsdCommands</artifactId>
+			<version>1.0</version>
+		</dependency>
+		
+		
+		<dependency>
+			<groupId>com.braintribe.build</groupId>
+			<artifactId>GmBuildCommands</artifactId>
+			<version>1.0</version>
+		</dependency>
+					
+		<dependency>		
+			<groupId>com.braintribe.codecs</groupId>
+			<artifactId>AutomaticExpressiveDomCodec</artifactId>
+			<version>1.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.braintribe.custom.cs.ncc.model</groupId>
+			<artifactId>InternalPaymentModel</artifactId>
+			<version>1.0</version>
+		</dependency>
+		 
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+		</dependency>
+	</dependencies>
+</project>

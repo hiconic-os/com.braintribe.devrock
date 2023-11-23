@@ -1,0 +1,2 @@
+com.braintribe.devrock:mala.*;local
+com.braintribe.gm;!remote,local

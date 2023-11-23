@@ -1,0 +1,6 @@
+com.braintribe.test.dependencies.buildOrderTest:A
+com.braintribe.test.dependencies.buildOrderTest:B
+com.braintribe.test.dependencies.buildOrderTest:C
+com.braintribe.test.dependencies.buildOrderTest:D
+com.braintribe.test.dependencies.buildOrderTest:BuildOrderTestTerminal
+=res/param/buildOrderTest/archive.zip

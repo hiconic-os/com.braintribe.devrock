@@ -1,0 +1,30 @@
+;
+; simplest tree for COREDR-10 transitive resolution
+;
+
+com.braintribe.devrock.test:a#1.0.1@4
+	-d 
+		com.braintribe.devrock.test:b#1.0.1
+		com.braintribe.devrock.test:c#1.0.1	
+	-x
+	
+com.braintribe.devrock.test:b#1.0.1@1
+	-d 
+		com.braintribe.devrock.test:d#1.0.1
+	-x	
+
+
+com.braintribe.devrock.test:c#1.0.1@3
+	-d 
+		com.braintribe.devrock.test:e#1.0.1
+	-x	
+	
+	
+com.braintribe.devrock.test:d#1.0.1@0
+	-x
+	
+	
+com.braintribe.devrock.test:e#1.0.1@2
+	-x
+	
+

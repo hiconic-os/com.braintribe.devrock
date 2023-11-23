@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!--  settings file to test profile activation on jdk version  -->
+<settings>    
+    <localRepository>myRepo</localRepository>
+    
+    <profiles>        
+      
+        <profile>
+            <id>no-file</id>
+            <repositories>
+                <repository>
+                    <id>no-file</id>                    
+                    <url>http://no-file</url>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                    <releases>
+                        <enabled>true</enabled>                    
+                    </releases>
+                </repository>                                   
+            </repositories>
+            
+            <activation>
+                <file>
+                    <missing>${env.existing}</missing>
+                </file>
+            </activation>            
+        </profile>
+        
+        <profile>
+            <id>file</id>
+            <repositories>
+                <repository>
+                    <id>file</id>                    
+                    <url>http://file</url>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                    <releases>
+                        <enabled>true</enabled>                    
+                    </releases>
+                </repository>                                   
+            </repositories>
+            
+            <activation>
+                <file>
+                    <exists>${env.existing}</exists>
+                </file>
+            </activation>            
+        </profile>
+        
+        
+                
+        
+      </profiles>  
+</settings>

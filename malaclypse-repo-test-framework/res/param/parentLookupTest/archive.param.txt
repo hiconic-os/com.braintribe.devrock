@@ -1,0 +1,9 @@
+com.braintribe.test.dependencies.parentLookupTest:A
+com.braintribe.test.dependencies.parentLookupTest:B
+com.braintribe.test.dependencies.parentLookupTest:C
+com.braintribe.test.dependencies.parentLookupTest:Parent
+com.braintribe.test.dependencies.parentLookupTest:PropertyParent
+com.braintribe.test.dependencies.parentLookupTest:ParentImport
+com.braintribe.test.dependencies.parentLookupTest:ParentImportImport
+com.braintribe.test.dependencies.parentLookupTest:ParentLookupTestTerminal
+=res/param/parentLookupTest/archive.zip

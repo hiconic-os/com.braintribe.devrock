@@ -1,0 +1,9 @@
+!com.braintribe.doc.meta.CustomFolderMetaData
+files:
+  artifacts.md:
+    displayTitle: "Resolving artifacts"
+  parts.md:
+    displayTitle: "Resolving parts"
+  rules.md:
+    displayTitle: "Rule filters"  
+  

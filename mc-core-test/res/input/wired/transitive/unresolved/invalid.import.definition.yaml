@@ -1,0 +1,43 @@
+# definition for some filter tests via the context of both TDR and CDR
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+
+    # terminal
+    { artifactId: "t", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},       
+       dependencies: [                
+          { artifactId: "a",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+          { artifactId: "b",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+
+       ],        
+    }, 
+
+    # a - first level child      
+   { artifactId: "a", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts:{":jar": null},
+       parent : { artifactId: "p",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+       dependencies: [                 
+            { artifactId: "c",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+            { artifactId: "d",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+       ],        
+    }, 
+    { artifactId: "b", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts:{":jar": null },
+       dependencies: [                 
+            { artifactId: "c",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+       ],        
+    }, 
+
+    { artifactId: "c", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts:{":jar": null},
+       dependencies: [                     
+       ],        
+    }, 
+    { artifactId: "d", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts:{":jar": null},
+       dependencies: [                        
+       ],        
+    }, 
+    { artifactId: "p", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts:{":jar": null},
+       managedDependencies: [                        
+            { artifactId: "invalid-import",  groupId: "com.braintribe.devrock.test", version: "1.0.1", scope: "import"}, 
+       ],        
+    }, 
+    
+  ]
+}

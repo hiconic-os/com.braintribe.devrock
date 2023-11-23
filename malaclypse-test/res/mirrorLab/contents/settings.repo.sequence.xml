@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+	<localRepository>/home/mla/Documents/Dev/firectrl/maven/localRepository</localRepository>
+
+	<servers>
+		<server>
+			<id>tribefire</id>
+			<username>devrock-tests-dummy</username>
+			<password>nonewhatsoever</password>
+		</server>
+		<server>
+			<id>third-party</id>
+			<username>devrock-tests-dummy</username>
+			<password>nonewhatsoever</password>
+		</server>
+	</servers>
+
+	<mirrors>
+		<mirror>
+			<id>tribefire</id>
+			<url>https://artifactory.bt.com/tribefire-repository-2.0-latest</url>
+			<mirrorOf>!third-party,*</mirrorOf>
+		</mirror>
+		<mirror>
+			<id>third-party</id>
+			<url>https://artifactory.bt.com/third-party-repository</url>
+			<mirrorOf>third-party</mirrorOf>
+		</mirror>
+	</mirrors>
+
+	<profiles>
+		<profile>
+			<id>default_profile</id>
+			<repositories>
+				<repository>
+					<id>tribefire</id>
+					<layout>default</layout>
+					<url>https://artifactory.bt.com/tribefire-repository-2.0-latest</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>never</updatePolicy>
+					</releases>
+				</repository>
+				<repository>
+					<id>third-party</id>
+					<layout>default</layout>
+					<url>https://artifactory.bt.com/third-party-repository</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>never</updatePolicy>
+					</releases>
+				</repository>
+			</repositories>
+		</profile>
+	</profiles>
+
+	<activeProfiles>
+		<activeProfile>default_profile</activeProfile>
+	</activeProfiles>
+
+</settings>

@@ -1,0 +1,4 @@
+!com.braintribe.doc.meta.CustomFolderMetaData
+files:
+  pom.md:
+    displayTitle: "Poms in mc-core"

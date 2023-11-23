@@ -1,0 +1,58 @@
+
+# simple definition for hash download test
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+    # parent
+    { artifactId: "p", groupId: "com.braintribe.devrock.test", version: "1.0.1",
+      packaging: "pom",
+      properties: [
+         {name: "V.standard.range", value: "[1.0,1.1)"},         
+      ],       
+      managedDependencies: [
+          { artifactId: "i",  groupId: "com.braintribe.devrock.test", version: "${V.standard.range}", scope: "import"},           
+          #{ artifactId: "c",  groupId: "com.braintribe.devrock.test", version: "${V.standard.range}", scope: "compile"},           
+      ]
+    },   
+    # i
+    { artifactId: "i", groupId: "com.braintribe.devrock.test", version: "1.0.1",
+      packaging: "pom",      
+      managedDependencies: [
+          { artifactId: "c",  groupId: "com.braintribe.devrock.test", version: "1.0.1", scope: "compile"},           
+      ]
+    },   
+    # terminal a
+    { artifactId: "a", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},       
+       parent:  { artifactId: "p",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+       dependencies: [                
+          { artifactId: "b",  groupId: "com.braintribe.devrock.test", version: "${V.standard.range}"}, 
+          { artifactId: "c",  groupId: "com.braintribe.devrock.test", scope: "compile"}, 
+       ],        
+    }, 
+    # b - first level child      
+   { artifactId: "b", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},
+       parent:  { artifactId: "p",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+       dependencies: [                 
+            { artifactId: "d",  groupId: "com.braintribe.devrock.test", version: "${V.standard.range}"}, 
+      ],        
+    }, 
+    # c - 
+    { artifactId: "c", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},
+       parent:  { artifactId: "p",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+       dependencies: [           
+          { artifactId: "e",  groupId: "com.braintribe.devrock.test", version: "${V.standard.range}"}, 
+       ],        
+    }, 
+   # d - first level child      
+   { artifactId: "d", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},
+       parent:  { artifactId: "p",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+       dependencies: [                 
+       ],        
+    },
+   # e - first level child      
+   { artifactId: "e", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},
+       parent:  { artifactId: "p",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+       dependencies: [                 
+       ],        
+    }
+  ]
+}

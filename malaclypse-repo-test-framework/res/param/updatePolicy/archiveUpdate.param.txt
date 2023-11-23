@@ -1,0 +1,4 @@
+com.braintribe.test.dependencies.updatePolicyTest:A
+com.braintribe.test.dependencies.updatePolicyTest:B
+com.braintribe.test.dependencies.updatePolicyTest:UpdatePolicyTestTerminal
+=res/content/updatePolicy/archiveUpdate.zip

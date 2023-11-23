@@ -1,0 +1,8 @@
+com.braintribe.test.dependencies.scopeTest:A
+com.braintribe.test.dependencies.scopeTest:B
+com.braintribe.test.dependencies.scopeTest:C
+com.braintribe.test.dependencies.scopeTest:D
+com.braintribe.test.dependencies.scopeTest:T
+com.braintribe.test.dependencies.scopeTest:P
+com.braintribe.test.dependencies.scopeTest:ScopeTestTerminal
+=res/param/scopetest/archive.zip

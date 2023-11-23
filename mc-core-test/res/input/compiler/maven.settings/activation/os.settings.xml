@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<!--  settings file to test profile activation on jdk version  -->
+<settings>    
+    <localRepository>myRepo</localRepository>
+    
+    <profiles>        
+      
+        <profile>
+            <id>windows-10</id>
+            <repositories>
+                <repository>
+                    <id>win-10</id>                    
+                    <url>http://win-10</url>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                    <releases>
+                        <enabled>true</enabled>                    
+                    </releases>
+                </repository>                                   
+            </repositories>
+            
+            <activation>
+                <os>
+                    <name>Windows 10</name>
+                    <arch>amd64</arch>
+                    <version>[10,]</version>
+                </os>                
+            </activation>
+        </profile>
+         <profile>
+            <id>windows-10x64</id>
+            <repositories>
+                <repository>
+                    <id>win-10x64</id>                    
+                    <url>http://win-10x64</url>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                    <releases>
+                        <enabled>true</enabled>                    
+                    </releases>
+                </repository>                                   
+            </repositories>
+            
+            <activation>
+                <os>
+                    <name>Windows 10</name>
+                    <arch>x64</arch>
+                    <version>[10,]</version>
+                </os>                
+            </activation>
+        </profile>
+        
+        <profile>
+            <id>windows-XP</id>
+            <repositories>
+                <repository>
+                    <id>win-XP</id>                
+                    <url>http://win-xp</url>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                    <releases>
+                        <enabled>true</enabled>                    
+                    </releases>
+                </repository>                                   
+            </repositories>
+            
+            <activation>
+                <os>
+	                <name>Windows XP</name>
+	                <arch>x86</arch>
+	                <version>[,7)</version>
+                </os>                
+            </activation>
+        </profile>
+        
+      </profiles>  
+</settings>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<metadata>
+    <groupId>com.braintribe.devrock.test.ape</groupId>
+    <artifactId>ape-commons</artifactId>
+    <versioning>
+        <versions>
+            <version>1.0.1-pc</version>
+        </versions>
+        <lastUpdated>20190217102501</lastUpdated>
+    </versioning>
+</metadata>

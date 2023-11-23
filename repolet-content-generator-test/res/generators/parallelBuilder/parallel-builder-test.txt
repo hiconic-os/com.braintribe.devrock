@@ -1,0 +1,61 @@
+;
+; 
+;
+com.braintribe.devrock.test:a#1.0	
+	-r 
+		com.braintribe.devrock.test:parent#[1.0,1.1)
+	-d 
+		com.braintribe.devrock.test:b#
+		com.braintribe.devrock.test:c#1.0:compile:jar;:d		
+	-c
+	:jar
+	sources:jar
+	
+	
+com.braintribe.devrock.test:b#1.0	
+	-r 
+		com.braintribe.devrock.test:parent#[1.0,1.1)
+	-c
+	:jar
+	sources:jar
+	-x
+	
+com.braintribe.devrock.test:c#1.0	
+	-r 
+		com.braintribe.devrock.test:parent#[1.0,1.1)	
+	-d
+		com.braintribe.devrock.test:d#1.0-c
+	-c
+	:jar
+	sources:jar
+	
+
+com.braintribe.devrock.test:d#1.0	
+	-r 
+		com.braintribe.devrock.test:parent#[1.0,1.1)	
+	-c
+	:jar
+	sources:jar
+	c:jar
+	-x
+
+com.braintribe.devrock.test:e#1.0	
+	-r 
+		com.braintribe.devrock.test:parent#[1.0,1.1)	
+	-c
+	:jar
+	sources:jar
+	-x
+	
+	
+com.braintribe.devrock.test:parent#1.0|pom
+	-p
+		V.com.braintribe.gm:[1.0,1.1)
+	-m
+		com.braintribe.devrock.test:import#[1.0,1.1):import
+		com.braintribe.devrock.test:e#1.0-c		
+	
+	
+com.braintribe.devrock.test:import#1.0|pom
+	-m	
+		com.braintribe.devrock.test:b#1.0			

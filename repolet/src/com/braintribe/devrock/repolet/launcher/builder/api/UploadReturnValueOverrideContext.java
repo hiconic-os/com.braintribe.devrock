@@ -1,0 +1,36 @@
+// ============================================================================
+// Copyright BRAINTRIBE TECHNOLOGY GMBH, Austria, 2002-2022
+// 
+// This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License along with this library; See http://www.gnu.org/licenses/.
+// ============================================================================
+package com.braintribe.devrock.repolet.launcher.builder.api;
+
+import com.braintribe.devrock.repolet.launcher.builder.cfg.UploadReturnValueOverrideCfg;
+
+public class UploadReturnValueOverrideContext<T extends UploadReturnValueOverrideConsumer> {
+	private T consumer;
+	private UploadReturnValueOverrideCfg cfg;
+
+	public UploadReturnValueOverrideContext(T consumer) {
+		this.consumer = consumer;
+		this.cfg = new UploadReturnValueOverrideCfg();
+	}
+	
+	public UploadReturnValueOverrideContext<T> code( String key, Integer value) {
+		cfg.getUploadReturnValuesOverride().put(key, value);
+		return this;
+	}
+	
+	public T close() {
+		this.consumer.accept(cfg);
+		return this.consumer;
+	}
+	
+
+}

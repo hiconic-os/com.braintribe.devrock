@@ -1,0 +1,54 @@
+;
+; simple tree that excludes one artifact
+;
+
+com.braintribe.devrock.test:a#1.0.1
+    -d 
+        com.braintribe.devrock.test:b#1.0.1:;:x
+        com.braintribe.devrock.test:c#1.0.1:;:x
+    -c
+        :jar
+    -x
+    
+com.braintribe.devrock.test:b#1.0.1
+    -d 
+        com.braintribe.devrock.test:d#1.0.1
+    -c
+        :jar
+    -x  
+
+
+com.braintribe.devrock.test:c#1.0.1
+    -d 
+        com.braintribe.devrock.test:d#1.0.1
+    -c
+        :jar
+    -x  
+    
+    
+com.braintribe.devrock.test:d#1.0.1
+    -d
+        com.braintribe.devrock.test:e#1.0.1
+        com.braintribe.devrock.test:x#1.0.1
+    -c
+        :jar
+    -x
+    
+    
+com.braintribe.devrock.test:e#1.0.1
+    -d
+        com.braintribe.devrock.test:f#1.0.1
+    -c
+        :jar
+    -x
+    
+com.braintribe.devrock.test:f#1.0.1 
+    -c
+        :jar
+    -x
+
+com.braintribe.devrock.test:x#1.0.1    
+    -c
+        :jar
+    -x
+    

@@ -1,0 +1,37 @@
+# definition for the test of the 'unresolved dependency' case
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+
+    # terminal
+    { artifactId: "t", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},       
+       dependencies: [                
+          { artifactId: "a",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+          { artifactId: "b",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+
+       ],        
+    }, 
+
+    # a - first level child      
+   { artifactId: "a", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts:{":jar": null, ":data": null},
+       dependencies: [                 
+            { artifactId: "c",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+            { artifactId: "d",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+       ],        
+    }, 
+    { artifactId: "b", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts:{":jar": null, ":data": null},
+       dependencies: [                 
+            { artifactId: "c",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+       ],        
+    }, 
+
+    { artifactId: "c", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts:{":jar": null, ":data": null},
+       dependencies: [                 
+            { artifactId: "missing",  groupId: "com.braintribe.devrock.test", version: "[1.0,1.1)"}, 
+       ],        
+    }, 
+    { artifactId: "d", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts:{":jar": null, ":data": null},
+       dependencies: [                        
+       ],        
+    }, 
+  ]
+}

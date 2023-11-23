@@ -1,0 +1,73 @@
+MC todo
+- HTTP 
+	- update to newer version
+	- activate connection pooling
+	- switch to HttpTransport
+
+ Ravenhurst updater
+ 	+ activate semaphore for parallel access
+ 	+ cache
+ 	
+ Dependency Resolver
+ 	- semaphore for pom download (in remote resolver)
+ 	
+ Solution enricher
+ 	- semaphore for part download 	
+ 	
+	
+- walk 
+	- build walk 
+		- build order 
+	- test listener information
+		- sufficient for dependency view
+			+ unresolved
+			+ undetermined
+			+ traversing
+			- properties (aka parent view)
+				- inherited dependencies
+				- dependency management
+				- parent properties
+			
+		- proper modelling of listener information
+	- harden walk
+		- missing deps
+		+ undetermined deps
+		+ redirection
+		+ corrupt poms / parents
+		- missing poms / parents
+		+ looping parents
+		+ looping dependencies
+		- check parent import .. single level, multiple level? Check maven docu on in
+		- 
+		
+	- monitoring
+		- add location to traversing event on weeded solutions?
+	
+- svn util
+	+ restructure to listeners 
+	- debug copy tool
+	
+ 
+
+
+*** brouillon ***
+sequence
+	- resolve part
+		a) RavenhurstClient.updateSolution 
+			checks if .updated.artifact exist
+				no -> get one 
+				yes -> continue
+
+			checks if version doesn't exist in container -> return null
+
+			checks if .updated.solution exists
+				no -> get one
+				yes -> load and return RavenhurstSolutionDataContainer
+
+		
+		b) if container's null, check local directory for version 
+		c) if container doesn't have pom file, check local 
+		d) if container has pom file, try to get from URLs that have it 
+
+
+		

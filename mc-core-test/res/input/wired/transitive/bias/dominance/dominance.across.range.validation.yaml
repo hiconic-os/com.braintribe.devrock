@@ -1,0 +1,15 @@
+
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+##
+   {artifactId: "terminal", groupId: "com.braintribe.devrock.test", version: "1.0.3" , parts: {":jar": null},
+    dependencies: [
+        { artifactId: "b", groupId: "com.braintribe.devrock.test",  version: "1.1"},
+      ] 
+    },
+   {artifactId: "b", groupId: "com.braintribe.devrock.test", version: "1.1" , parts: {":jar": null}}
+]
+}
+
+
+  

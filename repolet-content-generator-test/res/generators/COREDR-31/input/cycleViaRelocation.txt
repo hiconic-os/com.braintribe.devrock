@@ -1,0 +1,19 @@
+;
+; COREDR-31 : cycle via import dependency
+;
+com.braintribe.devrock.test:terminal#1.0.1	
+	-d
+		com.braintribe.devrock.test:a#1.0.1
+	-x	
+			
+com.braintribe.devrock.test:a#1.0.1
+    -u
+        com.braintribe.devrock.test:b#1.0.1
+	-x
+	
+com.braintribe.devrock.test:b#1.0.1
+    -u
+        com.braintribe.devrock.test:a#1.0.1
+    -x
+
+				

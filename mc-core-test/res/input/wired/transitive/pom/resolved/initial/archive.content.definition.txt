@@ -1,0 +1,15 @@
+com.braintribe.devrock.test:a#1.0.1-1.0.2
+    -r         
+        com.braintribe.devrock.test:parent#1.0.2        
+    -v
+        1.0.1-${project.parent.version}      
+    -x
+      
+com.braintribe.devrock.test:parent#1.0.2
+    -m
+      com.braintribe.devrock.test:refOne#1.0.1
+      com.braintribe.devrock.test:refTwo#1.0.2-classes
+      com.braintribe.devrock.test:refThree#1.0.3-properties::zip
+    -x
+    
+    

@@ -1,0 +1,20 @@
+<project>
+	<properties>
+		<maj>1</maj>
+		<min>0</min>
+		<bnd>1</bnd>
+		<rev>1</rev>
+		<version>${maj}.${min}</version>
+		<rng>[${version},${maj}.${bnd})</rng>
+	</properties>
+
+	<parent>
+		<groupId>foo.bar</groupId>
+		<artifactId>XParent</artifactId>
+		<version>${rng}</version>
+	</parent>
+
+	<artifactId>XCore</artifactId>
+	<version>${version}.${rev}</version>
+
+</project>

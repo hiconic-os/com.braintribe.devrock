@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!-- simple settings for a test with the local repository and two repolet backed remote repositories : NO FILTER aka AllMatchingFilter -->
+<settings>	
+	<localRepository>${env.repo}</localRepository>		
+	<profiles>		
+		<profile>
+			<id>default</id>
+			<repositories>
+				<!-- repolet backed repository 'archive-rh' with RH support -->
+				<repository>
+					<id>rh-archive</id>
+					<url>http://localhost:${env.port}/rh-archive/</url>					
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>daily</updatePolicy>				
+					</releases>
+				</repository>
+				<repository>
+					<id>rh-never-archive</id>
+					<url>http://localhost:${env.port}/rh-never-archive/</url>					
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>never</updatePolicy>
+					</releases>
+				</repository>
+				<!-- repolet backed repository 'archive-dumb' without RH support -->
+                <repository>
+                    <id>dumb-archive</id>                    
+                    <url>http://localhost:${env.port}/dumb-archive/</url>                 
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>daily</updatePolicy>
+                    </releases>
+                </repository>
+                <repository>
+                    <id>dumb-never-archive</id>
+                    <url>http://localhost:${env.port}/dumb-never-archive/</url>                 
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>                        
+                    </releases>
+                </repository>
+			</repositories>						
+			<properties>			 
+			</properties>
+		</profile>		
+	</profiles>
+	<activeProfiles>
+		<activeProfile>default</activeProfile>
+	</activeProfiles>
+</settings>

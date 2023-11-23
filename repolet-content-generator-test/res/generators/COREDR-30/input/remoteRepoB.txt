@@ -1,0 +1,65 @@
+;
+; COREDR-30 remote repo B
+;
+tribefire.extension.artifact.test.v:a#1.0.1-pc
+	-r
+		tribefire.extension.artifact.test.v:parent#[1.0,1.1)
+	-c
+		:jar
+	-x
+
+tribefire.extension.artifact.test.v:a#1.0.1
+	-r
+		tribefire.extension.artifact.test.v:parent#[1.0,1.1)
+	-c
+		:jar
+	-x	
+		
+tribefire.extension.artifact.test.v:a#1.0.2-pc
+	-r
+		tribefire.extension.artifact.test.v:parent#[1.0,1.1)
+	-c
+		:jar	
+	-x
+
+tribefire.extension.artifact.test.v:b#1.0.1-pc
+	-r
+		tribefire.extension.artifact.test.v:parent#[1.0,1.1)
+	-c
+		:jar
+	-x
+		
+tribefire.extension.artifact.test.v:b#1.0.1
+	-r
+		tribefire.extension.artifact.test.v:parent#[1.0,1.1)
+	-c
+		:jar
+	-x
+
+tribefire.extension.artifact.test.v:c#1.0.1-pc
+	-r
+		tribefire.extension.artifact.test.v:parent#[1.0,1.1)
+	-c
+		:jar
+	-x
+		
+tribefire.extension.artifact.test.v:c#1.0.1
+	-r
+		tribefire.extension.artifact.test.v:parent#[1.0,1.1)
+	-c
+		:jar
+	-x
+		
+tribefire.extension.artifact.test.v:c#1.0.2-pc
+	-r
+		tribefire.extension.artifact.test.v:parent#[1.0,1.1)
+	-c
+		:jar
+	-x
+
+tribefire.extension.artifact.test.v:parent#1.0.1
+	-p
+		V.tribefire.extension.artifact.test.v:[1.0, 1.1)
+	-x
+	
+

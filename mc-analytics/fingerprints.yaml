@@ -1,0 +1,16 @@
+? !com.braintribe.zarathud.model.forensics.FingerPrint
+  slots:
+    "issue": "MissingDependencyDeclarations"
+    "issue_key": "com.braintribe.devrock:essential-artifact-model"
+: !com.braintribe.zarathud.model.forensics.ForensicsRating ERROR
+? !com.braintribe.zarathud.model.forensics.FingerPrint
+  slots:
+    "issue": "MissingDependencyDeclarations"
+    "issue_key": "com.braintribe.devrock:declared-artifact-model"
+: !com.braintribe.zarathud.model.forensics.ForensicsRating WARN
+? !com.braintribe.zarathud.model.forensics.FingerPrint
+  slots:
+    "issue": "MissingDependencyDeclarations"
+    "issue_key": "com.braintribe.devrock:compiled-artifact-model"
+: !com.braintribe.zarathud.model.forensics.ForensicsRating IGNORE
+

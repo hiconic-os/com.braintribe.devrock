@@ -1,0 +1,8 @@
+Cases _ TF Services Deps 1.1
+
+dom4j:dom4j#1.6.1
+
+ dependency : org.hibernate:hibernate-core#3.6.10.Final
+ version : org.hibernate:hibernate-parent#3.6.10.Final
+
+

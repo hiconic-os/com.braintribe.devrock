@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<settings>
+	<localRepository>d:/alt.m2_local_repo</localRepository>
+	<profiles>
+		<profile>
+			<id>locallyRemote</id>
+			<repositories>
+				<repository>
+					<id>locallyRemote</id>
+					<layout>default</layout>
+					<url>file://res/fileSystemRepoLab/contents/repo/remote</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>always</updatePolicy>
+					</releases>
+				</repository>
+			</repositories>
+			<properties>
+				<trustworthyRepositories>*</trustworthyRepositories>		
+				<listingLenientRepositories>*</listingLenientRepositories>
+			</properties>
+		</profile>
+	</profiles>
+	<activeProfiles>
+		<activeProfile>locallyRemote</activeProfile>
+	</activeProfiles>
+</settings>

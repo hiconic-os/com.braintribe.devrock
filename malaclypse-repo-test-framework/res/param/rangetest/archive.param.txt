@@ -1,0 +1,6 @@
+com.braintribe.test.dependencies.rangeTest:A
+com.braintribe.test.dependencies.rangeTest:B
+com.braintribe.test.dependencies.rangeTest:C
+com.braintribe.test.dependencies.rangeTest:D
+com.braintribe.test.dependencies.rangeTest:RangeTestTerminal
+=res/param/rangetest/archive.zip

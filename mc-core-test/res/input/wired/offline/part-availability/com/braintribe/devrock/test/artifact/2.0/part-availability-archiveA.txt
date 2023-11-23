@@ -1,0 +1,4 @@
+89c69c69-9b4f-4186-b56c-e1d0e2fab592
+-:pom
+-:jar
+-javadoc:jar

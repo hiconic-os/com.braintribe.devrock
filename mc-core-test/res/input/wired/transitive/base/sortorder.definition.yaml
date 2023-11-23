@@ -1,0 +1,48 @@
+# definition for sort orders (visit- and dependency-order)
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+
+    # terminal
+    { artifactId: "t", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},       
+       dependencies: [      
+          { artifactId: "a",  groupId: "com.braintribe.devrock.test", version: "1.0.1"},                        
+          { artifactId: "f",  groupId: "com.braintribe.devrock.test", version: "1.0.1"},                        
+       ]  
+    }, 
+    # a - first level child      
+   { artifactId: "a", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},
+       dependencies: [         
+         { artifactId: "b", groupId: "com.braintribe.devrock.test", version: "1.0.1"}
+        ] 
+    }, 
+    # b - second level child     
+   { artifactId: "b", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null}, 
+       dependencies: [         
+         {artifactId: "c", groupId: "com.braintribe.devrock.test", version: "1.0.1", scope : "test" }, 
+         {artifactId: "d", groupId: "com.braintribe.devrock.test", version: "1.0.1", scope : "test" } 
+        ]
+    },   
+
+  # c - third level child     
+   { artifactId: "c", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null}, 
+       dependencies: [                  
+         {artifactId: "e", groupId: "com.braintribe.devrock.test", version: "1.0.1", scope : "test" } 
+        ]
+    },   
+
+  # d - third level child     
+   { artifactId: "d", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null}, 
+       dependencies: [                  
+         {artifactId: "f", groupId: "com.braintribe.devrock.test", version: "1.0.1", scope : "test" } 
+        ]
+    },   
+
+  #e - fourth level child
+  { artifactId: "e", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null}},     
+  
+  #f - second & fourth level child
+  { artifactId: "f", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null}},     
+
+      
+  ]
+}

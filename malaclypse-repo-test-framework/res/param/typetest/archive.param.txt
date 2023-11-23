@@ -1,0 +1,5 @@
+com.braintribe.test.dependencies.typeTest:C
+com.braintribe.test.dependencies.typeTest:B
+com.braintribe.test.dependencies.typeTest:A
+com.braintribe.test.dependencies.typeTest:TypeTestTerminal
+=res/param/typetest/archive.zip

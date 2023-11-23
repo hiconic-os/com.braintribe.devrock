@@ -1,0 +1,45 @@
+
+# simple definition for first stage
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+
+    # terminal
+    { artifactId: "t", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},       
+       dependencies: [                
+          { artifactId: "a",  groupId: "com.braintribe.devrock.test", version: "[1.0,1.1)"}, 
+          { artifactId: "b",  groupId: "com.braintribe.devrock.test", version: "[1.0,1.1)"}, 
+          { artifactId: "c",  groupId: "com.braintribe.devrock.test.two", version: "[1.0,1.1)"}, 
+       ],        
+    }, 
+    # a - first level child      
+   { artifactId: "a", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},
+       dependencies: [                 
+       ],        
+    }, 
+
+    { artifactId: "a", groupId: "com.braintribe.devrock.test", version: "1.0.2", parts: {":jar": null},
+       dependencies: [                 
+       ],        
+    }, 
+
+
+    { artifactId: "b", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},
+       dependencies: [           
+       ],        
+    }, 
+    { artifactId: "b", groupId: "com.braintribe.devrock.test", version: "1.0.2", parts: {":jar": null},
+       dependencies: [           
+       ],        
+    }, 
+    { artifactId: "c", groupId: "com.braintribe.devrock.test.two", version: "1.0.1", parts: {":jar": null},
+       dependencies: [           
+       ],        
+    }, 
+
+     { artifactId: "artifact-index", groupId: "meta", version: "1.0.2", parts: {":gz": !com.braintribe.model.resource.FileResource "artifact-index-content.two.txt.gz"},
+       dependencies: [           
+       ],        
+    }, 
+    
+  ]
+}

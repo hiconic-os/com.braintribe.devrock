@@ -1,0 +1,8 @@
+com.braintribe.devrock.test:t#1.0.1
+    -c
+        :jar
+        sources:jar
+        javadoc:jar
+        asset:man
+     -x
+ 

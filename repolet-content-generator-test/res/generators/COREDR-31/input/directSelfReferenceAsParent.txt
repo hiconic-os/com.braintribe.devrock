@@ -1,0 +1,10 @@
+;
+; COREDR-31 : cycle via direct self reference
+;
+com.braintribe.devrock.test:terminal#1.0.1
+	-r
+		com.braintribe.devrock.test:terminal#1.0.1
+	-c
+	:jar
+		
+	

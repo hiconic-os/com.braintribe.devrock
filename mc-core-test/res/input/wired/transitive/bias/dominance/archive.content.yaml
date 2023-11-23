@@ -1,0 +1,25 @@
+
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+## 
+  {artifactId: "terminal", groupId: "com.braintribe.devrock.test", version: "1.0.1" , parts: {":jar": null},
+    dependencies: [
+        { artifactId: "b", groupId: "com.braintribe.devrock.test",  version: "[1.0, 1.3)" },
+      ] 
+    },
+##
+   {artifactId: "terminal", groupId: "com.braintribe.devrock.test", version: "1.0.2" , parts: {":jar": null},
+    dependencies: [
+        { artifactId: "b", groupId: "com.braintribe.devrock.test",  version: "[1.3, 1.5)" },
+      ] 
+    },
+##
+   {artifactId: "terminal", groupId: "com.braintribe.devrock.test", version: "1.0.3" , parts: {":jar": null},
+    dependencies: [
+        { artifactId: "b", groupId: "com.braintribe.devrock.test",  version: "[1.0, 2.0)" },
+      ] 
+    },
+],
+}
+
+  

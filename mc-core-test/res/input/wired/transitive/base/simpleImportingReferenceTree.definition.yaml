@@ -1,0 +1,128 @@
+!com.braintribe.devrock.model.repolet.content.RepoletContent
+artifacts:
+  - !com.braintribe.devrock.model.repolet.content.Artifact
+    artifactId: "a"
+    dependencies:
+      - !com.braintribe.devrock.model.repolet.content.Dependency
+        artifactId: "b"
+        groupId: "com.braintribe.devrock.test"
+        version: "${V.standard.range}"
+      - !com.braintribe.devrock.model.repolet.content.Dependency
+        artifactId: "c"
+        groupId: "com.braintribe.devrock.test"
+    groupId: "com.braintribe.devrock.test"
+    parent: !com.braintribe.model.artifact.essential.VersionedArtifactIdentification
+      artifactId: "p"
+      globalId?: absent
+      groupId: "com.braintribe.devrock.test"
+      id?: absent
+      partition?: absent
+      version: "[1.0,1.1)"
+    parts:
+      ":jar": null
+      ":pom": null
+    version: "1.0.1"
+    versionOverride: "1.0.1"
+  - !com.braintribe.devrock.model.repolet.content.Artifact
+    artifactId: "b"
+    dependencies:
+      - !com.braintribe.devrock.model.repolet.content.Dependency
+        artifactId: "d"
+        groupId: "com.braintribe.devrock.test"
+        version: "${V.standard.range}"
+    groupId: "com.braintribe.devrock.test"
+    parent: !com.braintribe.model.artifact.essential.VersionedArtifactIdentification
+      artifactId: "p"
+      globalId?: absent
+      groupId: "com.braintribe.devrock.test"
+      id?: absent
+      partition?: absent
+      version: "[1.0,1.1)"
+    parts:
+      ":jar": null
+      ":pom": null
+    version: "1.0.1"
+    versionOverride: "1.0.1"
+  - !com.braintribe.devrock.model.repolet.content.Artifact
+    artifactId: "c"
+    dependencies:
+      - !com.braintribe.devrock.model.repolet.content.Dependency
+        artifactId: "e"
+        groupId: "com.braintribe.devrock.test"
+        version: "${V.standard.range}"
+    groupId: "com.braintribe.devrock.test"
+    parent: !com.braintribe.model.artifact.essential.VersionedArtifactIdentification
+      artifactId: "p"
+      globalId?: absent
+      groupId: "com.braintribe.devrock.test"
+      id?: absent
+      partition?: absent
+      version: "[1.0,1.1)"
+    parts:
+      ":jar": null
+      ":pom": null
+    version: "1.0.1"
+    versionOverride: "1.0.1"
+  - !com.braintribe.devrock.model.repolet.content.Artifact
+    artifactId: "d"
+    groupId: "com.braintribe.devrock.test"
+    parent: !com.braintribe.model.artifact.essential.VersionedArtifactIdentification
+      artifactId: "p"
+      globalId?: absent
+      groupId: "com.braintribe.devrock.test"
+      id?: absent
+      partition?: absent
+      version: "[1.0,1.1)"
+    parts:
+      ":jar": null
+      ":pom": null
+    version: "1.0.1"
+    versionOverride: "1.0.1"
+  - !com.braintribe.devrock.model.repolet.content.Artifact
+    artifactId: "e"
+    groupId: "com.braintribe.devrock.test"
+    parent: !com.braintribe.model.artifact.essential.VersionedArtifactIdentification
+      artifactId: "p"
+      globalId?: absent
+      groupId: "com.braintribe.devrock.test"
+      id?: absent
+      partition?: absent
+      version: "[1.0,1.1)"
+    parts:
+      ":jar": null
+      ":pom": null
+    version: "1.0.1"
+    versionOverride: "1.0.1"
+  - !com.braintribe.devrock.model.repolet.content.Artifact
+    artifactId: "i"
+    groupId: "com.braintribe.devrock.test"
+    managedDependencies:
+      - !com.braintribe.devrock.model.repolet.content.Dependency
+        artifactId: "c"
+        groupId: "com.braintribe.devrock.test"
+        version: "${V.standard.range}"
+    parts:
+      ":pom": null
+    properties:
+      - !com.braintribe.devrock.model.repolet.content.Property
+        name: "V.standard.range"
+        value: "[1.0,1.1)"
+    version: "1.0.1"
+    versionOverride: "1.0.1"
+  - !com.braintribe.devrock.model.repolet.content.Artifact
+    artifactId: "p"
+    groupId: "com.braintribe.devrock.test"
+    managedDependencies:
+      - !com.braintribe.devrock.model.repolet.content.Dependency
+        artifactId: "i"
+        groupId: "com.braintribe.devrock.test"
+        scope: "import"
+        version: "${V.standard.range}"
+    parts:
+      ":pom": null
+    properties:
+      - !com.braintribe.devrock.model.repolet.content.Property
+        name: "V.standard.range"
+        value: "[1.0,1.1)"
+    version: "1.0.1"
+    versionOverride: "1.0.1"

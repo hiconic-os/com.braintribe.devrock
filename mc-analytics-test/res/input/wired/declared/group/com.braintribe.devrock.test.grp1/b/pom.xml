@@ -1,0 +1,35 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.braintribe.devrock.test.grp1</groupId>
+        <artifactId>parent</artifactId>
+        <version>[${major}.${minor},${major}.${nextMinor})</version>
+    </parent>
+    <groupId>com.braintribe.devrock.test.grp1</groupId>
+    <artifactId>b</artifactId>
+    <version>${major}.${minor}.${revision}</version>
+    <properties>
+        <major>1</major>
+        <minor>1</minor>
+        <nextMinor>2</nextMinor>
+        <revision>3-pc</revision>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.braintribe.devrock.test.grp1</groupId>
+            <artifactId>c</artifactId>
+            <version>${V.com.braintribe.devrock.test.grp1}</version>
+        </dependency>
+		<dependency>
+            <groupId>com.braintribe.devrock.test.grp2</groupId>
+            <artifactId>b</artifactId>
+		    <version>${V.com.braintribe.devrock.test.grp2}</version>
+        </dependency>
+		<dependency>
+            <groupId>com.braintribe.devrock.test.grp3</groupId>
+            <artifactId>b</artifactId>
+		    <version>${V.com.braintribe.devrock.test.grp3}</version>
+        </dependency>
+
+    </dependencies>
+</project>

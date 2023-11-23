@@ -1,0 +1,29 @@
+# definition for some filter tests via the context of both TDR and CDR
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+   
+   # remainder : x
+   { artifactId: "x", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts:{":jar": null},
+       dependencies: [                 
+            { artifactId: "y",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+       ],        
+    }, 
+
+   # remainder : y
+   { artifactId: "y", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts:{":jar": null},
+       dependencies: [                 
+            { artifactId: "z",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+       ],        
+    }, 
+
+   # remainder : z
+   { artifactId: "z", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts:{":jar": null},
+       dependencies: [                    
+       ],        
+    }, 
+
+
+
+  ]
+
+}

@@ -1,0 +1,40 @@
+buildscript {
+    ext.configureBuildscript = { c -> buildscript c }
+    apply from: 'buildscript.gradle'
+
+    dependencies {
+        classpath 'com.braintribe.devrock.cicd:devrock-cicd-steps-plugin:1.0+'
+        classpath 'com.braintribe.devrock.cicd:devrock-cicd-steps:1.0+'
+    }
+}
+
+apply plugin: 'devrock-cicd-steps'
+
+import devrock.cicd.model.api.*
+
+defaultTasks 'build-artifacts'
+    
+steps {
+    
+    step InitializeExchange.T
+
+    step AnalyzeCodebase.T
+
+    step BuildArtifacts.T, { equip { handler = { ant it.folderName, 'install', 'candidateInstall' } } }
+
+    step CheckLinking.T, { equip { handler = { ant it.folderName, 'check-linking' } } }
+    
+    step RunTests.T, { equip { handler = { ant it.folderName, 'test' } } }
+
+    step RaiseAndMergeArtifacts.T // commit + merge
+
+    step PublishArtifacts.T
+
+}
+
+/* Notes:
+
+1. Validation of repo config (e.g in case of publishing there must be a configured upload repo)
+2. where to get candidate info from
+
+*/

@@ -1,0 +1,47 @@
+# definition for scope combinations
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+
+    # terminal
+    { artifactId: "t", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},       
+       dependencies: [
+          { artifactId: "t-optional",  groupId: "com.braintribe.devrock.test",  version: "1.0.1", optional : true},
+          { artifactId: "a",  groupId: "com.braintribe.devrock.test", version: "1.0.1"},                
+          { artifactId: "t-provided", groupId: "com.braintribe.devrock.test",  version: "1.0.1",  scope: "provided"},            
+          { artifactId: "t-test", groupId: "com.braintribe.devrock.test", version: "1.0.1", scope: "test"}         
+       ]  
+    }, 
+    # a - first level child      
+   { artifactId: "a", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},
+       dependencies: [
+         { artifactId: "a-provided", groupId: "com.braintribe.devrock.test", version: "1.0.1", scope: "provided"},           
+         { artifactId: "a-optional", groupId: "com.braintribe.devrock.test", version: "1.0.1", optional: true },           
+         { artifactId: "a-test", groupId: "com.braintribe.devrock.test",  version: "1.0.1", scope: "test" },
+         { artifactId: "b", groupId: "com.braintribe.devrock.test", version: "1.0.1"}
+        ] 
+    }, 
+    # b - second level child     
+   { artifactId: "b", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null}, 
+       dependencies: [
+         {artifactId: "b-provided", groupId: "com.braintribe.devrock.test", version: "1.0.1", scope: "provided" },
+         {artifactId: "b-optional", groupId: "com.braintribe.devrock.test", version: "1.0.1", optional : true },
+         {artifactId: "b-test", groupId: "com.braintribe.devrock.test", version: "1.0.1", scope : "test" } 
+         ]
+    },   
+    
+    # all other t children
+    { artifactId: "t-provided", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null}},     
+    { artifactId: "t-optional", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: { ":jar": null}},
+    { artifactId: "t-test", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null}},
+    
+    # all other a children
+    { artifactId: "a-provided", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null}},            
+    { artifactId: "a-optional",  groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null}},
+    { artifactId: "a-test", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null}},
+    
+    # all other b children
+    { artifactId: "b-provided", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null}},            
+    { artifactId: "b-optional",  groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null}},
+    { artifactId: "b-test", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null}},                     
+  ]
+}

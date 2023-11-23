@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!--  settings file to test profile activation on jdk version  -->
+<settings>    
+    <localRepository>myRepo</localRepository>
+    
+    <profiles>        
+      
+        <profile>
+            <id>jdk-9</id>
+            <repositories>
+                <repository>
+                    <id>jdk-9</id>                    
+                    <url>http://jdk-9</url>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                    <releases>
+                        <enabled>true</enabled>                    
+                    </releases>
+                </repository>                                   
+            </repositories>
+            
+            <activation>
+                <jdk>[9,]</jdk>    
+            </activation>
+        </profile>
+        
+        <profile>
+            <id>jdk-8</id>
+            <repositories>
+                <repository>
+                    <id>jdk-8</id>                
+                    <url>http://jdk-8</url>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                    <releases>
+                        <enabled>true</enabled>                    
+                    </releases>
+                </repository>                                   
+            </repositories>
+            
+            <activation>
+                 <jdk>[,9)</jdk>               
+            </activation>
+        </profile>
+        
+      </profiles>  
+</settings>

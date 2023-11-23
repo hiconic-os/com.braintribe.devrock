@@ -1,0 +1,7 @@
+com.braintribe.devrock:parent#1.0.11
+com.braintribe.devrock:malaclypse#1.0.38
+com.braintribe.devrock:malaclypse#1.0.39-pc
+com.braintribe.devrock:malaclypse#1.0.40
+com.braintribe.devrock:malaclypse#1.0.45
+com.braintribe.devrock:malaclypse#1.0.45-pc
+=res/param/resolverFeature/archive.zip

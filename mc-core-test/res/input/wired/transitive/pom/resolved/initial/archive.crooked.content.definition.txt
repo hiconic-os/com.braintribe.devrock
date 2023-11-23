@@ -1,0 +1,31 @@
+com.braintribe.devrock.test:inc-a#1.0.1         
+    -x
+    
+com.braintribe.devrock.test:inc-a-no-v#1.0.1
+    -v
+             
+    -x
+  
+  
+com.braintribe.devrock.test:inc-d#1.0.1
+    -d
+        com.braintribe.devrock.test:refOne
+  
+  
+ com.braintribe.devrock.test:inc-parent#1.0.1
+    -d
+        com.braintribe.devrock.test:refOne
+   
+com.braintribe.devrock.test:inc-parent-imp#1.0.1
+    -m
+         
+
+
+com.braintribe.devrock.test:inc-parent#1.0.2
+    -m
+      com.braintribe.devrock.test:refOne#1.0.1
+      com.braintribe.devrock.test:refTwo#1.0.2-classes
+      com.braintribe.devrock.test:refThree#1.0.3-properties::zip
+    -x
+    
+    

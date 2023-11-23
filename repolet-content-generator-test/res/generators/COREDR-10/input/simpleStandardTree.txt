@@ -1,0 +1,52 @@
+;
+; simplest tree for COREDR-10 transitive resolution
+;
+
+com.braintribe.devrock.test:a#1.0.1
+	-r 
+		com.braintribe.devrock.test:p#[1.0,1.1)
+	-d 
+		com.braintribe.devrock.test:b#[1.0,1.1)
+		com.braintribe.devrock.test:c#[1.0,1.1)
+	-c
+		:jar
+	-x
+	
+com.braintribe.devrock.test:b#1.0.1
+	-r 
+		com.braintribe.devrock.test:p#[1.0,1.1)
+	-d 
+		com.braintribe.devrock.test:d#[1.0,1.1)
+	-c
+		:jar
+	-x	
+
+
+com.braintribe.devrock.test:c#1.0.1
+	-r 
+		com.braintribe.devrock.test:p#[1.0,1.1)
+	-d 
+		com.braintribe.devrock.test:e#[1.0,1.1)
+	-c
+		:jar
+	-x	
+	
+	
+com.braintribe.devrock.test:d#1.0.1
+	-r 
+		com.braintribe.devrock.test:p#[1.0,1.1)
+	-c
+		:jar
+	-x
+	
+	
+com.braintribe.devrock.test:e#1.0.1
+	-r 
+		com.braintribe.devrock.test:p#[1.0,1.1)
+	-c
+		:jar
+	-x
+	
+com.braintribe.devrock.test:p#1.0.1
+	-x
+	

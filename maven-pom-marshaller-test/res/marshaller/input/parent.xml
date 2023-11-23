@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- 
+ ============================================================================
+ Braintribe IT-Technologies GmbH - www.braintribe.com
+ Copyright Braintribe IT-Technologies GmbH, Austria, 2002-2015 - All Rights Reserved
+ It is strictly forbidden to copy, modify, distribute or use this code without written permission
+ To this file the Braintribe License Agreement applies.
+ ============================================================================
+ $LastChangedDate: 2015-05-11 14:49:42 +0200 (Mo, 11 Mai 2015) $ // $LastChangedBy: roman.kurmanowytsch $
+ ============================================================================
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.braintribe.test</groupId>
+	<artifactId>Parent</artifactId>
+	<version>1.0</version>
+	<packaging>pom</packaging>
+	
+	<properties>
+		<codebase>braintribe-dev</codebase>
+		<version>1.0</version>
+		<property1>${version}</property1>
+	</properties>
+	
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.braintribe.test</groupId>
+				<artifactId>Dep1</artifactId>
+				<version>1.0</version>
+			</dependency>
+			<dependency>
+				<groupId>com.braintribe.test</groupId>
+				<artifactId>Dep2</artifactId>
+				<version>1.0</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.braintribe.test</groupId>
+				<artifactId>Dep3</artifactId>
+				<version>1.0</version>
+				<type>jar</type>
+			</dependency>
+			<dependency>
+				<groupId>com.braintribe.test</groupId>
+				<artifactId>Dep4</artifactId>
+				<version>1.0</version>
+				<optional>true</optional>
+				<exclusions>
+					<exclusion>
+						<groupId>com.braintribe.exclusion</groupId>
+						<artifactId>Exclusion</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>com.braintribe.test</groupId>
+				<artifactId>Dep5</artifactId>
+				<version>1.0</version>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	
+</project>

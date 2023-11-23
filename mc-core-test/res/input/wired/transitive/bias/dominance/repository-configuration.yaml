@@ -1,0 +1,21 @@
+!com.braintribe.devrock.model.repository.RepositoryConfiguration {        
+   localRepositoryPath: "${env.cache}",
+   repositories: [
+       !com.braintribe.devrock.model.repository.MavenHttpRepository {           
+           url: "http://localhost:${env.port}/dominant",
+           name: "dominant",
+           dominanceFilter :  !com.braintribe.devrock.model.repository.filters.QualifiedArtifactFilter { 
+                                groupId : 'com.braintribe.devrock.test',
+                                artifactId : 'b',
+                            }
+       },
+       !com.braintribe.devrock.model.repository.MavenHttpRepository {           
+           url: "http://localhost:${env.port}/archive",         
+           name: "archive"
+       },
+       !com.braintribe.devrock.model.repository.MavenHttpRepository {           
+           url: "http://localhost:${env.port}/recessive",         
+           name: "recessive"
+       },
+   ],
+}            

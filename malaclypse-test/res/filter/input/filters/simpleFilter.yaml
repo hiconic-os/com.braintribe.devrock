@@ -1,0 +1,23 @@
+!com.braintribe.devrock.model.repository.RepositoryConfiguration
+repositories:
+  - !com.braintribe.devrock.model.repository.MavenHttpRepository
+    artifactFilter: !com.braintribe.devrock.model.repository.filters.QualifiedArtifactFilter
+      artifactId: "a"
+      groupId: "com.braintribe.devrock.test"
+      version: "1.0.1"
+    name: "archiveA"
+  - !com.braintribe.devrock.model.repository.MavenHttpRepository
+    artifactFilter: !com.braintribe.devrock.model.repository.filters.QualifiedArtifactFilter
+      artifactId: "b"
+      groupId: "com.braintribe.devrock.test"
+      version: "1.0.1"
+    name: "archiveB"
+  - !com.braintribe.devrock.model.repository.MavenHttpRepository
+    artifactFilter: !com.braintribe.devrock.model.repository.filters.QualifiedArtifactFilter
+      artifactId: "c"
+      groupId: "com.braintribe.devrock.test"
+      version: "1.0.1"
+    name: "archiveC"
+  - !com.braintribe.devrock.model.repository.MavenHttpRepository
+    artifactFilter: !com.braintribe.devrock.model.repository.filters.NoneMatchingArtifactFilter {}
+    name: "local"

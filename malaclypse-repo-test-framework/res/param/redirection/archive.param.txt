@@ -1,0 +1,7 @@
+com.braintribe.test.dependencies.redirectionTest:A
+com.braintribe.test.dependencies.redirectionTest:B
+com.braintribe.test.dependencies.redirectionTest:C
+com.braintribe.test.dependencies.redirectionTest:D
+com.braintribe.test.dependencies.redirectionTest:E
+com.braintribe.test.dependencies.redirectionTest:RedirectionTestTerminal
+=res/param/redirection/archive.zip

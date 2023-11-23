@@ -1,0 +1,42 @@
+# definition for some build-range tests
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+
+  
+
+    # a - first level child      
+   { artifactId: "a", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts:{":jar": null, ":data": null},
+       dependencies: [                 
+            { artifactId: "b",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+            { artifactId: "c",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+       ],        
+    }, 
+   # b - second level child
+    { artifactId: "b", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null, ":data": null},
+       dependencies: [                 
+         { artifactId: "common",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+       ],        
+    }, 
+
+    # c - second level child
+    { artifactId: "c", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null, ":data": null},
+       dependencies: [                 
+         { artifactId: "common",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+       ],        
+    }, 
+
+   # remainder : common
+   { artifactId: "common", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts:{":jar": null},
+       dependencies: [     
+            { artifactId: "x",  groupId: "com.braintribe.devrock.test", version: "1.0.1"},              
+       ],        
+    }, 
+
+
+  
+
+
+
+  ]
+
+}

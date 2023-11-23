@@ -1,0 +1,15 @@
+!com.braintribe.devrock.model.repository.RepositoryConfiguration {        
+    repositories: [
+      !com.braintribe.devrock.model.repository.MavenHttpRepository {
+           name: 'added_repo_ex_1',
+            user: 'added_ex1_user',
+            password: 'added_ex1_password',
+            url: 'http://added_ex1_url',
+            checkSumPolicy: ignore,
+            artifactFilter :  !com.braintribe.devrock.model.repository.filters.QualifiedArtifactFilter { 
+                groupId : 'com.braintribe.devrock.test',
+                artifactId : 'x',
+            }
+        },                                                        
+    ]
+}

@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<settings>
+	<localRepository>${env.M2_REPO}</localRepository>
+ <servers>
+    <server>
+      <id>central.mirror</id>
+      <username>builder</username>
+      <password>operating2005</password>
+      <filePermissions>664</filePermissions>
+      <directoryPermissions>775</directoryPermissions>
+    </server>
+  </servers>
+  <mirrors>
+    <mirror>
+      <id>central.mirror</id>
+      <url>http://archiva.bt.com/repository/standalone/</url>
+      <mirrorOf>*</mirrorOf>
+    </mirror>
+  </mirrors>
+  
+	<profiles>
+		<profile>
+			<id>braintribe.GLOBAL</id>
+			<repositories>
+				<repository>
+					<id>braintribe</id>
+					<layout>default</layout>
+					<url>http://archiva.bt.com/repository/standalone/</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>never</updatePolicy>
+					</releases>
+				</repository>
+			</repositories>
+			<properties>
+				<ravenhurst-context>ravenhurst</ravenhurst-context>
+			</properties>
+		</profile>
+	</profiles>
+
+	<activeProfiles>
+		<activeProfile>braintribe.GLOBAL</activeProfile>
+	</activeProfiles>
+</settings>

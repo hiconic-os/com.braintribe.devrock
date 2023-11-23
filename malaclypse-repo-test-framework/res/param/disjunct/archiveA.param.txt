@@ -1,0 +1,5 @@
+com.braintribe.test.dependencies.subtreeexclusiontest:A
+com.braintribe.test.dependencies.subtreeexclusiontest:B
+com.braintribe.test.dependencies.subtreeexclusiontest:C
+com.braintribe.test.dependencies.subtreeexclusiontest:D
+=res/content/disjunct/archiveA.zip

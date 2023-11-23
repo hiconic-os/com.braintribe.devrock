@@ -1,0 +1,15 @@
+!com.braintribe.doc.meta.CustomFolderMetaData
+files:
+  configuration.md:
+    displayTitle: "Configuring mc-core"
+  devenvironment.md:
+    displayTitle: "Configuring mc-core via dev-env"
+  mavenconfiguration.md:  
+      displayTitle: "Configuring mc-core via Maven"  
+  filtering.md:
+    displayTitle: "Filters in the configuration"  
+  origination.md:
+      displayTitle: "Reflection on the origin of the configuration"
+  probing.md:
+    displayTitle: "Dynamic configuration enrichment"
+  

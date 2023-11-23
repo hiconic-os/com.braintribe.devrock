@@ -1,0 +1,17 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.braintribe.devrock.test</groupId>
+    <artifactId>missing-env-var</artifactId>
+    <version>1.0.1</version>
+    <properties>
+        <java5.home>${env.JAVA5_HOME}</java5.home>
+        <java6.home>${env.JAVA6_HOME}</java6.home>
+        <bootclasspath.java5>${java5.home}/lib/rt.jar</bootclasspath.java5>
+        <bootclasspath.java6>${java6.home}/lib/rt.jar</bootclasspath.java6>
+        <bootclasspath.compile>${bootclasspath.java5}</bootclasspath.compile>
+        <bootclasspath.testCompile>${bootclasspath.java6}</bootclasspath.testCompile>
+    </properties>
+    <dependencies>
+    
+    </dependencies>
+</project>

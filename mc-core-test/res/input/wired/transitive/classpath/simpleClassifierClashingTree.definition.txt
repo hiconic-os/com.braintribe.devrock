@@ -1,0 +1,55 @@
+;
+; simplest tree for COREDR-10 transitive classpath resolution
+; see https://docs.google.com/drawings/d/1DMIErztsLVXLrnruwdAWqdk35dkeoEiSOPbGsRjoAQA, left side
+;
+
+com.braintribe.devrock.test:t#1.0.1
+	-d 
+		com.braintribe.devrock.test:a#1.0.1
+		com.braintribe.devrock.test:b#1.0.1
+	-c
+		:jar
+	-x
+	
+com.braintribe.devrock.test:a#1.0.1
+    -d 
+        com.braintribe.devrock.test:d#1.0.1
+        com.braintribe.devrock.test:c#1.0.1-classifier
+    -c
+        :jar
+    -x
+    
+com.braintribe.devrock.test:b#1.0.1
+	-d 
+		com.braintribe.devrock.test:c#1.0.1
+	-c
+		:jar
+	-x	
+
+
+com.braintribe.devrock.test:c#1.0.1
+	-d 
+		com.braintribe.devrock.test:x#1.0.1
+	-c
+		:jar
+		classifier:jar
+	-x	
+	
+com.braintribe.devrock.test:d#1.0.1
+	-c
+		:jar
+	-x
+	
+com.braintribe.devrock.test:d#1.0.2
+    -c
+        :jar
+    -x
+	
+	
+com.braintribe.devrock.test:x#1.0.1
+    -d 
+        com.braintribe.devrock.test:d#1.0.2
+	-c
+		:jar
+	-x
+	

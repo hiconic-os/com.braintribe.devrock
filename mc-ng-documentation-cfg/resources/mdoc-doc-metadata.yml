@@ -1,0 +1,23 @@
+---
+!com.braintribe.doc.meta.CustomDocMetaData
+
+title: "Malaclypse documentation"
+
+assets: 
+  "com.braintribe.devrock:mc-ng-tutorials": &1
+    displayTitle: tutorials
+    startingPoint: tutorials.html
+  "com.braintribe.devrock:mc-ng-principles": &2 
+    displayTitle: principles
+    startingPoint: principles.html
+  "com.braintribe.devrock:mc-core-documentation": &3
+    displayTitle: mc-core documentation
+    startingPoint: mc-core.html
+
+entrypoints:
+  - assetId: com.braintribe.devrock:mc-ng-tutorials
+    displayInfo: *1      
+  - assetId: com.braintribe.devrock:mc-ng-principles
+    displayInfo: *2      
+  - assetId: com.braintribe.devrock:mc-core-documentation
+    displayInfo: *3

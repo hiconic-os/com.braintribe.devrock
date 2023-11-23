@@ -1,0 +1,101 @@
+{
+  "_id" : "0",
+  "_type" : "com.braintribe.model.ravenhurst.interrogation.RavenhurstBundle",
+  "date" : {
+    "_type" : "date",
+    "value" : "2019-01-21T10:10:32.311+0200"
+  },
+  "dynamicRepository" : true,
+  "failOnCrcMismatchForRelease" : false,
+  "failOnCrcMismatchForSnapshot" : false,
+  "globalId" : null,
+  "id" : null,
+  "inaccessible" : false,
+  "listingLenient" : true,
+  "partition" : null,
+  "profileId" : "core",
+  "ravenhurstClientKey" : null,
+  "ravenhurstRequest" : {
+    "_id" : "1",
+    "_type" : "com.braintribe.model.ravenhurst.interrogation.RavenhurstRequest",
+    "globalId" : null,
+    "id" : null,
+    "partition" : null,
+    "server" : {
+      "_id" : "2",
+      "_type" : "com.braintribe.model.maven.settings.Server",
+      "configuration" : null,
+      "directoryPermissions" : "775",
+      "filePermissions" : "664",
+      "globalId" : null,
+      "id" : "core-dev",
+      "partition" : null,
+      "passphrase" : null,
+      "password" : "nonewhatsoever",
+      "privateKey" : null,
+      "username" : "devrock-tests-dummy"
+    },
+    "url" : "https://artifactory.example.com/Ravenhurst/rest/core-dev///changes/?timestamp=2019-01-21T10%3A10%3A23.203%2B0200"
+  },
+  "ravenhurstResponse" : {
+    "_id" : "3",
+    "_type" : "com.braintribe.model.ravenhurst.interrogation.RavenhurstResponse",
+    "elapsedTime" : {
+      "_type" : "double",
+      "value" : 287.5423
+    },
+    "errorMsg" : null,
+    "globalId" : null,
+    "id" : null,
+    "isFaulty" : false,
+    "partition" : null,
+    "payload" : "com.braintribe.hmtltools:html-tools#1.0.9\ncom.braintribe.hmtltools:html-tools#1.0.10",
+    "responseDate" : {
+      "_type" : "date",
+      "value" : "2019-01-21T10:10:32.311+0200"
+    },
+    "touchedArtifacts" : [ 
+	    {
+	      "_id" : "1",
+	      "_type" : "com.braintribe.model.ravenhurst.Artifact",
+	      "artifactId" : "html-tools",
+	      "globalId" : null,
+	      "groupId" : "com.braintribe.htmltools",
+	      "id" : null,
+	      "partition" : null,
+	      "parts" : {
+		"_type" : "set",
+		"value" : [ ]
+	      },
+	      "redeployedFlag" : false,
+	      "snapshotFlag" : false,
+	      "version" : "1.0.9"
+	    },
+	    {
+	      "_id" : "1",
+	      "_type" : "com.braintribe.model.ravenhurst.Artifact",
+	      "artifactId" : "html-tools",
+	      "globalId" : null,
+	      "groupId" : "com.braintribe.htmltools",
+	      "id" : null,
+	      "partition" : null,
+	      "parts" : {
+		"_type" : "set",
+		"value" : [ ]
+	      },
+	      "redeployedFlag" : false,
+	      "snapshotFlag" : false,
+	      "version" : "1.0.10"
+	    }
+    ]
+  },
+  "relevantForRelease" : true,
+  "relevantForSnapshot" : false,
+  "repositoryClientKey" : null,
+  "repositoryId" : "core-dev",
+  "repositoryUrl" : "https://artifactory.example.com/artifactory/core-dev/",
+  "trustworthyRepository" : true,
+  "updateIntervalForRelease" : -1,
+  "updateIntervalForSnapshot" : -1,
+  "weaklyCertified" : false
+}

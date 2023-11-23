@@ -1,0 +1,14 @@
+com.braintribe.test.dependencies.subtreeexclusiontest:A#1.1
+com.braintribe.test.dependencies.subtreeexclusiontest:B#1.1
+com.braintribe.test.dependencies.subtreeexclusiontest:C#1.1
+com.braintribe.test.dependencies.subtreeexclusiontest:E#1.1
+com.braintribe.test.dependencies.subtreeexclusiontest:F#1.1
+com.braintribe.test.dependencies.subtreeexclusiontest:G#1.1
+com.braintribe.test.dependencies.subtreeexclusiontest:N#1.2
+com.braintribe.test.dependencies.subtreeexclusiontest:N#1.5
+com.braintribe.test.dependencies.subtreeexclusiontest:N#1.7
+com.braintribe.test.dependencies.subtreeexclusiontest:O#1.1
+com.braintribe.test.dependencies.subtreeexclusiontest:Q#1.9
+com.braintribe.test.dependencies.subtreeexclusiontest:Q#2.0
+com.braintribe.test.dependencies.subtreeexclusiontest:X#1.1
+=res/content/overlap/archiveAddOn.zip

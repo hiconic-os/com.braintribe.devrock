@@ -1,0 +1,2 @@
+com.braintribe.devrock.test:x
+com.braintribe.devrock.test:y;archive

@@ -1,0 +1,48 @@
+@local
+
+com.braintribe.devrock.test:a#1.0	
+	-r 
+		:parent#[1.0,1.1)
+	-d 
+		:b#1.0.1-pc
+		:c#1.0:compile:jar;a:b,c:e,:
+		com.braintribe.model:root-model#${V.com.braintribe.gm}
+	-c
+	:jar
+	sources:jar
+	-x
+	
+com.braintribe.devrock.test:b#1.0.1-pc	
+	-p
+		major:1
+		minor:0
+		revision:1-pc
+	-v
+		${major}.${minor}.${revision}
+	-r 
+		:parent#[1.0,1.1)
+	-d		
+		com.braintribe.model:root-model#${V.com.braintribe.gm}|tag:asset
+	
+	-c
+	:jar
+	sources:jar
+	-x
+	
+com.braintribe.devrock.test:c#1.0	
+	-r 
+		:parent#[1.0,1.1)
+	-c
+	:jar
+	sources:jar
+	-x
+	
+com.braintribe.devrock.test:parent#1.0|pom
+	-p
+		V.com.braintribe.gm:[1.0,1.1)
+	-i
+		:import#[1.0,1.1)
+	-x
+	
+	
+	

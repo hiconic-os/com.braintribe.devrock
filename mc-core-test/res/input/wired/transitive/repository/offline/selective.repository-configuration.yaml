@@ -1,0 +1,30 @@
+!com.braintribe.devrock.model.repository.RepositoryConfiguration {   
+  offline : false,
+  cachePath: "${env.cache}",
+
+  # the repo for local installation (e.g. via ant)
+  installRepository: &install-repo !com.braintribe.devrock.model.repository.MavenFileSystemRepository {
+    name: "install",
+    rootPath: "${env.install}",
+    dominanceFilter: !com.braintribe.devrock.model.repository.filters.AllMatchingArtifactFilter {},
+ 	cachable: false,
+  },
+
+  # the list of repos for resolving  
+  repositories: [
+    # the install-repo must be first to override other repos (combined with dominance filter)
+        *install-repo,
+       !com.braintribe.devrock.model.repository.MavenHttpRepository {
+           name: "archive_1",           
+           url: "http://localhost:${env.port}/archive_1",
+           updateable: true,
+           offline : true,
+
+       },
+      !com.braintribe.devrock.model.repository.MavenHttpRepository {
+           name: "archive_2",           
+           url: "http://localhost:${env.port}/archive_2",
+           offline : true,
+       },
+   ],
+}            

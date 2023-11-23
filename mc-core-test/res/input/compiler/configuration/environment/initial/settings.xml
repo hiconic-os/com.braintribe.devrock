@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!-- simple settings.xml for the variable replacement test -->
+<settings>	
+	<localRepository>${env.CACHE}</localRepository>			
+	<servers>
+		<server>
+			<id>${env.repoName}</id>
+			<username>${user.name}</username>
+			<password>${env.repoPwd}</password>
+			<filePermissions>664</filePermissions>
+			<directoryPermissions>775</directoryPermissions>
+		</server>		
+		</servers>
+	<profiles>		
+		<profile>
+			<id>default</id>
+			<repositories>
+				<!-- repolet backed repository 'archiveA' -->
+				<repository>
+					<id>${env.repoName}</id>
+					<layout>default</layout>
+					<url>${env.repoUrl}</url>					
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>never</updatePolicy>
+					</releases>
+				</repository>									
+			</repositories>						
+		</profile>		
+	</profiles>
+	<activeProfiles>
+		<activeProfile>default</activeProfile>
+	</activeProfiles>
+</settings>

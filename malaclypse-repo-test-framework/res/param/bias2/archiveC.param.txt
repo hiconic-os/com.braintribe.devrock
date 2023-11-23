@@ -1,0 +1,2 @@
+com.braintribe.devrock.test.bias:a#1.0.2
+=res/param/bias2/archiveC.zip

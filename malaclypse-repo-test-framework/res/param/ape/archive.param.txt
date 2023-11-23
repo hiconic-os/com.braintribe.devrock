@@ -1,0 +1,8 @@
+com.braintribe.devrock.test.tags:parent
+com.braintribe.devrock.test.tags:none
+com.braintribe.devrock.test.tags:standard
+com.braintribe.devrock.test.tags:one
+com.braintribe.devrock.test.tags:one-and-two
+com.braintribe.devrock.test.tags:tags-terminal
+com.braintribe.devrock.test.tags:classpath
+=res/param/tags/archive.zip

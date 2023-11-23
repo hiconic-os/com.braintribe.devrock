@@ -1,0 +1,61 @@
+;
+; simple tree that simply has a common branch (d downwards)
+;
+
+com.braintribe.devrock.test:a#1.0.1
+	-d 
+		com.braintribe.devrock.test:b#1.0.1
+		com.braintribe.devrock.test:c#1.0.1
+	-c
+		:jar
+	-x
+	
+com.braintribe.devrock.test:b#1.0.1
+	-d 
+		com.braintribe.devrock.test:d#1.0.1
+	-c
+		:jar
+	-x	
+
+
+com.braintribe.devrock.test:c#1.0.1
+	-d 
+		com.braintribe.devrock.test:d#1.0.1
+	-c
+		:jar
+	-x	
+	
+	
+com.braintribe.devrock.test:d#1.0.1
+	-d
+		com.braintribe.devrock.test:e#1.0.1
+		com.braintribe.devrock.test:xr#1.0.1
+	-c
+		:jar
+	-x
+	
+	
+com.braintribe.devrock.test:e#1.0.1
+	-d
+		com.braintribe.devrock.test:f#1.0.1
+	-c
+		:jar
+	-x
+	
+com.braintribe.devrock.test:f#1.0.1	
+    -d
+        com.braintribe.devrock.test:yr#1.0.1 
+	-c
+		:jar
+	-x
+    
+com.braintribe.devrock.test:xr#1.0.1    
+    -c
+        :jar
+    -x
+    
+com.braintribe.devrock.test:yr#1.0.1    
+    -c
+        :jar
+    -x
+    

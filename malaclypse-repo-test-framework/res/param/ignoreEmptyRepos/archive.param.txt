@@ -1,0 +1,5 @@
+com.braintribe.devrock.test.bias:parent
+com.braintribe.devrock.test.bias:a#1.0.1
+com.braintribe.devrock.test.bias:a#1.0.2
+com.braintribe.devrock.test.bias:bias-terminal
+=res/param/ignoreEmptyRepos/archive.base.zip

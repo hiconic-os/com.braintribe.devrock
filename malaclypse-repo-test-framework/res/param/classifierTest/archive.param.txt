@@ -1,0 +1,3 @@
+com.braintribe.test.dependencies.classifier:A
+com.braintribe.test.dependencies.classifier:ClassifierTestTerminal
+=res/content/classifier/archive.zip

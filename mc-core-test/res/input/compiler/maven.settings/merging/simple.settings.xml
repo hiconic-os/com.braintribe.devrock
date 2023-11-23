@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<settings>
+    
+    <localRepository>myDrive:/.m2/repository-groups/</localRepository>
+    
+    <servers>
+
+        <!-- core profile servers -->
+        <server>
+            <id>declared_repo</id>
+            <username>declared_user</username>
+            <password>declared_password</password>
+            <filePermissions>664</filePermissions>
+            <directoryPermissions>775</directoryPermissions>
+        </server>       
+    </servers>
+    
+
+    <profiles>
+        
+        <!-- core profile -->
+        <profile>
+            <id>declared_profile</id>
+            <repositories>                
+                <repository>
+                    <id>declared_repo</id>
+                    <layout>default</layout>
+                    <url>http://declared_url</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>always</updatePolicy>
+                    </snapshots>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                </repository>                                      
+            </repositories>        
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>               
+            </properties>    
+        </profile>        
+    </profiles>    
+</settings>

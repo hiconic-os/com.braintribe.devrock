@@ -1,0 +1,10 @@
+@local
+;  initial stage, all 1.0.1
+com.braintribe.devrock.test:a#1.0.1
+    -c
+        :jar
+        sources:jar
+        javadoc:jar
+        asset:man
+    -x
+      

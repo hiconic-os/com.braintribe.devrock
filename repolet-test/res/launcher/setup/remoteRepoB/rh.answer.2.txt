@@ -1,0 +1,1 @@
+com.braintribe.devrock.test:answer2-artifact#2.0

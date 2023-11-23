@@ -1,0 +1,63 @@
+;
+; simple reference tree (parent) for COREDR-10 transitive resolution
+;
+
+com.braintribe.devrock.test:a#1.0.1
+	-r 
+		com.braintribe.devrock.test:p#[1.0,1.1)
+	-d 
+		com.braintribe.devrock.test:b#${V.standard.range}
+		com.braintribe.devrock.test:c#
+	-c
+		:jar
+	-x
+	
+com.braintribe.devrock.test:b#1.0.1
+	-r 
+		com.braintribe.devrock.test:p#[1.0,1.1)
+	-d 
+		com.braintribe.devrock.test:d#${V.standard.range}
+	-c
+		:jar
+	-x	
+
+
+com.braintribe.devrock.test:c#1.0.1
+	-r 
+		com.braintribe.devrock.test:p#[1.0,1.1)
+	-d 
+		com.braintribe.devrock.test:e#${V.standard.range}
+	-c
+		:jar
+	-x	
+	
+	
+com.braintribe.devrock.test:d#1.0.1
+	-r 
+		com.braintribe.devrock.test:p#[1.0,1.1)
+	-c
+		:jar
+	-x
+	
+	
+com.braintribe.devrock.test:e#1.0.1
+	-r 
+		com.braintribe.devrock.test:p#[1.0,1.1)
+	-c
+		:jar
+	-x
+	
+com.braintribe.devrock.test:i#1.0.1
+    -p 
+        V.standard.range:[1.0,1.1)
+    -m
+        com.braintribe.devrock.test:c#${V.standard.range}
+    -x
+	
+com.braintribe.devrock.test:p#1.0.1
+	-p
+		V.standard.range:[1.0,1.1)
+	-m
+		com.braintribe.devrock.test:i#${V.standard.range}:import:
+	-x
+	

@@ -1,0 +1,9 @@
+;
+; simple tree data to test switching (stage one)
+;
+
+com.braintribe.devrock.test:a#2.0
+    -c
+        :jar
+    -x
+    

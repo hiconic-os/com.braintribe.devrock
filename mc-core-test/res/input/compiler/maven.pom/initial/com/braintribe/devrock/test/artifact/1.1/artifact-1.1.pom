@@ -1,0 +1,52 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.braintribe.devrock.test</groupId>
+        <artifactId>parent</artifactId>
+        <version>[1.0,1.1)</version>
+    </parent>
+    <artifactId>artifact</artifactId>
+    <version>${major}.${minor}</version>
+    <properties>
+        <major>1</major>
+        <minor>1</minor>
+        <nextMinor>2</nextMinor>
+        <overwrite>true</overwrite>               
+	<global-dominants>
+       [
+           "com.braintribe.model:platform-api#2.0",
+           "com.braintribe.model:common-api#2.0"
+       ]
+       </global-dominants>
+ 
+       <global-exclusions>
+       [
+           "com.braintribe.model:platform-api",
+           "com.braintribe.model:*"
+       ]
+       </global-exclusions>
+ 
+       <artifact-redirects>
+       {
+           "com.braintribe.model:gm-core-api#[1.0,1.1)": "tribefire.cortex.gwt:gm-core-api#[1.0,1.1)",
+           "com.braintribe.model:gm-core-api#[1.0,1.1)": "tribefire.cortex.gwt:gm-core-api#[1.0,1.1)"
+       }
+       </artifact-redirects>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.braintribe.devrock.test</groupId>
+            <artifactId>a</artifactId>
+            <version>${V.com.braintribe.devrock.test}</version>
+        </dependency>    
+		<dependency>
+            <groupId>com.braintribe.devrock.test</groupId>
+            <artifactId>b</artifactId>
+        </dependency>                     
+		<dependency>
+            <groupId>com.braintribe.devrock.test</groupId>
+            <artifactId>c</artifactId>           
+            <classifier>classifier</classifier>          
+        </dependency>
+    </dependencies>    
+</project>

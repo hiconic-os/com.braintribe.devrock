@@ -1,0 +1,42 @@
+# definition for an aritifact occuring twice with different classifier  : t -> a -> c:one, t-> b -> c:two
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+
+    # terminal
+    { artifactId: "t", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},       
+       dependencies: [      
+          { artifactId: "a",  groupId: "com.braintribe.devrock.test", version: "1.0.1"},                                  
+          { artifactId: "b",  groupId: "com.braintribe.devrock.test", version: "1.0.1"},                                       
+       ],  
+       parts: {
+         "jar" : null,                
+      }
+    }, 
+
+  { artifactId: "a", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},       
+       dependencies: [      
+          { artifactId: "c",  groupId: "com.braintribe.devrock.test", version: "1.0.1", classifier: "one"},                                  
+          
+       ],  
+       parts: {
+         "jar" : null,                
+      }
+    }, 
+  { artifactId: "b", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},       
+       dependencies: [      
+          { artifactId: "c",  groupId: "com.braintribe.devrock.test", version: "1.0.1", classifier: "two"},                                  
+          
+       ],  
+       parts: {
+         "jar" : null,                
+      }
+    }, 
+    { artifactId: "c", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},              
+       parts: {
+         "jar" : null,                
+         "one:jar" : null,
+         "two:jar" : null, 
+      }
+    }, 
+  ]
+}

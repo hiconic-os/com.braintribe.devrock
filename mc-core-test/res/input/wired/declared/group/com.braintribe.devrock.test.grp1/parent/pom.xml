@@ -1,0 +1,24 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.braintribe.devrock.test.grp1</groupId>
+    <artifactId>parent</artifactId>
+    <version>${major}.${minor}.${revision}</version>
+    <properties>
+        <major>1</major>
+        <minor>1</minor>
+        <nextMinor>2</nextMinor>
+        <revision>3-pc</revision>
+		<!-- --> 
+		<V.com.braintribe.devrock.test.grp1>[1.0,1,1)</V.com.braintribe.devrock.test.grp1>
+		<V.com.braintribe.devrock.test.grp2>[1.0,1,1)</V.com.braintribe.devrock.test.grp2>
+		<V.com.braintribe.devrock.test.grp3>[1.0,1,1)</V.com.braintribe.devrock.test.grp3>
+		<V.com.braintribe.devrock.test.grpX>[1.0,1,1)</V.com.braintribe.devrock.test.grpX>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.braintribe.devrock.test.grpX</groupId>
+            <artifactId>x</artifactId>
+            <version>${V.com.braintribe.devrock.test.grpX}</version>
+        </dependency>
+    </dependencies>
+</project>

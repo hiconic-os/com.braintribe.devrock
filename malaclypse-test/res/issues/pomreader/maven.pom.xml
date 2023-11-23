@@ -1,0 +1,42 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>tribefire.extension.enablement-maven.simple</groupId>
+		<artifactId>simple-cartridge-parent</artifactId>
+		<version>[2.0,2.1)</version>
+	</parent>
+	<artifactId>simple-data-model</artifactId>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>tribefire.cortex.maven</groupId>
+				<artifactId>model-declaration-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<!-- All models depend on the root-model. -->
+		<dependency>
+			<groupId>com.braintribe.gm</groupId>
+			<artifactId>root-model</artifactId>
+			<version>${V.com.braintribe.gm}</version>
+		</dependency>
+		<!-- Further core tribefire models this model depends on. -->
+		<dependency>
+			<groupId>com.braintribe.gm</groupId>
+			<artifactId>resource-model</artifactId>
+			<version>${V.com.braintribe.gm}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.braintribe.gm</groupId>
+			<artifactId>icon-model</artifactId>
+			<version>${V.com.braintribe.gm}</version>
+		</dependency>
+	</dependencies>
+</project>

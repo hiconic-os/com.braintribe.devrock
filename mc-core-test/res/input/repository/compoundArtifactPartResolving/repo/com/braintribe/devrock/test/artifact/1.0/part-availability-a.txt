@@ -1,0 +1,5 @@
+955014cf-06ce-4a1d-b04f-204fb9920c68
++:pom
++:jar
++sources:jar
+-javadoc:jar

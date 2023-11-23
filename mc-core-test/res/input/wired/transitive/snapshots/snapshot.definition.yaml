@@ -1,0 +1,30 @@
+# definition for the maven snapshot crap
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+
+    # parent
+    { artifactId: "snapshot-parent", groupId: "com.braintribe.devrock.test", version: "1.0.1-SNAPSHOT", 
+      properties: [
+         {name: "V.tribefire.setup.classic.env", value: "1.0.1"},
+         {name: "V.this.project", value: "1.0.1"}
+      ]       
+    }, 
+   #
+   { artifactId: "snapshot-one", groupId: "com.braintribe.devrock.test", version: "1.0.1-SNAPSHOT", parts:{":jar": null, "asset:man": null},
+       dependencies: [                 
+            { artifactId: "standard",  groupId: "com.braintribe.devrock.test", version: "1.0.1"},             
+            { artifactId: "snapshot-two",  groupId: "com.braintribe.devrock.test", version: "1.2.1-SNAPSHOT"},             
+       ],       
+    }, 
+    { artifactId: "snapshot-two", groupId: "com.braintribe.devrock.test", version: "1.2.1-SNAPSHOT", parts:{":jar": null, "asset:man": null},
+       dependencies: [                 
+            { artifactId: "standard",  groupId: "com.braintribe.devrock.test", version: "1.0.1"},             
+       ],       
+    }, 
+   # b - first level child
+    { artifactId: "standard", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null, "asset:man": null},       
+    }, 
+
+  ]
+
+}

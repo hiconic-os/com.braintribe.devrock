@@ -1,0 +1,4 @@
+com.braintribe.devrock.test.shortcutresolving:parent
+com.braintribe.devrock.test.shortcutresolving:a
+com.braintribe.devrock.test.shortcutresolving:short-cut-resolving-test-terminal
+=res/param/shortCutResolving/archive.zip

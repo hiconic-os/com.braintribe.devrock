@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<metadata>
+    <groupId>com.braintribe.devrock.test.bias</groupId>
+    <artifactId>a</artifactId>
+    <version>1.0.2-pc</version>
+    <versioning>
+        <latest>1.0.2-pc</latest>
+        <versions>            
+            <version>1.0.2-pc</version>
+        </versions>
+        <lastUpdated>20180702114423</lastUpdated>
+    </versioning>
+</metadata>

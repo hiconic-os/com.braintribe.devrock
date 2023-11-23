@@ -1,0 +1,238 @@
+<?xml version="1.0"?>
+	<settings>
+
+	<localRepository>C://Users/neidhart.orlich/.m2/repository_main</localRepository>
+
+		<servers>
+
+				<!-- core profile servers -->
+				<server>
+						<id>central.mirror</id>
+						<username>${env.DEVROCK_TESTS_READ_USERNAME}</username>
+						<password>${env.DEVROCK_TESTS_READ_PASSWORD}</password>
+						<filePermissions>664</filePermissions>
+						<directoryPermissions>775</directoryPermissions>
+				</server>
+
+				<server>
+						<id>core-dev</id>
+						<username>${env.DEVROCK_TESTS_READ_USERNAME}</username>
+						<password>${env.DEVROCK_TESTS_READ_PASSWORD}</password>
+						<filePermissions>664</filePermissions>
+						<directoryPermissions>775</directoryPermissions>
+				</server>
+				
+				<server>
+						<id>custom-assets</id>
+						<username>${env.DEVROCK_TESTS_READ_USERNAME}</username>
+						<password>${env.DEVROCK_TESTS_READ_PASSWORD}</password>
+						<filePermissions>664</filePermissions>
+						<directoryPermissions>775</directoryPermissions>
+				</server>
+
+				<server>
+						<id>central</id>
+						<username>${env.DEVROCK_TESTS_READ_USERNAME}</username>
+						<password>${env.DEVROCK_TESTS_READ_PASSWORD}</password>
+						<filePermissions>664</filePermissions>
+						<directoryPermissions>775</directoryPermissions>
+				</server>
+
+				<!-- devrock server -->
+				<server>
+						<id>devrock</id>
+						<username>${env.DEVROCK_TESTS_READ_USERNAME}</username>
+						<password>${env.DEVROCK_TESTS_READ_PASSWORD}</password>
+						<filePermissions>664</filePermissions>
+						<directoryPermissions>775</directoryPermissions>
+				</server>
+
+				<server>
+						<id>custom-target</id>
+						<username>${env.DEVROCK_TESTS_READ_USERNAME}</username>
+						<password>${env.DEVROCK_TESTS_READ_PASSWORD}</password>
+						<filePermissions>664</filePermissions>
+						<directoryPermissions>775</directoryPermissions>
+				</server>
+		</servers>
+
+		<mirrors>
+				<!-- core mirrors -->
+				<mirror>
+						<id>central.mirror</id>
+						<url>${env.DEVROCK_TESTS_REPOSITORY_BASE_URL}/third-party/</url>
+						<mirrorOf>*,!devrock,!core-dev,!custom-assets,!custom-target</mirrorOf>
+				</mirror>
+				<mirror>
+						<id>central</id>
+						<url>${env.DEVROCK_TESTS_REPOSITORY_BASE_URL}/third-party/</url>
+						<mirrorOf>*,!devrock,!core-dev,!custom-assets,!custom-target</mirrorOf>
+				</mirror>
+		</mirrors>
+
+		<profiles>
+
+				<!-- core profile -->
+				<profile>
+						<id>core</id>
+						<repositories>
+								<repository>
+										<id>third-party</id>
+										<layout>default</layout>
+										<url>${env.DEVROCK_TESTS_REPOSITORY_BASE_URL}/third-party/</url>
+										<snapshots>
+												<enabled>false</enabled>
+										</snapshots>
+										<releases>
+												<enabled>true</enabled>
+												<updatePolicy>never</updatePolicy>
+										</releases>
+								</repository>
+								<repository>
+										<id>core-dev</id>
+										<layout>default</layout>
+										<url>${env.DEVROCK_TESTS_REPOSITORY_BASE_URL}/core-dev/</url>
+										<snapshots>
+												<enabled>false</enabled>
+										</snapshots>
+										<releases>
+												<enabled>true</enabled>
+												<updatePolicy>never</updatePolicy>
+										</releases>
+								</repository>
+								<repository>
+										<id>custom-assets</id>
+										<layout>default</layout>
+										<url>${env.DEVROCK_TESTS_REPOSITORY_BASE_URL}/custom-assets/</url>
+										<snapshots>
+												<enabled>false</enabled>
+										</snapshots>
+										<releases>
+												<enabled>true</enabled>
+												<updatePolicy>never</updatePolicy>
+										</releases>
+								</repository>
+						</repositories>
+
+						<activation>
+								<property>
+										<name>env.PROFILE_USECASE</name>
+										<value>CORE</value>
+								</property>
+						</activation>
+
+						<properties>
+								<!-- ravenhurst settings -->
+								<updateReflectingRepositories>third-party,core-dev,custom-assets</updateReflectingRepositories>
+								<ravenhurst-context>/</ravenhurst-context>
+								<ravenhurst-url-third-party>${env.DEVROCK_TESTS_RAVENHURST_BASE_URL}/third-party</ravenhurst-url-third-party>
+								<ravenhurst-url-core-dev>${env.DEVROCK_TESTS_RAVENHURST_BASE_URL}/core-dev</ravenhurst-url-core-dev>
+								<ravenhurst-url-custom-assets>${env.DEVROCK_TESTS_RAVENHURST_BASE_URL}/custom-assets</ravenhurst-url-custom-assets>
+
+								<!-- automatic deploy target -->
+								<target-repository>core-dev</target-repository>
+						</properties>
+				</profile>
+
+				<!-- custom target profile -->
+				<profile>
+						<id>custom-target</id>
+						<repositories>
+								<repository>
+										<id>third-party</id>
+										<layout>default</layout>
+										<url>${env.DEVROCK_TESTS_REPOSITORY_BASE_URL}/third-party/</url>
+										<snapshots>
+												<enabled>false</enabled>
+										</snapshots>
+										<releases>
+												<enabled>true</enabled>
+												<updatePolicy>never</updatePolicy>
+										</releases>
+								</repository>
+								<repository>
+										<id>core-dev</id>
+										<layout>default</layout>
+										<url>${env.DEVROCK_TESTS_REPOSITORY_BASE_URL}/core-dev/</url>
+										<snapshots>
+												<enabled>false</enabled>
+										</snapshots>
+										<releases>
+												<enabled>true</enabled>
+												<updatePolicy>never</updatePolicy>
+										</releases>
+								</repository>
+								<repository>
+										<id>custom-target</id>
+										<layout>default</layout>
+										<url>${env.DEVROCK_TESTS_REPOSITORY_BASE_URL}/${env.CUSTOM_TARGET_REPO}/</url>
+										<snapshots>
+												<enabled>false</enabled>
+										</snapshots>
+										<releases>
+												<enabled>true</enabled>
+												<updatePolicy>never</updatePolicy>
+										</releases>
+								</repository>
+						</repositories>
+
+						<activation>
+								<property>
+										<name>env.PROFILE_USECASE</name>
+										<value>CUSTOM_TARGET</value>
+								</property>
+						</activation>
+
+						<properties>
+								<!-- ravenhurst settings -->
+								<!-- TODO: Enable again after bug is resolved: https://jira.braintribe.com/browse/DEVDR-190
+								<updateReflectingRepositories>third-party,core-dev,custom-target</updateReflectingRepositories>
+								<ravenhurst-context>/</ravenhurst-context>
+								<ravenhurst-url-third-party>${env.DEVROCK_TESTS_RAVENHURST_BASE_URL}/third-party</ravenhurst-url-third-party>
+								<ravenhurst-url-core-dev>${env.DEVROCK_TESTS_RAVENHURST_BASE_URL}/core-dev</ravenhurst-url-core-dev>
+								<ravenhurst-url-custom-target>${env.DEVROCK_TESTS_RAVENHURST_BASE_URL}/${env.CUSTOM_TARGET_REPO}</ravenhurst-url-custom-target>
+								-->
+								<!-- automatic deploy target -->
+								<target-repository>custom-target</target-repository>
+						</properties>
+				</profile>
+
+				<!-- devrock profile -->
+				<profile>
+						<id>devrock</id>
+						<repositories>
+								<repository>
+										<id>devrock</id>
+										<layout>default</layout>
+										<url>${env.DEVROCK_TESTS_REPOSITORY_BASE_URL}/devrock/</url>
+										<snapshots>
+												<enabled>false</enabled>
+										</snapshots>
+										<releases>
+												<enabled>true</enabled>
+												<updatePolicy>never</updatePolicy>
+										</releases>
+								</repository>
+						</repositories>
+
+						<activation>
+								<property>
+										<name>env.PROFILE_USECASE</name>
+										<value>DEVROCK</value>
+								</property>
+						</activation>
+
+						<properties>
+								<!-- ravenhurst settings -->
+								<updateReflectingRepositories>devrock</updateReflectingRepositories>
+								<ravenhurst-context-devrock>/</ravenhurst-context-devrock>
+								<ravenhurst-url-devrock>${env.DEVROCK_TESTS_RAVENHURST_BASE_URL}/devrock</ravenhurst-url-devrock>
+								<!-- trustworthy repositories of this profile -->
+								<trustworthyRepositories>devrock</trustworthyRepositories>
+								<!-- automatic deploy target -->
+								<target-repository>devrock</target-repository>
+						</properties>
+				</profile>
+
+		</profiles>
+</settings>

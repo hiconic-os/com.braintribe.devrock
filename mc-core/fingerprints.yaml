@@ -1,0 +1,5 @@
+? !com.braintribe.zarathud.model.forensics.FingerPrint
+  slots:
+    "issue": "ExcessDependencyDeclarations"
+    "issue_key": "com.braintribe.gm:http-transport-api"
+: !com.braintribe.zarathud.model.forensics.ForensicsRating IGNORE

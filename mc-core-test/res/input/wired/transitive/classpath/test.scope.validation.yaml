@@ -1,0 +1,30 @@
+# definition for scope combinations
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+   
+    # a - first level child      
+   { artifactId: "a", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},
+       dependencies: [                 
+         { artifactId: "b", groupId: "com.braintribe.devrock.test", version: "1.0.1"}
+        ] 
+    }, 
+    # b - second level child     
+   { artifactId: "b", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null}, 
+       dependencies: [                        
+         ]
+    },   
+    
+    # all other t children
+    
+    { artifactId: "t-optional", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: { ":jar": null}},
+    { artifactId: "t-test", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null}},
+    
+    # all other a children
+    
+    
+    
+    # all other b children
+    
+    
+  ]
+}

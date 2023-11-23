@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!-- simple settings for a test with the local repository and two repolet backed remote repositories -->
+<settings>	
+	<localRepository>${env.repo}</localRepository>			
+	<profiles>		
+		<profile>
+			<id>recessive</id>
+			<repositories>
+				<!-- repolet backed repository 'archiveA' -->
+				<repository>
+					<id>archive-recessive</id>
+					<layout>default</layout>
+					<url>http://localhost:8080/archive-recessive/</url>					
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>never</updatePolicy>
+					</releases>
+				</repository>									
+			</repositories>						
+		</profile>		
+	</profiles>
+	<activeProfiles>
+		<activeProfile>recessive</activeProfile>
+	</activeProfiles>
+</settings>

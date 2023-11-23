@@ -1,0 +1,152 @@
+<?xml version="1.0"?>
+<settings>
+	
+	<localRepository>${user.home}/.m2/repository-groups/</localRepository>
+	
+	<servers>
+
+		<!-- core profile servers -->
+		<server>
+			<id>central</id>
+			<username>${env.central.user}</username>
+			<password>${env.central.user.pwd}</password>
+			<filePermissions>664</filePermissions>
+			<directoryPermissions>775</directoryPermissions>
+		</server>
+
+		<server>
+			<id>core-dev</id>
+			<username>${env.core-dev.user}</username>
+			<password>${env.core-dev.user.pwd}</password>
+			<filePermissions>664</filePermissions>
+			<directoryPermissions>775</directoryPermissions>
+		</server>		
+
+		<server>
+			<id>central.mirror</id>
+			<username>${env.central.mirror.user}</username>
+			<password>${env.central.mirror.user.pwd}</password>
+			<filePermissions>664</filePermissions>
+			<directoryPermissions>775</directoryPermissions>
+		</server>		
+
+		<!-- devrock server -->
+		<server>
+			<id>devrock</id>
+			<username>${env.devrock.user}</username>
+			<password>${env.devrock.user.pwd}</password>
+			<filePermissions>664</filePermissions>
+			<directoryPermissions>775</directoryPermissions>
+		</server>
+	</servers>
+
+	<mirrors>
+		<!-- core mirrors -->
+		<mirror>
+			<id>central</id>
+			<url>${env.standard.mirror.url}</url>
+			<mirrorOf>${env.standard.mirror.expression}</mirrorOf>
+			<name>mirror for central</name>
+		</mirror>
+		<mirror>
+			<id>central.mirror</id>
+			<url>${env.central.mirror.url}</url>
+			<mirrorOf>${env.central.mirror.expression}</mirrorOf>
+			<name>mirror for central.mirror</name>
+		</mirror>
+	</mirrors>
+
+	<profiles>
+		
+		<!-- core profile -->
+		<profile>
+			<id>core</id>
+			<repositories>
+				<repository>
+					<id>third-party</id>
+					<layout>default</layout>
+					<url>${env.standard.mirror.url}</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>never</updatePolicy>
+					</releases>
+				</repository>			
+				<repository>
+					<id>core-dev</id>
+					<layout>default</layout>
+					<url>${env.core-dev.repo.url}</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>never</updatePolicy>
+					</releases>
+				</repository>			
+			</repositories>
+			
+			<activation>
+				<property>
+					<name>${env.profile_switch}</name>
+					<value>${env.core-value}</value>
+				</property>
+			</activation>
+	
+			<properties>
+				<!-- ravenhurst settings -->
+				<updateReflectingRepositories>${env.trustworthy}</updateReflectingRepositories>
+				<ravenhurst-context>/</ravenhurst-context>
+				<ravenhurst-url-third-party>${env.standard.mirror.ravenhurst}</ravenhurst-url-third-party>
+				<ravenhurst-url-core-dev>${env.core-dev.ravenhurst}</ravenhurst-url-core-dev>
+				<!-- trustworthy repositories of this profile -->
+				<trustworthyRepositories>${env.trustworthy}</trustworthyRepositories>
+				<!-- automatic deploy target -->
+				<target-repository>${env.core-dev.target}</target-repository>
+			</properties>
+		</profile>
+
+		<!-- devrock profile -->
+		<profile>
+			<id>devrock</id>
+			<repositories>
+				<repository>
+					<id>devrock</id>
+					<layout>default</layout>
+					<url>${env.devrock.repo.url}</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>never</updatePolicy>
+					</releases>
+				</repository>
+			</repositories>
+			
+			<activation>
+				<property>
+					<name>${env.profile_switch}</name>
+					<value>${env.devrock-value}</value>
+				</property>
+			</activation>
+			
+			<properties>
+				<!-- ravenhurst settings -->
+				<updateReflectingRepositories>${env.devrock.trustworthy}</updateReflectingRepositories>
+				<ravenhurst-context-devrock>/</ravenhurst-context-devrock>
+				<ravenhurst-url-devrock>${env.devrock.ravenhurst}</ravenhurst-url-devrock>
+				<!-- trustworthy repositories of this profile -->
+				<trustworthyRepositories>${env.devrock.trustworthy}</trustworthyRepositories>
+				<!-- automatic deploy target -->
+				<target-repository>${env.devrock.target}</target-repository>
+			</properties>
+		</profile>	
+	</profiles>
+	<activeProfiles>
+		<activeProfile>core</activeProfile>
+		<activeProfile>devrock</activeProfile>
+	</activeProfiles>
+</settings>

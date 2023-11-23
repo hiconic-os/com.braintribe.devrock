@@ -1,0 +1,64 @@
+# definition for some filter tests via the context of both TDR and CDR
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+
+    # terminal
+    { artifactId: "t", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},       
+       dependencies: [                
+          { artifactId: "a",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+          { artifactId: "b",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+       ],        
+       parent : { artifactId: "parent",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+    }, 
+
+    # parent  - referenced by t, a, b
+    { artifactId: "parent", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts:{":jar": null},       
+       managedDependencies: [                        
+            { artifactId: "import",  groupId: "com.braintribe.devrock.test", version: "1.0.1", scope: "import"}, 
+       ],        
+    }, 
+
+   # parent-1 - referenced by a-1, b-1
+   { artifactId: "parent-1", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts:{":jar": null},       
+       managedDependencies: [                        
+            { artifactId: "import-1",  groupId: "com.braintribe.devrock.test", version: "1.0.1", scope: "import"}, 
+       ],        
+    }, 
+
+    # a - first level child      
+   { artifactId: "a", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts:{":jar": null, ":data": null},
+       dependencies: [                 
+            { artifactId: "a-1",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+       ],        
+       parent : { artifactId: "parent",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+    }, 
+   # b - first level child
+    { artifactId: "b", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null, ":data": null},
+       dependencies: [                 
+         { artifactId: "b-1",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+       ],        
+       parent : { artifactId: "parent",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+    }, 
+
+    # a-1 - second level child
+   { artifactId: "a-1", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts:{":jar": null},       
+       parent : { artifactId: "parent-1",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+    }, 
+    
+    # b-1 - second level child
+   { artifactId: "b-1", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts:{":jar": null},
+       parent : { artifactId: "parent-1",  groupId: "com.braintribe.devrock.test", version: "1.0.1"}, 
+    }, 
+
+   # import : imported from parent 
+   { artifactId: "import", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts:{":jar": null},   
+    }, 
+
+   # import-1 : imported from parent-1
+   { artifactId: "import-1", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts:{":jar": null},       
+    }, 
+
+
+  ]
+
+}

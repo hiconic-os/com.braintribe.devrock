@@ -1,0 +1,17 @@
+;
+; COREDR-31 : cycle via ranged self reference
+;
+com.braintribe.devrock.test:terminal#2.0.1
+	-d
+		com.braintribe.devrock.test:terminal#[2.0,2.1)
+	-c
+	:jar
+		
+
+com.braintribe.devrock.test:terminal#1.0.1
+	-d
+		com.braintribe.devrock.test:terminal#1.0.1
+	-c
+	:jar
+		
+	

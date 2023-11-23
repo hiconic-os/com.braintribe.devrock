@@ -1,0 +1,26 @@
+!com.braintribe.devrock.model.repository.RepositoryConfiguration {        
+    localRepositoryPath: "${env.repo}",    
+    repositories: [
+       !com.braintribe.devrock.model.repository.MavenHttpRepository {
+           name: "rh-archive",           
+           url: "http://localhost:${env.port}/rh-archive",
+           updateable: true
+       },
+       !com.braintribe.devrock.model.repository.MavenHttpRepository {
+           name: "rh-never-archive",           
+           url: "http://localhost:${env.port}/rh-never-archive",
+           updateable: false
+       },
+       !com.braintribe.devrock.model.repository.MavenHttpRepository {
+           name: "dumb-archive",           
+           url: "http://localhost:${env.port}/dumb-archive",
+           updateable: true
+       },
+       !com.braintribe.devrock.model.repository.MavenHttpRepository {
+           name: "dumb-never-archive",           
+           url: "http://localhost:${env.port}/dumb-never-archive",
+           updateable: false
+       },
+       
+   ],
+}            

@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<settings>
+	<localRepository>${env.M2_REPO}</localRepository>
+ <servers>
+  
+    <server>
+      <id>mirror.base</id>
+      <username>builder</username>
+      <password>operating2005</password>
+      <filePermissions>664</filePermissions>
+      <directoryPermissions>775</directoryPermissions>
+    </server>
+  </servers>
+  
+  <mirrors>
+    <mirror>
+      <id>mirror.base</id>
+      <url>http://localhost:${env.port}/archive/</url>
+      <mirrorOf>braintribe.Base</mirrorOf>
+    </mirror>
+    
+      
+  </mirrors>
+
+	<profiles>
+		<profile>
+			<id>braintribe</id>
+			<repositories>
+				<repository>
+					<id>braintribe.Base</id>
+					<layout>default</layout>
+					<url>http://UNUSED</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>never</updatePolicy>
+					</releases>
+				</repository>		
+			</repositories>
+			<properties>	
+				<!-- neither trustworthy nor listing-lenient -->
+			</properties>
+		</profile>
+	</profiles>
+
+	<activeProfiles>
+		<activeProfile>braintribe</activeProfile>
+	</activeProfiles>
+</settings>

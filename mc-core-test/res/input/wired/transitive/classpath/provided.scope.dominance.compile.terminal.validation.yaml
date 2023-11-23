@@ -1,0 +1,13 @@
+# definition for scope combinations
+!com.braintribe.devrock.model.repolet.content.RepoletContent {
+artifacts: [
+
+    # terminal
+    { artifactId: "t", groupId: "com.braintribe.devrock.test", version: "1.0.1", parts: {":jar": null},       
+       dependencies: [          
+          { artifactId: "a",  groupId: "com.braintribe.devrock.test", version: "1.0.1"},                
+          { artifactId: "t-provided", groupId: "com.braintribe.devrock.test",  version: "1.0.1",  scope: "provided"},
+       ]  
+    }, 
+  ]
+}

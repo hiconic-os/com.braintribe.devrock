@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+	<groupId>com.braintribe.test.dependencies.repositoryRoleTest</groupId>
+	<artifactId>RepositoryRoleTestTerminal</artifactId>
+	<versioning>
+		<lastUpdated>20180828102425</lastUpdated>
+		<versions>
+			<version>1.0</version>
+		</versions>
+	</versioning>
+</metadata>

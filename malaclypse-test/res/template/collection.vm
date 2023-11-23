@@ -1,0 +1,18 @@
+<html>
+<head>
+<title>Collection: ${group}</title>
+</head>
+<body>
+<h3>Collection: $group</h3>
+#if ($parent)
+<ul>
+<li><a href="../">${parent}</a> <i><small>(Parent)</small></i></li>
+</ul>
+#end
+<ul>
+#foreach ($file in $files) 	
+	<li><a href="$file.href">$file.name</a></li>
+#end
+</ul>
+</body>
+</html>

@@ -1,0 +1,4 @@
+!com.braintribe.model.artifact.changes.RepositoryProbingResult
+repositoryProbeStatus: available
+repositoryRestSupport: artifactory
+timestamp: !!timestamp 2020-10-01T13:00:26.402Z
