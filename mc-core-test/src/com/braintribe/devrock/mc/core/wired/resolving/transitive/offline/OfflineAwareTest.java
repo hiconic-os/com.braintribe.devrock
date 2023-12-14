@@ -15,22 +15,26 @@ import java.io.File;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 import com.braintribe.devrock.model.repolet.content.RepoletContent;
 import com.braintribe.devrock.repolet.generator.RepositoryGenerations;
 import com.braintribe.model.artifact.analysis.AnalysisArtifactResolution;
-import com.braintribe.testing.category.KnownIssue;
 
 /**
  * runs TDR and CPR resolutions, for each first with an online repolet, then shutsdown the repolet and runs the 
  * resolution again. There should be no failure on the second run, and the two resolutions MUST be identical, 
  * even if the repolet is offline during the second run.
+ *
+ *  
+ * initially, the test was intended to make sure only the CPR fails on a 'unexpectedly offline' repository. With the (uncoordinated) introduction
+ * of the 'com.braintribe.devrock.mc.core.resolver.FailingArtifactResolver' (mid 2023) this is no longer possible (also AC cannot work in this case anymore).
+ * 
+ * So the test has been modified to make sure that if the configuration has been move to offline, it can still resolve. 
  *  
  * @author pit
  *
  */
-@Category(KnownIssue.class)
+
 public class OfflineAwareTest extends AbstractOfflineHandlingTest {
 
 	@Override
@@ -54,7 +58,7 @@ public class OfflineAwareTest extends AbstractOfflineHandlingTest {
 		// run first resolving
 		AnalysisArtifactResolution resolutionOnline;
 		try {
-			resolutionOnline = run("com.braintribe.devrock.test:t#1.0.1",standardTransitiveResolutionContext);
+			resolutionOnline = run("com.braintribe.devrock.test:t#1.0.1",standardTransitiveResolutionContext, onlineSettings.getAbsolutePath());
 		} catch (Exception e) {
 			Assert.fail("cannot run online phase of test as " + e);
 			return;
@@ -64,7 +68,7 @@ public class OfflineAwareTest extends AbstractOfflineHandlingTest {
 		// run second resolving
 		AnalysisArtifactResolution resolutionOffline;
 		try {
-			resolutionOffline = run("com.braintribe.devrock.test:t#1.0.1",standardTransitiveResolutionContext);
+			resolutionOffline = run("com.braintribe.devrock.test:t#1.0.1",standardTransitiveResolutionContext, offlineSettings.getAbsolutePath());
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail("cannot run offline phase of test as " + e);
@@ -83,7 +87,7 @@ public class OfflineAwareTest extends AbstractOfflineHandlingTest {
 		// run first resolving
 		AnalysisArtifactResolution resolutionOnline;
 		try {
-			resolutionOnline = run("com.braintribe.devrock.test:t#1.0.1",standardClasspathResolutionContext);
+			resolutionOnline = run("com.braintribe.devrock.test:t#1.0.1",standardClasspathResolutionContext, onlineSettings.getAbsolutePath());
 		} catch (Exception e) {
 			Assert.fail("cannot run online phase of test as " + e);
 			return;
@@ -93,7 +97,7 @@ public class OfflineAwareTest extends AbstractOfflineHandlingTest {
 		// run second resolving
 		AnalysisArtifactResolution resolutionOffline;
 		try {
-			resolutionOffline = run("com.braintribe.devrock.test:t#1.0.1",standardClasspathResolutionContext);
+			resolutionOffline = run("com.braintribe.devrock.test:t#1.0.1",standardClasspathResolutionContext, offlineSettings.getAbsolutePath());
 		} catch (Exception e) {
 			Assert.fail("cannot run offline phase of test as " + e);
 			return;

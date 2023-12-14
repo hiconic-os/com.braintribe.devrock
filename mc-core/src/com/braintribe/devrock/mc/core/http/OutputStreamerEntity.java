@@ -14,20 +14,32 @@ package com.braintribe.devrock.mc.core.http;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.DigestOutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import org.apache.http.entity.AbstractHttpEntity;
 
 import com.braintribe.model.generic.session.OutputStreamer;
+import com.braintribe.utils.StringTools;
 import com.braintribe.utils.stream.api.StreamPipe;
 import com.braintribe.utils.stream.api.StreamPipes;
 
 public class OutputStreamerEntity extends AbstractHttpEntity {
 
 	private OutputStreamer outputStreamer;
+	private boolean buildMd5;
+	private String md5;
+	private MessageDigest digest;
 	
 	public OutputStreamerEntity(OutputStreamer outputStreamer) {
+		this(outputStreamer, false);
+	}
+	
+	public OutputStreamerEntity(OutputStreamer outputStreamer, boolean buildMd5) {
 		super();
 		this.outputStreamer = outputStreamer;
+		this.buildMd5 = buildMd5;
 	}
 
 	@Override
@@ -44,20 +56,47 @@ public class OutputStreamerEntity extends AbstractHttpEntity {
 	public InputStream getContent() throws IOException, UnsupportedOperationException {
 		StreamPipe pipe = StreamPipes.fileBackedFactory().newPipe("http-output");
 		
-		try (OutputStream out = pipe.openOutputStream()) {
+		try (OutputStream out = wrapWithDigestIfRequired(pipe.openOutputStream())) {
 			writeTo(out);
 		}
+		
+		assignDigestIfRequired();
 		
 		return pipe.openInputStream();
 	}
 
+	private void assignDigestIfRequired() {
+		if (digest != null) {
+			md5 = StringTools.toHex(digest.digest());
+		}
+	}
+	
+	private OutputStream wrapWithDigestIfRequired(OutputStream out) {
+		if (buildMd5) {
+			try {
+				digest = MessageDigest.getInstance("MD5");
+			} catch (NoSuchAlgorithmException e) {
+				throw new UnsupportedOperationException(e);
+			}
+			out = new DigestOutputStream(out, digest);
+		}
+		return out;
+	}
+
 	@Override
 	public void writeTo(OutputStream outStream) throws IOException {
-		outputStreamer.writeTo(outStream);
+		OutputStream out = wrapWithDigestIfRequired(outStream);
+		outputStreamer.writeTo(out);
+		out.flush();
+		assignDigestIfRequired();
 	}
 
 	@Override
 	public boolean isStreaming() {
 		return false;
+	}
+	
+	public String getMd5() {
+		return md5;
 	}
 }

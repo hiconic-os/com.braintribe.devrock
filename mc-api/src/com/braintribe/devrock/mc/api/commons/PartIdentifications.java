@@ -23,6 +23,9 @@ public interface PartIdentifications {
 
 	PartIdentification pom = PartIdentification.create( "pom");
 	
+	// this part serves the special purpose to mark an artifact as completely published
+	PartIdentification publishComplete = PartIdentification.create( "publish-complete");
+	
 	String pomPartKey = pom.asString();
 	
 	PartIdentification jar = PartIdentification.create( "jar");

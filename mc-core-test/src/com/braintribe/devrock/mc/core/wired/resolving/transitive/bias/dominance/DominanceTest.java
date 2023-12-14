@@ -22,16 +22,29 @@ import com.braintribe.testing.category.KnownIssue;
 
 /**
  * tests a dominance issue found in mc-core..
+ * 	archive content : 
+ * 		terminal#1.0.1 -> b#[1.0,1.3)
+ * 		terminal#1.0.2 -> b#[1.3, 1.5)
+ * 		terminal#1.0.3 -> b#[1.0, 2.0)
+ * 
+ * dominant content
+ *  	b#1.1
+ * recessive content
+ * 		b#1.2
+ * 		b#1.3
+ * 
  * current state in mc-core#1.0.103 is that a dominant repository blocks any further lookup if it creates ANY content, 
  * and not only if it creates MEANINGFUL content
- * i.e. dominant : 1.1, recessive 1.2, 1.3
+ * 
+ * i.e. dominant : b#1.1, recessive b#1.2, b#1.3
+ * 
  * if asked for [1.1,1.3) -> 1.1 needs to be returned (works also in #1.0.103) 
  * if asked for [1.3,1.5) -> 1.3 needs to be returned (fails in #1.0.103)
  * if asked for [1.0,2.0) -> 1.1 needs to be returned
+ * 
  * @author pit
  *
  */
-@Category( KnownIssue.class)
 public class DominanceTest extends AbstractTransitiveResolverDominanceTest {
 	
 	/**

@@ -13,7 +13,11 @@ package com.braintribe.devrock.mc.core.deploy;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.UncheckedIOException;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -23,7 +27,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Phaser;
@@ -35,6 +38,7 @@ import com.braintribe.cfg.Configurable;
 import com.braintribe.cfg.Required;
 import com.braintribe.devrock.mc.api.commons.ArtifactAddress;
 import com.braintribe.devrock.mc.api.commons.ArtifactAddressBuilder;
+import com.braintribe.devrock.mc.api.commons.PartIdentifications;
 import com.braintribe.devrock.mc.api.deploy.ArtifactDeployer;
 import com.braintribe.devrock.mc.core.commons.McConversions;
 import com.braintribe.devrock.mc.core.resolver.common.AnalysisArtifactResolutionPreparation;
@@ -159,143 +163,127 @@ public abstract class AbstractArtifactDeployer<R extends Repository> implements 
 	
 	@Override
 	public ArtifactResolution deploy(Iterable<? extends Artifact> artifacts) {
-		TransferContext transferContext = openTransferContext();
-
-		ArtifactResolution resolution = ArtifactResolution.T.create();
-		
-		Map<Artifact, Lock> artifactLocks = new ConcurrentHashMap<>();
-		
-		try (ParallelProcessing parallelProcessing = new ParallelProcessing(8)) {
-			// upload parts and version level metadata in parallel 
-			for (Artifact artifact: artifacts) {
-				Artifact resolutionArtifact = Artifact.T.create();
-				resolutionArtifact.setGroupId(artifact.getGroupId());
-				resolutionArtifact.setArtifactId(artifact.getArtifactId());
-				resolutionArtifact.setVersion(artifact.getVersion());
-	
-				resolution.getTerminals().add(resolutionArtifact);
-				resolution.getSolutions().add(resolutionArtifact);
+		try (TransferContext transferContext = openTransferContext()) {
+			ArtifactResolution resolution = ArtifactResolution.T.create();
 			
-				MavenMetaData versionedMetaData = buildVersionedMetaData(artifact);
-	
-				ArtifactAddress versionedMetaDataAddress = transferContext.metaDataAddress(artifact, true);
-	
-				parallelProcessing.execute(() -> {
-					Maybe<Resource> mdResourceMaybe = transferContext.transfer(versionedMetaDataAddress, out -> DeclaredMavenMetaDataMarshaller.INSTANCE.marshall(out, versionedMetaData));
-					
-					if (mdResourceMaybe.isUnsatisfied()) {
-						Lock lock = artifactLocks.computeIfAbsent(resolutionArtifact, k -> new ReentrantLock());
-						lock.lock();
-						
-						try {
-							Reason error = mdResourceMaybe.whyUnsatisfied();
-							Reason reason = Reasons.build(MetadataUploadFailed.T).text("Uploading artifact version metadata for " + artifact.asString() + " failed").cause(error).toReason();
-							AnalysisArtifactResolutionPreparation.acquireCollatorReason(resolutionArtifact).getReasons().add(reason);
-						}
-						finally {
-							lock.unlock();
-						}
-					}
-				});
+			try (ParallelProcessing parallelProcessing = new ParallelProcessing(8)) {
+				// upload parts and version level metadata in parallel 
+				for (Artifact artifact: artifacts) {
+					Artifact resolutionArtifact = Artifact.T.create();
+					resolutionArtifact.setGroupId(artifact.getGroupId());
+					resolutionArtifact.setArtifactId(artifact.getArtifactId());
+					resolutionArtifact.setVersion(artifact.getVersion());
+		
+					resolution.getTerminals().add(resolutionArtifact);
+					resolution.getSolutions().add(resolutionArtifact);
 				
-				for (Map.Entry<String, Part> entry: artifact.getParts().entrySet()) {
-					Part part = entry.getValue();
-					String partKey = entry.getKey();
-					Resource resource = part.getResource();
-					
-					final ArtifactAddress artifactAddress;
-					
-					if ("<escape>".equals(part.getType())) {
-						artifactAddress = transferContext.newAddressBuilder().versionedArtifact(artifact).file(partKey);
-					}
-					else {
-						artifactAddress = transferContext.newAddressBuilder().versionedArtifact(artifact).part(part);
-					}
-	
-					parallelProcessing.execute(() -> {
-						Maybe<Resource> resourcePotential = transferContext.transfer(artifactAddress, resource::writeToStream);
-						
-						Part resolutionPart = Part.T.create();
-						resolutionPart.setClassifier(part.getClassifier());
-						resolutionPart.setType(part.getType());
-						
-						Lock lock = artifactLocks.computeIfAbsent(resolutionArtifact, k -> new ReentrantLock());
-						
-						if (resourcePotential.isUnsatisfied()) {
-							Reason error = resourcePotential.whyUnsatisfied();
-							Reason reason = Reasons.build(PartUploadFailed.T).text("Part [" + part.asString() + "] could not be transferred.").cause(error).toReason();
-							resolutionPart.setFailure(reason);
-						}
-						else {
-							Resource uploadedResource = resourcePotential.get();
-							resolutionPart.setResource(uploadedResource);
-						}
-
-						// update artifact synchronized due to parallel processing
-						lock.lock();
-						try {
-							resolutionArtifact.getParts().put(partKey, resolutionPart);
-							
-							if (resolutionPart.hasFailed())
-								AnalysisArtifactResolutionPreparation.acquireCollatorReason(resolutionArtifact).getReasons().add(resolutionPart.getFailure());
-						}
-						finally {
-							lock.unlock();
-						}
-					});
+					// currently we use the execute() method to try all artifacts
+					// if we want to eagerly fail we can use submit and therefore the reason which is returned from uploadArtifacts
+					parallelProcessing.execute(() -> uploadArtifact(transferContext, artifact, resolutionArtifact));
 				}
+	
+				// wait for all data (version metadata, parts, hashes, metadata) being uploaded
+				parallelProcessing.await();
 				
-				// update or create artifact metadata
-				updateMetaData(transferContext, artifact);
-				
-			}
-
-			// wait for all parts being uploaded
-			parallelProcessing.await();
-			
-			// upload metadata
-			for (Map.Entry<Artifact, Lock> entry: artifactLocks.entrySet()) {
-				Artifact artifact = entry.getKey();
-				
-				// only update metadata if parts and version metadata could be uploaded
-				if (artifact.hasFailed())
-					continue;
-				
-				// update or create artifact metadata
-				parallelProcessing.execute(() -> {
-					Reason error = updateMetaData(transferContext, artifact);
-					
-					if (error != null) {
-						Lock lock = artifactLocks.computeIfAbsent(artifact, k -> new ReentrantLock());
-						lock.lock();
-						try {
-							Reason reason = Reasons.build(MetadataUploadFailed.T).text("Uploading artifact metadata for " + artifact.asString() + " failed").cause(error).toReason();
-							AnalysisArtifactResolutionPreparation.acquireCollatorReason(artifact).getReasons().add(reason);
-						}
-						finally {
-							lock.unlock();
-						}
+				// transfer overall error
+				for (Artifact artifact: resolution.getSolutions()) {
+					if (artifact.hasFailed()) {
+						AnalysisArtifactResolutionPreparation.acquireCollatorReason(resolution).getReasons().add(artifact.getFailure());
 					}
-				});
+				}
 			}
 			
-			// wait for all metadata updates being done
-			parallelProcessing.await();
+			return resolution;
+		}
+	}
+	
+	private Reason uploadArtifact(TransferContext transferContext, Artifact artifact, Artifact resolutionArtifact) {
+		Maybe<Void> maybe = uploadArtifactVersionMetadata(transferContext, artifact) //
+			.flatMap(v -> uploadArtifactParts(transferContext, artifact, resolutionArtifact)) //
+			.flatMap(v -> uploadArtifactMetadata(transferContext, artifact)) //
+			.flatMap(v -> transferContext.onUploadComplete(artifact));
+		
+		if (maybe.isUnsatisfied()) {
+			AnalysisArtifactResolutionPreparation.acquireCollatorReason(resolutionArtifact).getReasons().add(maybe.whyUnsatisfied());
+			return maybe.whyUnsatisfied();
+		}
+		
+		return null;
+	}
+	
+	private Maybe<Void> uploadArtifactVersionMetadata(TransferContext transferContext, Artifact artifact) {
+		MavenMetaData versionedMetaData = buildVersionedMetaData(artifact);
+		
+		ArtifactAddress versionedMetaDataAddress = transferContext.metaDataAddress(artifact, true);
+		
+		Maybe<Resource> mdResourceMaybe = transferContext.transfer(versionedMetaDataAddress, out -> DeclaredMavenMetaDataMarshaller.INSTANCE.marshall(out, versionedMetaData), true);
+		
+		if (mdResourceMaybe.isUnsatisfied()) {
+			Reason error = mdResourceMaybe.whyUnsatisfied();
+			Reason reason = Reasons.build(MetadataUploadFailed.T).text("Uploading artifact version metadata for " + artifact.asString() + " failed").cause(error).toReason();
+			return reason.asMaybe();
+		}
+		
+		return Maybe.complete(null);
+	}
+
+	private Maybe<Void> uploadArtifactParts(TransferContext transferContext, Artifact artifact, Artifact resolutionArtifact) {
+		for (Map.Entry<String, Part> entry: artifact.getParts().entrySet()) {
+			Part part = entry.getValue();
+			String partKey = entry.getKey();
+			Resource resource = part.getResource();
 			
-			// transfer overall error
-			for (Artifact artifact: artifactLocks.keySet()) {
-				if (artifact.hasFailed()) {
-					AnalysisArtifactResolutionPreparation.acquireCollatorReason(resolution).getReasons().add(artifact.getFailure());
-				}
+			final ArtifactAddress artifactAddress;
+			
+			if ("<escape>".equals(part.getType())) {
+				artifactAddress = transferContext.newAddressBuilder().versionedArtifact(artifact).file(partKey);
+			}
+			else {
+				artifactAddress = transferContext.newAddressBuilder().versionedArtifact(artifact).part(part);
+			}
+
+			Maybe<Resource> resourcePotential = transferContext.transfer(artifactAddress, resource::writeToStream, true);
+			
+			Part resolutionPart = Part.T.create();
+			resolutionPart.setClassifier(part.getClassifier());
+			resolutionPart.setType(part.getType());
+			
+			if (resourcePotential.isUnsatisfied()) {
+				Reason error = resourcePotential.whyUnsatisfied();
+				Reason reason = Reasons.build(PartUploadFailed.T).text("Part [" + part.asString() + "] could not be transferred.").cause(error).toReason();
+				resolutionPart.setFailure(reason);
+			}
+			else {
+				Resource uploadedResource = resourcePotential.get();
+				resolutionPart.setResource(uploadedResource);
+			}
+
+			resolutionArtifact.getParts().put(partKey, resolutionPart);
+				
+			if (resolutionPart.hasFailed()) {
+				return resolutionPart.getFailure().asMaybe();
 			}
 		}
 		
-		return resolution;			
+		return Maybe.complete(null);
+	}
+
+	private Maybe<Void> uploadArtifactMetadata(TransferContext transferContext, Artifact artifact) {
+		Reason error = updateMetaData(transferContext, artifact);
+		
+		if (error == null)
+			return Maybe.complete(null);
+		
+		Reason reason = Reasons.build(MetadataUploadFailed.T).text("Uploading artifact metadata for " + artifact.asString() + " failed").cause(error).toReason();
+		return reason.asMaybe();
 	}
 	
 	protected abstract TransferContext openTransferContext();
 
 	private Reason updateMetaData(TransferContext context, Artifact artifact) {
+		if (artifact.hasFailed())
+			return null;
+		
 		ArtifactAddress metaDataAddress = context.metaDataAddress(artifact, false);
 		
 		Maybe<MavenMetaData> existingMavenMetaDataMaybe = readOrPrimeMavenMetaData(context, metaDataAddress, artifact);
@@ -307,7 +295,7 @@ public abstract class AbstractArtifactDeployer<R extends Repository> implements 
 		
 		return updateMetaDataIfRequired(context, existingMavenMetaData, metaDataAddress, artifact);
 	}
-
+	
 	private Reason updateMetaDataIfRequired(TransferContext context, MavenMetaData mavenMetaData,
 			ArtifactAddress metaDataAddress, Artifact artifact) {
 		Versioning versioning = mavenMetaData.getVersioning();
@@ -332,7 +320,7 @@ public abstract class AbstractArtifactDeployer<R extends Repository> implements 
 		versioning.setLastUpdated(lastUpdatedStr);
 		versioning.setLatest(version);
 		
-		return context.transfer(metaDataAddress, out -> DeclaredMavenMetaDataMarshaller.INSTANCE.marshall(out, mavenMetaData)).whyUnsatisfied();
+		return context.transfer(metaDataAddress, out -> DeclaredMavenMetaDataMarshaller.INSTANCE.marshall(out, mavenMetaData), true).whyUnsatisfied();
 	}
 
 	private Maybe<MavenMetaData> readOrPrimeMavenMetaData(TransferContext context, ArtifactAddress metaDataAddress, Artifact artifact) {
@@ -371,11 +359,14 @@ public abstract class AbstractArtifactDeployer<R extends Repository> implements 
 		return versionedMetaData;
 	}
 	
-	interface TransferContext {
-		Maybe<Resource> transfer(ArtifactAddress address, OutputStreamer outputStreamer);
+	interface TransferContext extends AutoCloseable {
+		Maybe<Resource> transfer(ArtifactAddress address, OutputStreamer outputStreamer, boolean hashWorthy);
 		ArtifactAddress metaDataAddress(Artifact artifact, boolean versioned);
 		Maybe<InputStream> openInputStreamReasoned(ArtifactAddress address);
 		Optional<InputStream> openInputStream(ArtifactAddress address);
 		ArtifactAddressBuilder newAddressBuilder();
+		Maybe<Void> onUploadComplete(Artifact artifact);
+		@Override
+		void close();
 	}
 }

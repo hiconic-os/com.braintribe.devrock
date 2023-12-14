@@ -22,6 +22,7 @@ import org.junit.After;
 import org.junit.Before;
 
 import com.braintribe.common.lcd.Pair;
+import com.braintribe.devrock.mc.api.commons.PartIdentifications;
 import com.braintribe.devrock.mc.api.deploy.ArtifactDeployer;
 import com.braintribe.devrock.mc.core.commons.test.HasCommonFilesystemNode;
 import com.braintribe.devrock.mc.core.commons.utils.TestUtils;

@@ -44,6 +44,8 @@ import com.braintribe.devrock.model.repository.WorkspaceRepository;
 import com.braintribe.devrock.model.repository.filters.ArtifactFilter;
 import com.braintribe.devrock.model.repository.filters.ConjunctionArtifactFilter;
 import com.braintribe.gm.model.reason.Reason;
+import com.braintribe.gm.model.reason.Reasons;
+import com.braintribe.gm.model.reason.essential.InternalError;
 import com.braintribe.gm.reason.TemplateReasons;
 import com.braintribe.logging.Logger;
 import com.braintribe.model.artifact.changes.RepositoryProbingResult;
@@ -151,21 +153,31 @@ public class RepositoryConfigurationProbing implements Supplier<RepositoryConfig
 					repositoryToChangedArtifactIdentificatons.put( entry.getKey(), changedArtifactIdentifications);
 				} catch (InterruptedException e) {
 					Repository repository = entry.getKey();
-					IllegalStateException ilsException = new IllegalStateException( "error while probing [" + repository.getName() + "]", e);				
+					IllegalStateException ilsException = new IllegalStateException( "error while probing [" + repository.getName() + "]", e);
 					throwables.add( ilsException);
+					
+					Reason reason = InternalError.from(ilsException, "probing error");
+					repository.setFailure(reason);
+					
 				} catch (ExecutionException e) {
 					Repository repository = entry.getKey();
 					IllegalStateException ilsException = new IllegalStateException( "error while probing [" + repository.getName() + "]", e.getCause());				
-					throwables.add( ilsException);						
+					throwables.add( ilsException);
+					
+					Reason reason = InternalError.from(ilsException, "probing error");
+					repository.setFailure(reason);					
 				}
 			}
+			/*
 			if (throwables.size() > 0) {
 				RuntimeException re = new RuntimeException("probing failed");
 				for (Throwable throwable : throwables) {
 					re.addSuppressed(throwable);
 				}
 				throw re;
-			}		
+			}
+			*/
+					
 		}
 		finally {
 			executorService.shutdown();

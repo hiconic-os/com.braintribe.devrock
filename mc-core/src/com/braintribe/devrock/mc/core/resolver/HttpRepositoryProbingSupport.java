@@ -38,6 +38,7 @@ import com.braintribe.gm.model.reason.essential.InternalError;
 import com.braintribe.gm.model.reason.essential.InvalidArgument;
 import com.braintribe.gm.model.reason.essential.IoError;
 import com.braintribe.gm.reason.TemplateReasons;
+import com.braintribe.logging.Logger;
 import com.braintribe.model.artifact.changes.RepositoryProbeStatus;
 import com.braintribe.model.artifact.changes.RepositoryProbingResult;
 import com.braintribe.model.generic.reflection.EntityType;
@@ -48,7 +49,7 @@ import com.braintribe.model.generic.reflection.EntityType;
  *
  */
 public class HttpRepositoryProbingSupport extends HttpRepositoryBase implements RepositoryProbingSupport {
-	
+	private static final Logger logger = Logger.getLogger(HttpRepositoryProbingSupport.class);
 	private RepositoryProbingMethod probingMethod = RepositoryProbingMethod.head;
 	
 	@Configurable
@@ -59,69 +60,101 @@ public class HttpRepositoryProbingSupport extends HttpRepositoryBase implements 
 	}
 
 	@Override
-	public RepositoryProbingResult probe() {		
-		try {
+	public RepositoryProbingResult probe() {
+		int MAX_TRIES= 3;
+		Exception exception = null;
+		for (int i = 0; i < MAX_TRIES; i++) {
+			if (i > 0) {
+				try {
+					Thread.sleep(i * 2000);
+				} catch (InterruptedException e) {
+					// ignore
+				}
+			}
 			try {
-				URI.create(root);
-			} catch (IllegalArgumentException e) {
-				return RepositoryProbingResult.create(RepositoryProbeStatus.erroneous, Reasons.build(InvalidArgument.T).text("Repository probing path is not a valid url: " + root).toReason(), null, null);
-			}
-			CloseableHttpResponse response = null;
-			switch (probingMethod) {
-				case none:
-					return RepositoryProbingResult.create(RepositoryProbeStatus.unprobed, null, null, null);
-				case get:
-					response = getResponse(new HttpGet( root));
-					break;
-				case options:
-					response = getResponse(new HttpOptions( root));
-					break;
-				default:
-				case head:
-					response = getResponse(new HttpHead( root));
-					break;			
-			}
-			
-			StatusLine statusLine = response.getStatusLine();
-			int statusCode = statusLine.getStatusCode();
-
-			Reason failure;
-			RepositoryProbeStatus status;
-			switch (statusCode) {
-				case 200:
-				case 204:
-					status = RepositoryProbeStatus.available;
-					failure = null;
-					break;
-				default:
-					status = failureStatus(statusCode);
-					String reasonPhrase = statusLine.getReasonPhrase();
-					failure = TemplateReasons.build(failureType(statusCode)) //
-							.assign(HasRepository::setRepository, repositoryId) //
-							.cause(IoError
-									.create(root + " responded with HTTP status " + statusCode + (reasonPhrase == null ? "" : ": " + reasonPhrase)))
-							.toReason();
-					break;
-			}
-			// TODO : check if this is ok to pre-initialize 
-			// rest api
-			RepositoryRestSupport restApi = identifyRestSupport(response);
-			
-			String changesUrl = null;
-			Header rhHeader = response.getFirstHeader("X-Artifact-Repository-Changes-Url");
-			if (rhHeader != null) {
-				changesUrl = rhHeader.getValue();
-			}
-					
-			return RepositoryProbingResult.create(status, failure, changesUrl, restApi);
+				try {
+					URI.create(root);
+				} catch (IllegalArgumentException e) {
+					return RepositoryProbingResult.create(RepositoryProbeStatus.erroneous, Reasons.build(InvalidArgument.T).text("Repository probing path is not a valid url: " + root).toReason(), null, null);
+				}
+				CloseableHttpResponse response = null;
+				switch (probingMethod) {
+					case none:
+						return RepositoryProbingResult.create(RepositoryProbeStatus.unprobed, null, null, null);
+					case get:
+						response = getResponse(new HttpGet( root));
+						break;
+					case options:
+						response = getResponse(new HttpOptions( root));
+						break;
+					default:
+					case head:
+						response = getResponse(new HttpHead( root));
+						break;			
+				}
+				
+				StatusLine statusLine = response.getStatusLine();
+				int statusCode = statusLine.getStatusCode();
+	
+				Reason failure;
+				RepositoryProbeStatus status;
+				switch (statusCode) {
+					case 200:
+					case 204:
+						status = RepositoryProbeStatus.available;
+						failure = null;
+						break;
+					default:
+						status = failureStatus(statusCode);
+						String reasonPhrase = statusLine.getReasonPhrase();
+						failure = TemplateReasons.build(failureType(statusCode)) //
+								.assign(HasRepository::setRepository, repositoryId) //
+								.cause(IoError
+										.create(root + " responded with HTTP status " + statusCode + (reasonPhrase == null ? "" : ": " + reasonPhrase)))
+								.toReason();
+						break;
+				}
+				// TODO : check if this is ok to pre-initialize 
+				// rest api
+				RepositoryRestSupport restApi = identifyRestSupport(response);
+				
+				String changesUrl = null;
+				Header rhHeader = response.getFirstHeader("X-Artifact-Repository-Changes-Url");
+				if (rhHeader != null) {
+					changesUrl = rhHeader.getValue();
+				}
 						
-		} catch (IOException e) {
-			CommunicationError failure = CommunicationError.create("Error while probing repository " + repositoryId);
-			failure.getReasons().add(InternalError.from(e));
-
-			return RepositoryProbingResult.create(RepositoryProbeStatus.erroneous, failure, null, null);
+				return RepositoryProbingResult.create(status, failure, changesUrl, restApi);
+							
+			} catch (IOException e) {
+				exception = e;
+				logger.warn("failed try to probe repository " + repositoryId + ": " + getFirstMessage(e));
+				// continue for retries
+			}
 		}
 		
+		String msg = "Error while probing repository " + repositoryId;
+		logger.error(msg, exception);
+		
+		CommunicationError failure = CommunicationError.create(msg);
+		failure.getReasons().add(InternalError.from(exception, getFirstMessage(exception)));
+
+		return RepositoryProbingResult.create(RepositoryProbeStatus.erroneous, failure, null, null);
+	}
+
+	private String getFirstMessage(Exception exception) {
+		Throwable curException = exception;
+		
+		while (curException != null) {
+			String msg = curException.getMessage();
+			
+			if (msg != null)
+				return msg;
+			
+			curException = curException.getCause();
+		}
+		
+		return "Unkown error -> see logs";
 	}
 
 	private RepositoryProbeStatus failureStatus(int statusCode) {

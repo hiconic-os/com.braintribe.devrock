@@ -750,6 +750,7 @@ public class Validator {
 		
 		List<String> excessKeys = new ArrayList<>( targetKeys);
 		excessKeys.removeAll( matchingKeys);
+		excessKeys.remove(PartIdentifications.publishComplete.getType());
 		
 		assertTrue( "excess : " + excessKeys.stream().collect( Collectors.joining(",")), excessKeys.size() == 0);
 	}

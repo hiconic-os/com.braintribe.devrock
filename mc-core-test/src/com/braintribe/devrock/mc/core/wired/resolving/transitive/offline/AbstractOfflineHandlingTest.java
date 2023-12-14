@@ -16,7 +16,6 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.After;
@@ -69,7 +68,9 @@ public abstract class AbstractOfflineHandlingTest implements HasCommonFilesystem
 		repo = new File( output, "repo");			
 	}
 	
-	private File settings = new File( input, "settings.xml");
+	protected File onlineSettings = new File( input, "settings.online.xml");
+	
+	protected File offlineSettings  = new File( input, "settings.offline.xml");
 	
 	protected TransitiveResolutionContext standardTransitiveResolutionContext = TransitiveResolutionContext.build().lenient( true).done();
 	protected ClasspathResolutionContext standardClasspathResolutionContext = ClasspathResolutionContext.build().lenient(false).done();
@@ -113,13 +114,10 @@ public abstract class AbstractOfflineHandlingTest implements HasCommonFilesystem
 		launcher.shutdown();
 	}
 	
-	protected OverridingEnvironment buildVirtualEnvironement(Map<String,String> overrides) {
+	protected OverridingEnvironment buildVirtualEnvironement(String settings) {
 		OverridingEnvironment ove = new OverridingEnvironment(StandardEnvironment.INSTANCE);
-		if (overrides != null && !overrides.isEmpty()) {
-			ove.setEnvs(overrides);						
-		}
 		ove.setEnv("M2_REPO", repo.getAbsolutePath());
-		ove.setEnv("ARTIFACT_REPOSITORIES_EXCLUSIVE_SETTINGS", settings.getAbsolutePath());
+		ove.setEnv("ARTIFACT_REPOSITORIES_EXCLUSIVE_SETTINGS", settings);
 		ove.setEnv( "port", Integer.toString( launcher.getAssignedPort()));
 				
 		return ove;		
@@ -131,7 +129,7 @@ public abstract class AbstractOfflineHandlingTest implements HasCommonFilesystem
 	 * @param resolutionContext - the {@link ClasspathResolutionContext}
 	 * @return - the resulting {@link AnalysisArtifactResolution}
 	 */
-	protected AnalysisArtifactResolution run(String terminal, ClasspathResolutionContext resolutionContext) throws Exception {
+	protected AnalysisArtifactResolution run(String terminal, ClasspathResolutionContext resolutionContext, String settings) throws Exception {
 		try (				
 				WireContext<ClasspathResolverContract> resolverContext = Wire.contextBuilder( ClasspathResolverWireModule.INSTANCE, MavenConfigurationWireModule.INSTANCE)
 					.bindContract(VirtualEnvironmentContract.class, () -> buildVirtualEnvironement(null))				
@@ -153,7 +151,7 @@ public abstract class AbstractOfflineHandlingTest implements HasCommonFilesystem
 	 * @return - the resulting {@link AnalysisArtifactResolution}
 	 */
 	
-	protected AnalysisArtifactResolution run(String terminal, TransitiveResolutionContext resolutionContext) throws Exception {
+	protected AnalysisArtifactResolution run(String terminal, TransitiveResolutionContext resolutionContext, String settings) throws Exception {
 		try (				
 				WireContext<TransitiveResolverContract> resolverContext = Wire.contextBuilder( TransitiveResolverWireModule.INSTANCE, MavenConfigurationWireModule.INSTANCE)
 					.bindContract(VirtualEnvironmentContract.class, () -> buildVirtualEnvironement(null))				

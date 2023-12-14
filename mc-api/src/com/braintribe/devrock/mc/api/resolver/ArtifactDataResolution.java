@@ -36,12 +36,20 @@ public interface ArtifactDataResolution {
 	Resource getResource();
 	
 	default Maybe<InputStream> openStream() {
-		return Maybe.complete(getResource().openStream());
+		Resource resource = getResource();
+		if (resource == null)
+			return InternalError.create(toString() + " has no resource.").asMaybe();
+
+		try {
+			return Maybe.complete(resource.openStream());
+
+		} catch (Exception e) {
+			return InternalError.from(e, toString() + " could not open stream on it's resource: " + resource).asMaybe();
+		}
 	}
-	
+
 	/**
 	 * @param supplier - supplies the {@link OutputStream} to write to 
-	 * @throws IOException 
 	 * @return- true if it succeeded, false otherwise 
 	 */
 	boolean tryWriteTo( Supplier<OutputStream> supplier) throws IOException;
@@ -57,6 +65,7 @@ public interface ArtifactDataResolution {
 			return Reasons.build(CommunicationError.T).text("Error while transferring resource").cause(InternalError.from(e)).toReason();
 		}
 	}
+
 	/**
 	 * @param out - the {@link OutputStream} to write to
 	 * @throws IOException - thrown if it couldn't successfully write the file

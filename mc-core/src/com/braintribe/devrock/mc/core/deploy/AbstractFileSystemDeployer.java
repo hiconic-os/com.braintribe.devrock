@@ -29,7 +29,6 @@ import com.braintribe.devrock.model.repository.Repository;
 import com.braintribe.gm.model.reason.Maybe;
 import com.braintribe.gm.model.reason.Reasons;
 import com.braintribe.gm.model.reason.essential.InternalError;
-import com.braintribe.gm.model.reason.essential.IoError;
 import com.braintribe.gm.model.reason.essential.NotFound;
 import com.braintribe.logging.Logger;
 import com.braintribe.model.artifact.consumable.Artifact;
@@ -97,7 +96,7 @@ public abstract class AbstractFileSystemDeployer<R extends Repository> extends A
 		}
 		
 		@Override
-		public Maybe<Resource> transfer(ArtifactAddress address, OutputStreamer outputStreamer) {
+		public Maybe<Resource> transfer(ArtifactAddress address, OutputStreamer outputStreamer, boolean hashWorthy) {
 			File file = address.toPath().toFile();
 			
 			File directory = file.getParentFile();
@@ -121,6 +120,16 @@ public abstract class AbstractFileSystemDeployer<R extends Repository> extends A
 			catch (IOException e) {
 				return InternalError.from(e, "Error while writing file: " + file).asMaybe();
 			}
+		}
+		
+		@Override
+		public Maybe<Void> onUploadComplete(Artifact artifact) {
+			return Maybe.complete(null);
+		}
+		
+		@Override
+		public void close() {
+			// currently nothing to do
 		}
 	}
 	

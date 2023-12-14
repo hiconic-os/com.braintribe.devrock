@@ -67,6 +67,7 @@ import com.braintribe.gm.model.reason.Reasons;
 import com.braintribe.gm.model.reason.essential.CommunicationError;
 import com.braintribe.gm.model.reason.essential.InternalError;
 import com.braintribe.gm.model.reason.essential.IoError;
+import com.braintribe.gm.model.reason.essential.NotFound;
 import com.braintribe.logging.Logger;
 import com.braintribe.model.artifact.changes.ArtifactChanges;
 import com.braintribe.model.artifact.changes.ArtifactIndexLevel;
@@ -177,9 +178,21 @@ public class BasicArtifactChangesSynchronization implements ArtifactChangesSynch
 			return Maybe.empty( Reasons.build( InvalidRepositoryConfiguration.T).text("repository is not a HTTP backed repository : " + repository.getName() + "]").toReason());
 		
 		MavenHttpRepository mavenHttpRepository = (MavenHttpRepository) repository;
+		Maybe<List<VersionedArtifactIdentification>> touchedArtifactsMaybe;
+		switch (mavenHttpRepository.getChangesIndexType()) {
+			case incremental:
+					String url = mavenHttpRepository.getChangesUrl();
+					touchedArtifactsMaybe = getRavenhurstResponse(url);
+				break;
+			case total:
+					touchedArtifactsMaybe = retrieveChangesTotally(ArtifactChanges.T.create(), mavenHttpRepository, false);
+				break;
+			default:
+				// silently return an empty set or reflect that it can't be scanned? 
+				touchedArtifactsMaybe = Maybe.complete( Collections.emptyList());
+				break;		
+		}
 	
-		String url = mavenHttpRepository.getChangesUrl();
-		Maybe<List<VersionedArtifactIdentification>> touchedArtifactsMaybe = getRavenhurstResponse(url);
 		
 		return touchedArtifactsMaybe;		 		
 	}
@@ -224,8 +237,12 @@ public class BasicArtifactChangesSynchronization implements ArtifactChangesSynch
 			
 			ChangesIndexType changesIndexType = mavenHttpRepository.getChangesIndexType();
 			
-			if (changesIndexType == null)
-				throw new IllegalArgumentException("Repository [" + mavenHttpRepository.getName() + "] is missing changedIndexType");
+			// TODO : review -> this breaks a lot if declaration is required..
+			// still: incremental is the default as set by the initializer on Repository. So how come it can be null? 
+			if (changesIndexType == null) {
+				//throw new IllegalArgumentException("Repository [" + mavenHttpRepository.getName() + "] is missing changedIndexType");
+				changesIndexType = ChangesIndexType.incremental;
+			}
 			
 			switch (changesIndexType) {
 				case incremental:
@@ -235,7 +252,7 @@ public class BasicArtifactChangesSynchronization implements ArtifactChangesSynch
 					touchedArtifactsMaybe = retrieveChangesIncrementally(basicUrl, date);
 					break;
 				case total:
-					touchedArtifactsMaybe = retrieveChangesTotally(changes, mavenHttpRepository);
+					touchedArtifactsMaybe = retrieveChangesTotally(changes, mavenHttpRepository, true);
 					break;
 				default:
 					throw new UnsupportedOperationException("Repository [" + mavenHttpRepository.getName() + "] has unsupported changes index type: " + mavenHttpRepository.getChangesIndexType());
@@ -266,7 +283,7 @@ public class BasicArtifactChangesSynchronization implements ArtifactChangesSynch
 		
 	}
 	
-	private Maybe<List<VersionedArtifactIdentification>> retrieveChangesTotally(ArtifactChanges artifactChanges, MavenHttpRepository mavenHttpRepository) {
+	private Maybe<List<VersionedArtifactIdentification>> retrieveChangesTotally(ArtifactChanges artifactChanges, MavenHttpRepository mavenHttpRepository, boolean onlyReadIfNewVersionAvailable) {
 		ArtifactDataResolver artifactDataResolver = artifactDataResolverFactory.apply(mavenHttpRepository);
 		
 		BasicDependencyResolver dependencyResolver = new BasicDependencyResolver(artifactDataResolver);
@@ -284,43 +301,47 @@ public class BasicArtifactChangesSynchronization implements ArtifactChangesSynch
 		
 		CompiledArtifactIdentification cai = caiMaybe.get();
 		
-		if (isHigherVersion(artifactChanges, cai)) {
-			Maybe<ArtifactDataResolution> dataResMaybe = artifactDataResolver.resolvePart(cai, PartIdentification.create("gz"));
+		if (onlyReadIfNewVersionAvailable && !isHigherVersion(artifactChanges, cai)) {
+			return Maybe.empty(Reasons.build(NotFound.T).text("no higher version found of :" + cai.asString()).toReason());
+		}
+							
+		Maybe<ArtifactDataResolution> dataResMaybe = artifactDataResolver.resolvePart(cai, PartIdentification.create("gz"));
 
-			if (dataResMaybe.isUnsatisfied()) {
-				return dataResMaybe.whyUnsatisfied().asMaybe();
-			}
-			
-			Maybe<InputStream> inMaybe = dataResMaybe.get().openStream();
-			
-			if (inMaybe.isUnsatisfied()) {
-				return inMaybe.whyUnsatisfied().asMaybe();
-			}
-			
-			try (InputStream in = new GZIPInputStream(inMaybe.get())) {
-				ArtifactIndexLevel artifactIndexLevel = artifactChanges.getArtifactIndexLevel();
-				ArtifactIndex index = ArtifactIndex.read(in, false, artifactIndexLevel != null? artifactIndexLevel.getSequenceNumber(): -1);
-				
-				List<VersionedArtifactIdentification> changedArtifacts = index.getArtifacts().stream().map(VersionedArtifactIdentification::parse).collect(Collectors.toList());
-				
-				if (artifactIndexLevel == null) {
-					artifactIndexLevel = ArtifactIndexLevel.T.create();
-					artifactChanges.setArtifactIndexLevel(artifactIndexLevel);
-				}
-				
-				artifactIndexLevel.setSequenceNumber(index.getLastSequenceNumber());
-				artifactIndexLevel.setVersion(cai.getVersion().asString());
-				
-				return Maybe.complete(changedArtifacts);
-			}
-			catch (IOException e) {
-				return Reasons.build(IoError.T).text("Error while reading " + cai.asString() + " from " + mavenHttpRepository.getUrl()).cause(InternalError.from(e)).toMaybe();
-			}
+		if (dataResMaybe.isUnsatisfied()) {
+			return dataResMaybe.whyUnsatisfied().asMaybe();
 		}
 		
+		Maybe<InputStream> inMaybe = dataResMaybe.get().openStream();
 		
-		// TODO Auto-generated method stub
-		return null;
+		if (inMaybe.isUnsatisfied()) {
+			return inMaybe.whyUnsatisfied().asMaybe();
+		}
+		
+		InputStream inputStream = inMaybe.get();
+		return readFile(artifactChanges, mavenHttpRepository.getUrl(), cai, inputStream);
+		
+	}
+
+	public static Maybe<List<VersionedArtifactIdentification>> readFile(ArtifactChanges artifactChanges, String repositoryKey, CompiledArtifactIdentification cai, InputStream inputStream) {
+		try (InputStream in = new GZIPInputStream(inputStream)) {
+			ArtifactIndexLevel artifactIndexLevel = artifactChanges.getArtifactIndexLevel();
+			ArtifactIndex index = ArtifactIndex.read(in, false, artifactIndexLevel != null? artifactIndexLevel.getSequenceNumber(): -1);
+			
+			List<VersionedArtifactIdentification> changedArtifacts = index.getArtifacts().stream().map(VersionedArtifactIdentification::parse).collect(Collectors.toList());
+			
+			if (artifactIndexLevel == null) {
+				artifactIndexLevel = ArtifactIndexLevel.T.create();
+				artifactChanges.setArtifactIndexLevel(artifactIndexLevel);
+			}
+			
+			artifactIndexLevel.setSequenceNumber(index.getLastSequenceNumber());
+			artifactIndexLevel.setVersion(cai.getVersion().asString());
+			
+			return Maybe.complete(changedArtifacts);
+		}
+		catch (IOException e) {
+			return Reasons.build(IoError.T).text("Error while reading " + cai.asString() + " from " + repositoryKey).cause(InternalError.from(e)).toMaybe();
+		}
 	}
 
 	private boolean isHigherVersion(ArtifactChanges artifactChanges,

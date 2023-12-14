@@ -11,7 +11,7 @@
        },
        !com.braintribe.devrock.model.repository.MavenHttpRepository {           
            url: "http://localhost:${env.port}/archive",         
-           name: "archive"
+           name: "archive"        
        },
        !com.braintribe.devrock.model.repository.MavenHttpRepository {           
            url: "http://localhost:${env.port}/recessive",         

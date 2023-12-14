@@ -14,13 +14,18 @@ package com.braintribe.devrock.mc.core.deploy;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.UncheckedIOException;
+import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -55,6 +60,7 @@ import com.braintribe.cfg.Required;
 import com.braintribe.common.lcd.Pair;
 import com.braintribe.devrock.mc.api.commons.ArtifactAddress;
 import com.braintribe.devrock.mc.api.commons.ArtifactAddressBuilder;
+import com.braintribe.devrock.mc.api.commons.PartIdentifications;
 import com.braintribe.devrock.mc.core.http.OutputStreamerEntity;
 import com.braintribe.devrock.model.mc.reason.PartUploadFailed;
 import com.braintribe.devrock.model.repository.MavenHttpRepository;
@@ -63,6 +69,7 @@ import com.braintribe.gm.model.reason.Maybe;
 import com.braintribe.gm.model.reason.Reason;
 import com.braintribe.gm.model.reason.Reasons;
 import com.braintribe.gm.model.reason.essential.CommunicationError;
+import com.braintribe.gm.model.reason.essential.InternalError;
 import com.braintribe.gm.model.reason.essential.IoError;
 import com.braintribe.gm.model.reason.essential.NotFound;
 import com.braintribe.logging.Logger;
@@ -70,7 +77,9 @@ import com.braintribe.model.artifact.consumable.Artifact;
 import com.braintribe.model.generic.session.InputStreamProvider;
 import com.braintribe.model.generic.session.OutputStreamer;
 import com.braintribe.model.resource.Resource;
+import com.braintribe.utils.IOTools;
 import com.braintribe.utils.StringTools;
+import com.braintribe.utils.encryption.Md5Tools;
 import com.braintribe.utils.stream.NullOutputStream;
 
 public class HttpRepositoryDeployer extends AbstractArtifactDeployer<MavenHttpRepository> {
@@ -100,6 +109,8 @@ public class HttpRepositoryDeployer extends AbstractArtifactDeployer<MavenHttpRe
 	private class HttpTransferContext implements TransferContext {
 		private HttpClientContext context = HttpClientContext.create();
 		private boolean authProvoked;
+		private StringBuilder protocol = new StringBuilder();
+		private int protocolLevel = 0;
 
 		@Override
 		public ArtifactAddressBuilder newAddressBuilder() {
@@ -206,16 +217,30 @@ public class HttpRepositoryDeployer extends AbstractArtifactDeployer<MavenHttpRe
 				throw new CommunicationException("Error while reading from " + url, e);
 			}
 		}
-
+		
+		private void appendProtocolLevel(int level) {
+			synchronized(protocol) {
+				protocolLevel = Math.max(protocolLevel, level);
+			}
+		}
+		
+		private void appendToProtocol(String line, int level) {
+			synchronized(protocol) {
+				protocolLevel = Math.max(protocolLevel, level);
+				protocol.append(line);
+				protocol.append("\n");
+			}
+		}
+		
 		@Override
-		public Maybe<Resource> transfer(ArtifactAddress address, OutputStreamer outputStreamer) {
+		public Maybe<Resource> transfer(ArtifactAddress address, OutputStreamer outputStreamer, boolean hashWorthy) {
 			ensureAuthentication(address);
 			String url = address.toPath().toSlashPath();
 			Map<String, String> hashes = generateHash(outputStreamer, hashAlgToHeaderKeyAndExtension.keySet());
 
 			boolean targetExists = false;
 			Pair<String, String> hashAlgAndValuePairOfExistingFile = null;
-
+			
 			// test if it's there already..
 			HttpHead headRequest = new HttpHead(url);
 			try {
@@ -253,20 +278,23 @@ public class HttpRepositoryDeployer extends AbstractArtifactDeployer<MavenHttpRe
 					filePut.setHeader(entry.getValue().first(), hashes.get(entry.getKey()));
 				}
 			});
-
-			if (reason != null)
+			
+			if (reason != null) {
 				return reason.asMaybe();
+			}
 
-			for (Map.Entry<String, Pair<String, String>> entry : hashAlgToHeaderKeyAndExtension.entrySet()) {
-				String algKey = entry.getKey();
-				String hash = hashes.get(algKey);
-				String extension = entry.getValue().second();
-				String hashUrl = url + "." + extension;
-
-				Reason hashUploadReason = putFile(hashUrl, out -> out.write(hash.getBytes("US-ASCII")), null);
-
-				if (hashUploadReason != null)
-					return hashUploadReason.asMaybe();
+			if (hashWorthy) {
+				for (Map.Entry<String, Pair<String, String>> entry : hashAlgToHeaderKeyAndExtension.entrySet()) {
+					String algKey = entry.getKey();
+					String hash = hashes.get(algKey);
+					String extension = entry.getValue().second();
+					String hashUrl = url + "." + extension;
+	
+					Reason hashUploadReason = putFile(hashUrl, out -> out.write(hash.getBytes("US-ASCII")), null);
+	
+					if (hashUploadReason != null)
+						return hashUploadReason.asMaybe();
+				}
 			}
 
 			InputStreamProvider isp = () -> {
@@ -285,30 +313,172 @@ public class HttpRepositoryDeployer extends AbstractArtifactDeployer<MavenHttpRe
 		}
 
 		private Reason putFile(String url, OutputStreamer streamer, Consumer<HttpPut> putConfigurer) {
-			HttpPut filePut = new HttpPut(url);
-
-			OutputStreamerEntity streamEntity = new OutputStreamerEntity(streamer);
-			if (putConfigurer != null)
-				putConfigurer.accept(filePut);
-
-			filePut.setEntity(streamEntity);
-
-			StatusLine httpStatusLine = null;
+			Map<Object, Reason> errors = new LinkedHashMap<>();
 
 			for (int tries = 0; tries < MAX_RETRIES; tries++) {
-				httpStatusLine = put(httpClient, filePut, context);
+				appendToProtocol("trying upload to " + url, 0);
+
+				StatusLine httpStatusLine = null;
+				String message = null;
+				String md5 = null;
+
+				try {
+					HttpPut filePut = new HttpPut(url);
+
+					OutputStreamerEntity streamEntity = new OutputStreamerEntity(streamer, true);
+					if (putConfigurer != null)
+						putConfigurer.accept(filePut);
+
+					filePut.setEntity(streamEntity);
+
+					Pair<StatusLine, String> result = put(httpClient, filePut, context);
+					
+					md5 = streamEntity.getMd5();
+					httpStatusLine = result.first();
+					message = result.second();
+				}
+				catch (RuntimeException e) {
+					appendToProtocol("failed with exception when uploading (try " + (tries + 1) + "/"+ MAX_RETRIES +") to " + url + ": " + e.getMessage(), 1);
+					
+					String msg = getFirstMessage(e);
+					
+					errors.put(e.getClass(), InternalError.from(e, msg));
+
+					continue;
+				}
+				 
 				int statusCode = httpStatusLine.getStatusCode();
 
 				if (statusCode >= 200 && statusCode < 300) {
+					appendToProtocol("successfully uploaded to " + url, 0);
 					return null;
 				}
-			}
+				else {
+					Reason error = Reasons.build(CommunicationError.T) //
+							.text("Unexpected HTTP status code: " + // 
+									httpStatusLine.getStatusCode() + " " + httpStatusLine.getReasonPhrase() + // 
+									", message: " + message).toReason();
 
-			return Reasons.build(PartUploadFailed.T).text("Upload to [" + url + "] failed with: " + httpStatusLine).toReason();
+					appendToProtocol("failed when trying upload to " + url + " with reason: " + error.stringify(), 1);
+
+					if (statusCode >= 500 && statusCode < 600) {
+						// this extra check
+						if (exists(url, md5)) {
+							appendToProtocol("successfully uploaded to " + url + ". Note: Actually received a 500 status code but still succesfully checked existence.", 0);
+							return null;
+						}
+						
+						errors.put(statusCode, error);
+						continue;
+					}
+					
+					if (statusCode == 409) {
+						if (exists(url, md5)) {
+							appendToProtocol("successfully uploaded to " + url + ". Note: Actually received a 409 status code but still succesfully checked existence.", 0);
+							return null;
+						}
+					}
+					
+					appendProtocolLevel(2);
+					
+					return Reasons.build(PartUploadFailed.T) //
+								.text("Upload to [" + url + "] failed after " + (tries + 1) + " tries.") //
+								.cause(error).toReason();
+				}
+			}
+			
+			appendToProtocol("failed after " + MAX_RETRIES + " tries when uploading to " + url, 2);
+			
+			if (errors.size() == 1)
+				return errors.values().iterator().next();
+			
+			return Reasons.build(PartUploadFailed.T) //
+					.text("Upload to [" + url + "] failed after " + MAX_RETRIES + " tries.") //
+					.causes(errors.values()).toReason();
+		}
+		
+		private boolean exists(String url, String expectedMd5) {
+			HttpGet httpGet = new HttpGet(url);
+
+			try {
+				CloseableHttpResponse response = httpClient.execute(httpGet, context);
+				int statusCode = response.getStatusLine().getStatusCode();
+				
+				if (statusCode == 404) {
+					appendToProtocol("existence check for " + url + " returned 404", 0);
+					return false;
+				}
+				
+				if (!(statusCode >= 200 && statusCode < 300)) {
+					String message = readBody(response);
+					appendToProtocol("existence check for " + url + " failed with " + response.getStatusLine() + ", message: " + message, 1);
+					return false;
+				}
+				
+				MessageDigest digest = MessageDigest.getInstance("MD5");
+				
+				try (InputStream in = response.getEntity().getContent(); OutputStream out = new DigestOutputStream(NullOutputStream.getInstance(), digest)) {
+					IOTools.transferBytes(in, out);
+				}
+				
+				String actualMd5 = StringTools.toHex(digest.digest());
+				
+				boolean hashMatch = expectedMd5.equals(actualMd5);
+				
+				if (!hashMatch)
+					appendToProtocol("existence check for " + url + " showed different hashes", 1);
+				
+				return hashMatch;
+				
+			} catch (Exception e) {
+				appendToProtocol("existence check for " + url + " failed with an exception: " + e.getClass().getSimpleName() + ": " + getFirstMessage(e), 1);
+				return false;
+			}
 		}
 
-	}
+		/* copied from com.braintribe.devrock.mc.core.resolver.HttpRepositoryProbingSupport in mc-core for later consolidation into exception tools */
+		private String getFirstMessage(Exception exception) {
+			Throwable curException = exception;
+			
+			while (curException != null) {
+				String msg = curException.getMessage();
+				
+				if (msg != null)
+					return msg;
+				
+				curException = curException.getCause();
+			}
+			
+			return "Unkown error -> see logs";
+		}
 
+		@Override
+		public Maybe<Void> onUploadComplete(Artifact artifact) {
+			// write publish-complete part to have a marker which shows that the publish was able to write all parts 
+			ArtifactAddress completionPart = newAddressBuilder().versionedArtifact(artifact).part(PartIdentifications.publishComplete);
+			
+			return transfer(completionPart, this::writeCompletionPart, false) //
+					.flatMap(r -> Maybe.complete(null));
+		}
+		
+		private void writeCompletionPart(OutputStream out) throws IOException {
+			try (Writer writer = new OutputStreamWriter(out, StandardCharsets.UTF_8)) {
+				writer.write(new Date().toInstant().toString());
+			}
+		}
+
+		
+		@Override
+		public void close() {
+			switch (protocolLevel) {
+			case 1: log.warn(protocol.toString()); break;
+			case 2: log.error(protocol.toString()); break;
+			default:
+				break;
+			}
+		}
+	}
+	
 	private HttpEntity deleteTarget(CloseableHttpClient httpclient, HttpClientContext context, String url) {
 		HttpEntity entity = null;
 		try {
@@ -320,11 +490,17 @@ public class HttpRepositoryDeployer extends AbstractArtifactDeployer<MavenHttpRe
 				if (log.isDebugEnabled()) {
 					log.debug("target [" + url + "] doesn't exist");
 				}
+			} else if (statusCode == 405) {
+				// 405 Invalid Method
+				// It seems deleting is not supported. A real case of that kind is given in github packages maven repo implementation
+				// We ignore as it is still valid to overwrite certain files (e.g. maven-metadata.xml) otherwise it will fail 
+				// with the actual overwriting upload
 			} else if ((statusCode >= 200) && (statusCode < 300)) {
 				if (log.isDebugEnabled()) {
 					log.debug("target [" + url + "] successfully deleted");
 				}
-			} else {
+			}
+			else {
 				log.warn("cannot delete [" + url + "] as statuscode's [" + statusCode + "]");
 			}
 
@@ -388,12 +564,26 @@ public class HttpRepositoryDeployer extends AbstractArtifactDeployer<MavenHttpRe
 		return result;
 	}
 
-	private static StatusLine put(CloseableHttpClient client, HttpEntityEnclosingRequestBase request, HttpContext httpContext) {
+	private static Pair<StatusLine, String> put(CloseableHttpClient client, HttpEntityEnclosingRequestBase request, HttpContext httpContext) {
 		try (CloseableHttpResponse httpResponse = client.execute(request, httpContext)) {
 			StatusLine httpStatusLine = httpResponse.getStatusLine();
-			return httpStatusLine;
+			
+			String message = readBody(httpResponse);
+			return Pair.of(httpStatusLine, message);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
+		}
+	}
+	
+	private static String readBody(CloseableHttpResponse httpResponse) throws IOException {
+		HttpEntity entity = httpResponse.getEntity();
+		Header contentEncoding = entity.getContentEncoding();
+		
+		String encoding = contentEncoding != null? contentEncoding.getValue(): "UTF-8";
+		
+		try (InputStream in = entity.getContent()) {
+			String message = IOTools.slurp(in, encoding);
+			return message;
 		}
 	}
 

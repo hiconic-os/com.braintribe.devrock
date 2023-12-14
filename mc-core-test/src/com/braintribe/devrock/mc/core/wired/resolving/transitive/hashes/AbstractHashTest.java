@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.After;
 import org.junit.Before;
@@ -125,7 +126,7 @@ public abstract class AbstractHashTest implements HasCommonFilesystemNode, Entit
 		TestUtils.ensure(repo); 			
 
 		downloadsNotified = new HashMap<>();
-		updateDataNotified = new HashMap<>();
+		updateDataNotified = new ConcurrentHashMap<>();
 		launcher.addListener( OnDownloadEvent.T, this::onEvent);
 		launcher.addListener( OnUploadEvent.T, this::onUploadEvent);
 		launcher.addListener( OnHashFileUploadEvent.T, this::onUploadHashFileEvent);
