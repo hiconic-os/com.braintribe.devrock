@@ -456,6 +456,7 @@ public class HttpRepositoryDeployer extends AbstractArtifactDeployer<MavenHttpRe
 		public Maybe<Void> onUploadComplete(Artifact artifact) {
 			// write publish-complete part to have a marker which shows that the publish was able to write all parts 
 			ArtifactAddress completionPart = newAddressBuilder().versionedArtifact(artifact).part(PartIdentifications.publishComplete);
+			// create data once to stabilize content for a stable hash of that part
 			String date = new Date().toInstant().toString();
 			return transfer(completionPart, o -> writeCompletionPart(o, date), false) //
 					.flatMap(r -> Maybe.complete(null));
