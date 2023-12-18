@@ -456,18 +456,17 @@ public class HttpRepositoryDeployer extends AbstractArtifactDeployer<MavenHttpRe
 		public Maybe<Void> onUploadComplete(Artifact artifact) {
 			// write publish-complete part to have a marker which shows that the publish was able to write all parts 
 			ArtifactAddress completionPart = newAddressBuilder().versionedArtifact(artifact).part(PartIdentifications.publishComplete);
-			
-			return transfer(completionPart, this::writeCompletionPart, false) //
+			String date = new Date().toInstant().toString();
+			return transfer(completionPart, o -> writeCompletionPart(o, date), false) //
 					.flatMap(r -> Maybe.complete(null));
 		}
 		
-		private void writeCompletionPart(OutputStream out) throws IOException {
+		private void writeCompletionPart(OutputStream out, String date) throws IOException {
 			try (Writer writer = new OutputStreamWriter(out, StandardCharsets.UTF_8)) {
-				writer.write(new Date().toInstant().toString());
+				writer.write(date);
 			}
 		}
-
-		
+	
 		@Override
 		public void close() {
 			switch (protocolLevel) {
