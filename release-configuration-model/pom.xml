@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.braintribe.devrock</groupId>
+        <artifactId>parent</artifactId>
+        <version>[2.0,2.1)</version>
+    </parent>
+    <artifactId>release-configuration-model</artifactId>
+    <version>2.0.1</version>
+    <properties>
+        <archetype>model</archetype>
+    </properties>
+    <licenses>
+        <license>
+            <name>GNU Lesser General Public License v3.0</name>
+            <url>https://www.gnu.org/licenses/lgpl-3.0.html</url>
+            <distribution>repo</distribution>
+            <comments>A free software license that allows users to run, study, share, and modify the software.</comments>
+        </license>
+    </licenses>
+    <dependencies>
+        <dependency>
+            <groupId>com.braintribe.gm</groupId>
+            <artifactId>root-model</artifactId>
+            <version>${V.com.braintribe.gm}</version>
+            <?tag asset?>
+        </dependency>
+        <dependency>
+            <groupId>com.braintribe.devrock</groupId>
+            <artifactId>repository-configuration-model</artifactId>
+            <version>${V.com.braintribe.devrock}</version>
+            <?tag asset?>
+        </dependency>
+    </dependencies>
+</project>
