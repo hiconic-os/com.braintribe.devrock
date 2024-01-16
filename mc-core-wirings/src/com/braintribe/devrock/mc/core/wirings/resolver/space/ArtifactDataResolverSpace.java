@@ -59,6 +59,7 @@ import com.braintribe.devrock.mc.core.wirings.venv.contract.VirtualEnvironmentCo
 import com.braintribe.devrock.model.mc.cfg.origination.RepositoryBiasAdded;
 import com.braintribe.devrock.model.mc.cfg.origination.RepositoryBiasLoaded;
 import com.braintribe.devrock.model.mc.cfg.origination.RepositoryGloballyOffline;
+import com.braintribe.devrock.model.repository.ChangesIndexType;
 import com.braintribe.devrock.model.repository.LocalRepository;
 import com.braintribe.devrock.model.repository.MavenHttpRepository;
 import com.braintribe.devrock.model.repository.Repository;
@@ -207,7 +208,10 @@ public class ArtifactDataResolverSpace implements ArtifactDataResolverContract {
 		bean.setRestSupport( repository.getRestSupport());
 		
 		// here the repository can reflect whether it's a RH driven repository and convey it to the delegate
-		bean.setDynamic( repository.getChangesUrl() != null);
+		// TODO: review - a dynamic repo is either supplemented by a URL to retrieve changes (RH) or has an index-artifact.. RH would also have ChangesIndexType.incremental though 
+		ChangesIndexType changesIndexType = repository.getChangesIndexType();
+		bean.setDynamic( repository.getChangesUrl() != null || (changesIndexType != null && changesIndexType  == ChangesIndexType.total));
+	
 		
 		bean.setProbingResultPersistenceExpert(probingResultPersistenceExpert());
 		bean.setCachable(repository.getCachable());
