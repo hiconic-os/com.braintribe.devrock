@@ -29,7 +29,6 @@ You should have received a copy of the GNU Lesser General Public License along w
         <V.com.braintribe.velocity>[2.0,2.1)</V.com.braintribe.velocity>
         <V.com.braintribe.wire>[2.0,2.1)</V.com.braintribe.wire>
         <V.com.braintribe.xml>[2.0,2.1)</V.com.braintribe.xml>
-        <V.com.braintribe.logging>[2.0,2.1)</V.com.braintribe.logging>
         <V.com.zaxxer>2.6.2</V.com.zaxxer>
         <V.javax.servlet>3.1.0</V.javax.servlet>
         <V.junit>4.11</V.junit>
