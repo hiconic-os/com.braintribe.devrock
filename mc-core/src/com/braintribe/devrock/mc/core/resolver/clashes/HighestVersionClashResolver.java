@@ -19,14 +19,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.braintribe.cc.lcd.EqProxy;
 import com.braintribe.devrock.mc.core.declared.commons.HashComparators;
+import com.braintribe.devrock.model.mc.reason.IncompleteClashResolving;
+import com.braintribe.devrock.model.mc.reason.InvalidClashResolvingWinner;
 import com.braintribe.devrock.model.mc.reason.UnresolvableClash;
+import com.braintribe.gm.model.reason.Maybe;
 import com.braintribe.gm.model.reason.Reason;
 import com.braintribe.gm.model.reason.Reasons;
+import com.braintribe.gm.reason.TemplateReasons;
 import com.braintribe.model.artifact.analysis.AnalysisArtifact;
 import com.braintribe.model.artifact.analysis.AnalysisDependency;
 import com.braintribe.model.artifact.analysis.DependencyClash;
@@ -88,16 +91,23 @@ public class HighestVersionClashResolver {
 		return lowestBound;
 	}
 	
-	public List<DependencyClash> resolve() {
+	public Maybe<List<DependencyClash>> resolve() {
 		clashes = ClashDetector.detect(dependencies);
 		
 		buildClashInvolvements();
 		
-		resolveClashesWithHighestVersion();
+		List<Reason> failures = resolveClashesWithHighestVersion();
 		
 		buildVisitAndDependencyOrder();
 		
-		return new ArrayList<>(dependencyClashes);
+		if (failures == null || failures.isEmpty()) {
+			return Maybe.complete(new ArrayList<>(dependencyClashes));
+		}
+		else  {
+			Reason umbrellaReason = IncompleteClashResolving.T.create();
+			umbrellaReason.getReasons().addAll(failures);		
+			return Maybe.incomplete(new ArrayList<>(dependencyClashes), umbrellaReason);
+		}
 	}
 
 	private void buildVisitAndDependencyOrder() {
@@ -126,7 +136,7 @@ public class HighestVersionClashResolver {
 			visitSolutionForOrdering(solution);
 	}
 
-	private void resolveClashesWithHighestVersion() {
+	private List<Reason> resolveClashesWithHighestVersion() {
 		Set<AnalysisArtifact> visited = new HashSet<AnalysisArtifact>();
 		List<List<AnalysisDependency>> orderedClashes = new ArrayList<List<AnalysisDependency>>();
 		
@@ -135,10 +145,15 @@ public class HighestVersionClashResolver {
 		for (AnalysisDependency clashingDependency: clashingDependencies) {
 			collectClashesInClashDependerOrder(clashingDependency.getSolution(), visited, orderedClashes);
 		}
-		
+		List<Reason> collectedErrors = new ArrayList<>();
 		for (List<AnalysisDependency> clashes: orderedClashes) {
-			resolve(clashes);
+			
+			Reason failure = resolve(clashes);
+			if (failure != null) {
+				collectedErrors.add( failure);
+			}
 		}
+		return collectedErrors;
 	}
 	
 	private void collectClashesInClashDependerOrder(AnalysisArtifact artifact, Set<AnalysisArtifact> visited, List<List<AnalysisDependency>> orderedClashes) {
@@ -174,23 +189,29 @@ public class HighestVersionClashResolver {
 		}
 	}
 
-	private void resolve(List<AnalysisDependency> clashes) {
+	private Reason resolve(List<AnalysisDependency> clashes) {
+		Reason failReason = null;
+		
 		AnalysisDependency winner = getBestMatchForStrategy(clashes);
 		
 		if (winner == null)
-			return;
+			return null;
 		
 		AnalysisArtifact winnerSolution = winner.getSolution();
 		if (winnerSolution == null) {			
 			String msg = "winner dependency [" +  buildDependencyOutput(winner) + "] amongst [" + clashes.stream().map( d -> buildDependencyOutput(d)).collect(Collectors.joining(",")) + "] has no solution";
-			//System.err.println(msg);
-			throw new IllegalStateException( msg);
+			System.out.println(msg);
+			failReason = TemplateReasons.build(InvalidClashResolvingWinner.T)
+					.assign( InvalidClashResolvingWinner::setDependency, buildDependencyOutput(winner))
+					.assign( InvalidClashResolvingWinner::setChoices, clashes.stream().map( d -> buildDependencyOutput(d)).collect(Collectors.joining(",")))
+					.toReason();
+			return failReason;
 		}
 
 		DependencyClash dependencyClash = DependencyClash.T.create();
 		dependencyClash.setSolution(winnerSolution);
-		dependencyClash.setGroupId(winnerSolution.getGroupId());
-		dependencyClash.setArtifactId(winnerSolution.getArtifactId());
+		dependencyClash.setGroupId(winner.getGroupId());
+		dependencyClash.setArtifactId(winner.getArtifactId());
 		dependencyClash.setSelectedDependency(winner);
 		
 		AnalysisDependency[] copiedClashes = clashes.toArray(new AnalysisDependency[clashes.size()]);
@@ -212,6 +233,7 @@ public class HighestVersionClashResolver {
 		}
 		
 		dependencyClashes.add(dependencyClash);
+		return failReason;
 	}
 
 	/**

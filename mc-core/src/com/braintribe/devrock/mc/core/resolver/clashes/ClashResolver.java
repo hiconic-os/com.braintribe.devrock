@@ -13,6 +13,7 @@ package com.braintribe.devrock.mc.core.resolver.clashes;
 
 import java.util.List;
 
+import com.braintribe.gm.model.reason.Maybe;
 import com.braintribe.model.artifact.analysis.AnalysisDependency;
 import com.braintribe.model.artifact.analysis.ClashResolvingStrategy;
 import com.braintribe.model.artifact.analysis.DependencyClash;
@@ -26,7 +27,7 @@ import com.braintribe.model.artifact.analysis.DependencyClash;
  *
  */
 public interface ClashResolver {
-	public static List<DependencyClash> resolve( Iterable<AnalysisDependency> dependencies, ClashResolvingStrategy strategy) {
+	public static Maybe<List<DependencyClash>> resolve( Iterable<AnalysisDependency> dependencies, ClashResolvingStrategy strategy) {
 		switch (strategy) {
 		case firstOccurrence:
 			return new FirstVisitClashResolver(dependencies).resolve();

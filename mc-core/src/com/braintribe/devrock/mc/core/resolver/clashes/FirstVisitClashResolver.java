@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 import com.braintribe.cc.lcd.EqProxy;
 import com.braintribe.devrock.mc.core.declared.commons.HashComparators;
+import com.braintribe.gm.model.reason.Maybe;
 import com.braintribe.model.artifact.analysis.AnalysisArtifact;
 import com.braintribe.model.artifact.analysis.AnalysisDependency;
 import com.braintribe.model.artifact.analysis.DependencyClash;
@@ -48,12 +49,12 @@ public class FirstVisitClashResolver {
 		new FirstVisitClashResolver(dependencies).resolve();
 	}
 	
-	public List<DependencyClash> resolve() {
+	public Maybe<List<DependencyClash>> resolve() {
 		for (AnalysisDependency dependency: dependencies) {
 			resolve(dependency);
 		}
-		
-		return clashes.values().stream().sorted(ArtifactIdentification::compareTo).collect(Collectors.toList());
+		// seems to be always capable of returning a full 
+		return Maybe.complete(clashes.values().stream().sorted(ArtifactIdentification::compareTo).collect(Collectors.toList()));
 	}
 	
 	private void resolve(AnalysisDependency dependency) {

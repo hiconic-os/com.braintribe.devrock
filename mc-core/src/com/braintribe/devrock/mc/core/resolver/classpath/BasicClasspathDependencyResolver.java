@@ -48,6 +48,7 @@ import com.braintribe.devrock.mc.core.resolver.clashes.ClashResolver;
 import com.braintribe.devrock.mc.core.resolver.common.AnalysisArtifactResolutionPreparation;
 import com.braintribe.devrock.model.mc.reason.ClasspathInvalidDependencyReference;
 import com.braintribe.devrock.model.mc.reason.ClasspathInvalidPartReference;
+import com.braintribe.gm.model.reason.Maybe;
 import com.braintribe.gm.model.reason.Reason;
 import com.braintribe.gm.model.reason.essential.InternalError;
 import com.braintribe.gm.reason.TemplateReasons;
@@ -159,8 +160,18 @@ public class BasicClasspathDependencyResolver implements ClasspathDependencyReso
 			
 
 			// resolve clashes
-			List<DependencyClash> dependencyClashes = ClashResolver.resolve(dependencies, context.clashResolvingStrategy());
-			resolution.setClashes(dependencyClashes);
+			// TODO : review
+			Maybe<List<DependencyClash>> dependencyClashesMaybe = ClashResolver.resolve(dependencies, context.clashResolvingStrategy());
+			if (dependencyClashesMaybe.isSatisfied()) {
+				resolution.setClashes(dependencyClashesMaybe.get());		
+			}
+			else {
+				if (dependencyClashesMaybe.hasValue()) {
+					resolution.setClashes(dependencyClashesMaybe.value());				
+				}
+				AnalysisArtifactResolutionPreparation.acquireCollatorReason(resolution).getReasons().add( dependencyClashesMaybe.whyUnsatisfied());
+				return resolution;
+			}		
 			
 			// analyze clash free tree for valid artifact relations and classpath contributions  
 			AnalysisArtifactResolutionPreparation analysisArtifactResolutionPreparation = new AnalysisArtifactResolutionPreparation(resolution, solutionSortingComparator, this::filterSolution);
