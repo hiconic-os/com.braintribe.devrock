@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -58,6 +59,17 @@ public class RepositoryIndexTest extends AbstractRepositoryIndexTest {
 	protected LazyInitialized<CloseableHttpClient> httpClient = new LazyInitialized<>(this::client);
 	
 	private YamlMarshaller marshaller = new YamlMarshaller();
+	
+	
+
+	@Override
+	protected void additionalTasks() {
+		// touch the local-repo files : two days before this test 
+		File mdToTouch = new File( repoCache, "com/braintribe/devrock/test/x/maven-metadata-archive.xml");
+		long touch = new Date().getTime() - (60*60*48*1000);
+		mdToTouch.setLastModified( touch);
+		super.additionalTasks();
+	}
 
 	@Test 
 	public void test() throws Exception{

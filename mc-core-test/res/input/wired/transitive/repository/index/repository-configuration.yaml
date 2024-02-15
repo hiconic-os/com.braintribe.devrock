@@ -16,7 +16,8 @@
        !com.braintribe.devrock.model.repository.IndexedMavenHttpRepository {
            name: "archive",           
            url: "http://localhost:${env.port}/archive",
-           updateable: true
+           updateable: true,
+           changesIndexType: "total",
        },
    ],
 }            

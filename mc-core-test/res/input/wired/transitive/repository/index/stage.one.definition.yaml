@@ -8,6 +8,7 @@ artifacts: [
        dependencies: [                
           { artifactId: "a",  groupId: "com.braintribe.devrock.test", version: "[1.0,1.1)"}, 
           { artifactId: "b",  groupId: "com.braintribe.devrock.test", version: "[1.0,1.1)"}, 
+          { artifactId: "x",  groupId: "com.braintribe.devrock.test", version: "[1.0,1.1)"}, 
 
        ],        
     }, 
@@ -26,6 +27,12 @@ artifacts: [
        dependencies: [           
        ],        
     }, 
+
+     { artifactId: "x", groupId: "com.braintribe.test", version: "1.0.1", parts: {":jar": null},
+       dependencies: [           
+       ],        
+    }, 
+
     
   ]
 }
