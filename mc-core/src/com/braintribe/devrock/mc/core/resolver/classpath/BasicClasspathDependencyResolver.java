@@ -209,6 +209,14 @@ public class BasicClasspathDependencyResolver implements ClasspathDependencyReso
 		private boolean filterSolution(AnalysisArtifact solution) {
 			return !"pom".equals(solution.getOrigin().getPackaging());
 		}
+		
+		private PartEnrichment buildPomAttachment() {
+			PartEnrichment enrichment = PartEnrichment.T.create();			
+			enrichment.setType("pom");
+			enrichment.setKey("pom");
+			return enrichment;
+		}
+		
 
 		private PartEnrichment buildJarAttachmentEnrichment(String classifier) {
 			PartEnrichment enrichment = PartEnrichment.T.create();
@@ -236,8 +244,9 @@ public class BasicClasspathDependencyResolver implements ClasspathDependencyReso
 		}
 		
 		private Collection<String> extractJarClassifiers(AnalysisArtifact artifact) {
-			if ("pom".equals(artifact.getOrigin().getPackaging()))
+			if ("pom".equals(artifact.getOrigin().getPackaging())) {				
 				return Collections.emptyList();
+			}
 			
 			Set<AnalysisDependency> dependers = artifact.getDependers();
 			
@@ -251,6 +260,10 @@ public class BasicClasspathDependencyResolver implements ClasspathDependencyReso
 		}
 		
 		private List<PartEnrichment> determineJarEnrichment(AnalysisArtifact artifact) {
+			if ("pom".equals(artifact.getOrigin().getPackaging())) {
+				return Collections.singletonList( buildPomAttachment());
+			}
+			
 			
 			Collection<String> jarClassifiers = extractJarClassifiers(artifact);
 			

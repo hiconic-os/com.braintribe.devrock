@@ -449,8 +449,9 @@ public class ArtifactCompiler implements CompiledArtifactResolver, DeclaredArtif
 				importSolution.setDeclaringParent(declaringParent);
 				
 				compiledArtifact.getImportSolutions().add(importSolution);
-				if (declaringParent == compiledArtifact)
-				compiledArtifact.getImports().add(importCdi);
+				if (declaringParent == compiledArtifact) {
+					compiledArtifact.getImports().add(importCdi);
+				}
 				
 				Maybe<CompiledArtifactIdentification> importCaiMaybe = dependencyResolver.resolveDependency(importCdi);
 				

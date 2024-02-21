@@ -118,6 +118,16 @@ public class BasicPartEnricher implements PartEnricher {
 			if (!artifacts.add(analysisArtifact)) 
 				return;
 			
+			AnalysisDependency parent = analysisArtifact.getParent();
+			if (parent != null) {
+				AnalysisArtifact artifact = parent.getSolution();
+				collect(artifact, artifacts);
+				for (AnalysisDependency importDep : artifact.getImports()) {
+					AnalysisArtifact importSolution = importDep.getSolution();
+					collect( importSolution, artifacts);
+				}
+			}
+			
 			for (AnalysisDependency dependency: analysisArtifact.getDependencies()) {
 				AnalysisArtifact artifact = dependency.getSolution();
 				collect(artifact, artifacts);

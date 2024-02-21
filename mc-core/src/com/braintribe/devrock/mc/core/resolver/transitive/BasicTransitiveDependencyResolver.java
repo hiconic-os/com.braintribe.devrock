@@ -487,7 +487,7 @@ public class BasicTransitiveDependencyResolver implements TransitiveDependencyRe
 				
 				poiIdm.processed = true;
 				
-				joinParentAndImports(poiIdm.artifact, false);
+				joinParentAndImports(poiIdm.artifact, true);
 				
 				return poiIdm.artifact;
 			}
