@@ -207,11 +207,11 @@ public class ArtifactReflectionGenerator implements Opcodes {
 				String name = groupId + ":" + artifactId;
 				String versionedName = name + "#" + version;
 				
-				fillStaticField(classWriter, internalName, mv, "groupId", groupId);
-				fillStaticField(classWriter, internalName, mv, "artifactId", artifactId);
-				fillStaticField(classWriter, internalName, mv, "version", version);
-				fillStaticField(classWriter, internalName, mv, "name", name);
-				fillStaticField(classWriter, internalName, mv, "versionedName", versionedName);
+				fillStaticField(classWriter, internalName, "groupId", groupId);
+				fillStaticField(classWriter, internalName, "artifactId", artifactId);
+				fillStaticField(classWriter, internalName, "version", version);
+				fillStaticField(classWriter, internalName, "name", name);
+				fillStaticField(classWriter, internalName, "versionedName", versionedName);
 
 				// instantiate plain StandardArtifactReflection instance which places it on
 				// stack
@@ -247,16 +247,10 @@ public class ArtifactReflectionGenerator implements Opcodes {
 			}
 		}
 
-		private void fillStaticField(ClassWriter classWriter, String internalName, MethodVisitor mv, String name, String value) {
-
+		private void fillStaticField(ClassWriter classWriter, String internalName, String name, String value) {
 			// add public static final field for the reflection instance
 			String stringDesc = "Ljava/lang/String;";
-			classWriter.visitField(ACC_PUBLIC + ACC_STATIC + ACC_FINAL, name, stringDesc, null, null);
-			
-			// push String argument for PUT instruction
-			mv.visitLdcInsn(value);
-			// assign pushed value to field
-			mv.visitFieldInsn(PUTSTATIC, internalName, name, stringDesc);
+			classWriter.visitField(ACC_PUBLIC + ACC_STATIC + ACC_FINAL, name, stringDesc, null, value);
 		}
 
 		private String buildCanonizedClassName(String groupId, String artifactId) {
