@@ -182,6 +182,9 @@ public class BasicArtifactChangesSynchronization implements ArtifactChangesSynch
 		switch (mavenHttpRepository.getChangesIndexType()) {
 			case incremental:
 					String url = mavenHttpRepository.getChangesUrl();
+					if (url == null) {
+						return Maybe.empty( Reasons.build(NotFound.T).assign( NotFound::setText, "incremental update require a non-null changes-url : " + repository.getName()).toReason());
+					}
 					touchedArtifactsMaybe = getRavenhurstResponse(url);
 				break;
 			case total:
