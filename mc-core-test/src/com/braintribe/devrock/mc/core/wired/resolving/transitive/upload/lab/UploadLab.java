@@ -24,6 +24,7 @@ import com.braintribe.common.lcd.Pair;
 import com.braintribe.devrock.mc.api.deploy.ArtifactDeployer;
 import com.braintribe.devrock.mc.api.repository.configuration.RepositoryReflection;
 import com.braintribe.devrock.mc.core.commons.test.HasCommonFilesystemNode;
+import com.braintribe.devrock.mc.core.configuration.RepositoryConfigurationLoader;
 import com.braintribe.devrock.mc.core.wirings.maven.configuration.MavenConfigurationWireModule;
 import com.braintribe.devrock.mc.core.wirings.resolver.ArtifactDataResolverModule;
 import com.braintribe.devrock.mc.core.wirings.resolver.contract.ArtifactDataResolverContract;
@@ -119,6 +120,7 @@ public class UploadLab implements HasCommonFilesystemNode {
 			ove.setEnvs(overrides);						
 		}
 		ove.setEnv("M2_REPO", repo.getAbsolutePath());
+		ove.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 		ove.setEnv("ARTIFACT_REPOSITORIES_EXCLUSIVE_SETTINGS", settings.getAbsolutePath());
 		return ove;		
 		

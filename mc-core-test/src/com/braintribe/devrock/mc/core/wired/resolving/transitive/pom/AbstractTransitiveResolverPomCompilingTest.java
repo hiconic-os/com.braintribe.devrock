@@ -25,6 +25,7 @@ import com.braintribe.devrock.mc.api.resolver.CompiledArtifactResolver;
 import com.braintribe.devrock.mc.api.transitive.TransitiveResolutionContext;
 import com.braintribe.devrock.mc.core.commons.test.HasCommonFilesystemNode;
 import com.braintribe.devrock.mc.core.commons.utils.TestUtils;
+import com.braintribe.devrock.mc.core.configuration.RepositoryConfigurationLoader;
 import com.braintribe.devrock.mc.core.wirings.maven.configuration.MavenConfigurationWireModule;
 import com.braintribe.devrock.mc.core.wirings.transitive.TransitiveResolverWireModule;
 import com.braintribe.devrock.mc.core.wirings.transitive.contract.TransitiveResolverContract;
@@ -103,6 +104,7 @@ public abstract class AbstractTransitiveResolverPomCompilingTest implements Laun
 			ove.setEnvs(overrides);						
 		}
 		ove.setEnv("repo", repo.getAbsolutePath());
+		ove.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 		ove.setEnv("ARTIFACT_REPOSITORIES_EXCLUSIVE_SETTINGS", settings.getAbsolutePath());
 		ove.setEnv( "port", Integer.toString( launcher.getAssignedPort()));
 				

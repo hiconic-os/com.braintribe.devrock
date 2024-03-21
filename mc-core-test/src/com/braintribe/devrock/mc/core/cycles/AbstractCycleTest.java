@@ -23,6 +23,7 @@ import org.junit.experimental.categories.Category;
 import com.braintribe.common.lcd.Pair;
 import com.braintribe.devrock.mc.core.commons.test.HasCommonFilesystemNode;
 import com.braintribe.devrock.mc.core.commons.utils.TestUtils;
+import com.braintribe.devrock.mc.core.configuration.RepositoryConfigurationLoader;
 import com.braintribe.devrock.mc.core.wirings.maven.configuration.MavenConfigurationWireModule;
 import com.braintribe.devrock.mc.core.wirings.resolver.ArtifactDataResolverModule;
 import com.braintribe.devrock.mc.core.wirings.resolver.contract.ArtifactDataResolverContract;
@@ -83,6 +84,7 @@ public abstract class AbstractCycleTest implements HasCommonFilesystemNode {
 		if (overrides != null && !overrides.isEmpty()) {
 			ove.setEnvs(overrides);						
 		}
+		ove.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 		ove.setEnv("M2_REPO", repo.getAbsolutePath());
 		ove.setEnv("ARTIFACT_REPOSITORIES_EXCLUSIVE_SETTINGS", settings.getAbsolutePath());
 		ove.setEnv( "port", Integer.toString( launcher.getAssignedPort()));

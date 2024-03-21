@@ -34,6 +34,7 @@ import com.braintribe.devrock.mc.api.transitive.TransitiveResolutionContext;
 import com.braintribe.devrock.mc.core.commons.test.HasCommonFilesystemNode;
 import com.braintribe.devrock.mc.core.commons.utils.RepoletUsingTrait;
 import com.braintribe.devrock.mc.core.commons.utils.TestUtils;
+import com.braintribe.devrock.mc.core.configuration.RepositoryConfigurationLoader;
 import com.braintribe.devrock.mc.core.wired.resolving.Validator;
 import com.braintribe.devrock.mc.core.wirings.maven.configuration.MavenConfigurationWireModule;
 import com.braintribe.devrock.mc.core.wirings.transitive.TransitiveResolverWireModule;
@@ -327,6 +328,7 @@ public class NgInteractionTests implements LauncherTrait, HasConnectivityTokens,
 		if (overrides != null && !overrides.isEmpty()) {
 			ove.setEnvs(overrides);						
 		}
+		ove.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 		ove.setEnv("repo", repo.getAbsolutePath());
 		ove.setEnv("ARTIFACT_REPOSITORIES_EXCLUSIVE_SETTINGS", currentSettings.getAbsolutePath());
 		ove.setEnv( "port", Integer.toString( launcher.getAssignedPort()));

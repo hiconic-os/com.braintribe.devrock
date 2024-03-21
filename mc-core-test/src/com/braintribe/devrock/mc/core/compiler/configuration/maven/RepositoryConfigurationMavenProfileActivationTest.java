@@ -20,6 +20,7 @@ import org.junit.Test;
 import com.braintribe.common.lcd.Pair;
 import com.braintribe.devrock.mc.core.compiler.AbstractCompilerTest;
 import com.braintribe.devrock.mc.core.compiler.RepositoryConfigurationValidator;
+import com.braintribe.devrock.mc.core.configuration.RepositoryConfigurationLoader;
 import com.braintribe.devrock.mc.core.configuration.maven.MavenSettingsCompiler;
 import com.braintribe.devrock.model.repository.ChecksumPolicy;
 import com.braintribe.devrock.model.repository.MavenHttpRepository;
@@ -100,6 +101,7 @@ public class RepositoryConfigurationMavenProfileActivationTest extends AbstractC
 	public void testJdkSwitch() {
 		File jdkProfileSettings = new File( input, "jdk.settings.xml");
 		OverridingEnvironment ove = new OverridingEnvironment( StandardEnvironment.INSTANCE);
+		ove.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 		ove.setProperty("java.specification.version", "9");
 		
 		RepositoryConfiguration expectedForJdk_9 = generateTestRepositoryConfiguration( Pair.of( "jdk-9", "http://jdk-9"));
@@ -117,6 +119,7 @@ public class RepositoryConfigurationMavenProfileActivationTest extends AbstractC
 	public void testOsSwitch() {	
 		File jdkProfileSettings = new File( input, "os.settings.xml");
 		OverridingEnvironment ove = new OverridingEnvironment( StandardEnvironment.INSTANCE);
+		ove.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 		ove.setProperty("os.name", "Windows 10");
 		ove.setProperty("os.arch", "amd64");
 		ove.setProperty("os.version", "10");
@@ -146,6 +149,7 @@ public class RepositoryConfigurationMavenProfileActivationTest extends AbstractC
 		File environmentProfileSettings = new File( input, "env.settings.xml");
 		// 
 		OverridingEnvironment ove = new OverridingEnvironment( StandardEnvironment.INSTANCE);
+		ove.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 
 		// a) no variable
 		RepositoryConfiguration expectedForNoVar = generateTestRepositoryConfiguration(Pair.of( "no-var", "http://no-var"));
@@ -177,6 +181,7 @@ public class RepositoryConfigurationMavenProfileActivationTest extends AbstractC
 		File existingFileProfileSettings = new File( input, "property.settings.xml");
 		// 
 		OverridingEnvironment ove = new OverridingEnvironment( StandardEnvironment.INSTANCE);
+		ove.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 
 		// a) no variable
 		RepositoryConfiguration expectedForNoVar = generateTestRepositoryConfiguration(Pair.of( "no-property", "http://no-property"));
@@ -207,6 +212,7 @@ public class RepositoryConfigurationMavenProfileActivationTest extends AbstractC
 		File fileProfileSettings = new File( input, "file.settings.xml");
 	
 		OverridingEnvironment ove = new OverridingEnvironment( StandardEnvironment.INSTANCE);
+		ove.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 		String existingFilePath = new File( input, "existing.file.marker.txt").getAbsolutePath();
 		ove.setEnv("existing", existingFilePath);
 		ove.setEnv("missing", existingFilePath);

@@ -37,6 +37,7 @@ import com.braintribe.devrock.mc.api.transitive.TransitiveResolutionContext;
 import com.braintribe.devrock.mc.core.commons.test.HasCommonFilesystemNode;
 import com.braintribe.devrock.mc.core.commons.utils.RepoletUsingTrait;
 import com.braintribe.devrock.mc.core.commons.utils.TestUtils;
+import com.braintribe.devrock.mc.core.configuration.RepositoryConfigurationLoader;
 import com.braintribe.devrock.mc.core.declared.commons.HashComparators;
 import com.braintribe.devrock.mc.core.wired.resolving.Validator;
 import com.braintribe.devrock.mc.core.wirings.maven.configuration.MavenConfigurationWireModule;
@@ -208,6 +209,7 @@ public abstract class AbstractDiscoveryTest implements LauncherTrait, HasCommonF
 			ove.setEnvs(overrides);						
 		}
 		ove.setEnv("repo", repo.getAbsolutePath());
+		ove.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 		ove.setEnv("ARTIFACT_REPOSITORIES_EXCLUSIVE_SETTINGS", currentSettings.getAbsolutePath());
 		ove.setEnv( "port", Integer.toString( launcher.getAssignedPort()));
 				

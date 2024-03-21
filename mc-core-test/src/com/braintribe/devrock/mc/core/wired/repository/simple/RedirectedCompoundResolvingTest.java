@@ -31,6 +31,7 @@ import com.braintribe.devrock.mc.api.resolver.CompiledArtifactResolver;
 import com.braintribe.devrock.mc.api.resolver.DependencyResolver;
 import com.braintribe.devrock.mc.core.commons.test.HasCommonFilesystemNode;
 import com.braintribe.devrock.mc.core.commons.utils.TestUtils;
+import com.braintribe.devrock.mc.core.configuration.RepositoryConfigurationLoader;
 import com.braintribe.devrock.mc.core.wirings.maven.configuration.MavenConfigurationWireModule;
 import com.braintribe.devrock.mc.core.wirings.resolver.ArtifactDataResolverModule;
 import com.braintribe.devrock.mc.core.wirings.resolver.contract.ArtifactDataResolverContract;
@@ -142,6 +143,7 @@ public class RedirectedCompoundResolvingTest implements LauncherTrait, HasCommon
 		OverridingEnvironment ves = new OverridingEnvironment(StandardEnvironment.INSTANCE);
 		ves.setEnv("repo", repo.getAbsolutePath());
 		ves.setEnv( "port", Integer.toString( launcher.getAssignedPort()));
+		ves.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 		ves.setEnv("ARTIFACT_REPOSITORIES_EXCLUSIVE_SETTINGS", settings.getAbsolutePath());
 
 		

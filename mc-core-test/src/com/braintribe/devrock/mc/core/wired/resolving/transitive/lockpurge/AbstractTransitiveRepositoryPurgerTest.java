@@ -20,6 +20,7 @@ import org.junit.Before;
 import com.braintribe.common.lcd.Pair;
 import com.braintribe.devrock.mc.core.commons.test.HasCommonFilesystemNode;
 import com.braintribe.devrock.mc.core.commons.utils.TestUtils;
+import com.braintribe.devrock.mc.core.configuration.RepositoryConfigurationLoader;
 import com.braintribe.devrock.model.repolet.content.RepoletContent;
 import com.braintribe.devrock.repolet.launcher.Launcher;
 import com.braintribe.devrock.repolet.launcher.LauncherTrait;
@@ -93,6 +94,7 @@ public abstract class AbstractTransitiveRepositoryPurgerTest implements Launcher
 		if (overrides != null && !overrides.isEmpty()) {
 			ove.setEnvs(overrides);						
 		}
+		ove.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 		ove.setEnv("M2_REPO", repo.getAbsolutePath());
 		ove.setEnv("ARTIFACT_REPOSITORIES_EXCLUSIVE_SETTINGS", settings().getAbsolutePath());
 		ove.setEnv( "port", Integer.toString( launcher.getAssignedPort()));

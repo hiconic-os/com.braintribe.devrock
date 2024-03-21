@@ -35,6 +35,7 @@ import com.braintribe.devrock.mc.api.js.JsLibraryLinker;
 import com.braintribe.devrock.mc.api.js.JsLibraryLinkingContext;
 import com.braintribe.devrock.mc.core.commons.test.HasCommonFilesystemNode;
 import com.braintribe.devrock.mc.core.commons.utils.TestUtils;
+import com.braintribe.devrock.mc.core.configuration.RepositoryConfigurationLoader;
 import com.braintribe.devrock.mc.core.wirings.codebase.CodebaseRepositoryModule;
 import com.braintribe.devrock.mc.core.wirings.js.JsResolverWireModule;
 import com.braintribe.devrock.mc.core.wirings.js.contract.JsResolverContract;
@@ -341,6 +342,7 @@ public class JsResolverTest_COREDR26 implements LauncherTrait, HasCommonFilesyst
 	private void test(Collection<String> terminals, File targetDirectory, File projectsDirectory, File settings, File m2Repository, boolean useSymbolicLinks, boolean preferMinOverPretty, boolean localProjectSupport, Map<String, Pair<Boolean,Boolean>> jsRepositoryExpectations, Map<String,Pair<String,String>> libEntryExpectations) {
 		OverridingEnvironment ove = new OverridingEnvironment( StandardEnvironment.INSTANCE);
 		ove.setEnv( "ARTIFACT_REPOSITORIES_EXCLUSIVE_SETTINGS", settingsFile.getAbsolutePath());
+		ove.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 		ove.setEnv( "port", "" + launcher.getAssignedPort());
 		ove.setEnv("M2_REPO", repo.getAbsolutePath());
 

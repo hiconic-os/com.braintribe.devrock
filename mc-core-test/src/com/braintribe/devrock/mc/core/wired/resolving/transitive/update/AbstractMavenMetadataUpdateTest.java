@@ -28,6 +28,7 @@ import com.braintribe.devrock.mc.api.transitive.TransitiveDependencyResolver;
 import com.braintribe.devrock.mc.api.transitive.TransitiveResolutionContext;
 import com.braintribe.devrock.mc.core.commons.test.HasCommonFilesystemNode;
 import com.braintribe.devrock.mc.core.commons.utils.TestUtils;
+import com.braintribe.devrock.mc.core.configuration.RepositoryConfigurationLoader;
 import com.braintribe.devrock.mc.core.wirings.env.configuration.EnvironmentSensitiveConfigurationWireModule;
 import com.braintribe.devrock.mc.core.wirings.maven.configuration.MavenConfigurationWireModule;
 import com.braintribe.devrock.mc.core.wirings.transitive.TransitiveResolverWireModule;
@@ -161,6 +162,7 @@ public abstract class AbstractMavenMetadataUpdateTest implements HasCommonFilesy
 	
 	protected OverridingEnvironment buildVirtualEnvironement(Map<String,String> overrides) {
 		OverridingEnvironment ove = new OverridingEnvironment(StandardEnvironment.INSTANCE);
+		ove.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 		if (overrides != null && !overrides.isEmpty()) {
 			ove.setEnvs(overrides);						
 		}

@@ -22,6 +22,7 @@ import com.braintribe.common.lcd.Pair;
 import com.braintribe.devrock.mc.core.commons.test.HasCommonFilesystemNode;
 import com.braintribe.devrock.mc.core.commons.utils.TestUtils;
 import com.braintribe.devrock.mc.core.compiler.configuration.origination.ReasoningHelper;
+import com.braintribe.devrock.mc.core.configuration.RepositoryConfigurationLoader;
 import com.braintribe.devrock.mc.core.configuration.maven.MavenSettingsCompiler;
 import com.braintribe.devrock.mc.core.configuration.maven.MavenSettingsLoader;
 import com.braintribe.devrock.model.repository.RepositoryConfiguration;
@@ -73,6 +74,7 @@ public class RepositoryConfigurationOriginationMavenTest implements HasCommonFil
 	public void testDirectLocationPassed() {
 		File cfg = new File( input, "exclusive.settings.xml");
 		OverridingEnvironment ove = new OverridingEnvironment( StandardEnvironment.INSTANCE);
+		ove.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 		ove.setEnv(MavenSettingsLoader.ENV_EXCLUSIVE_SETTINGS, cfg.getAbsolutePath()); // 
 		
 		// 'null'-out all other env settings
@@ -121,6 +123,7 @@ public class RepositoryConfigurationOriginationMavenTest implements HasCommonFil
 		OverridingEnvironment ove = new OverridingEnvironment( StandardEnvironment.INSTANCE);
 		ove.setEnv( MavenSettingsLoader.ENV_LOCAL_SETTINGS, local.getAbsolutePath()); //
 		ove.setEnv( MavenSettingsLoader.ENV_GLOBAL_SETTINGS, global.getAbsolutePath()); //
+		ove.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 		
 		// 'null'-out all other env settings
 		ove.setEnv(MavenSettingsLoader.ENV_EXCLUSIVE_SETTINGS, null); // 
@@ -185,7 +188,7 @@ public class RepositoryConfigurationOriginationMavenTest implements HasCommonFil
 		OverridingEnvironment ove = new OverridingEnvironment( StandardEnvironment.INSTANCE);
 		File userHome = new File( input, "initial/user.home");
 		ove.setProperty( MavenSettingsLoader.USERHOME, userHome.getAbsolutePath());
-		
+		ove.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 		// 'null'-out all other env settings
 		ove.setEnv(MavenSettingsLoader.ENV_LOCAL_SETTINGS, null); //
 		ove.setEnv(MavenSettingsLoader.ENV_EXCLUSIVE_SETTINGS, null); // 		
@@ -231,7 +234,7 @@ public class RepositoryConfigurationOriginationMavenTest implements HasCommonFil
 		OverridingEnvironment ove = new OverridingEnvironment( StandardEnvironment.INSTANCE);
 		File mavenHome = new File( input, "initial/m2.home");
 		ove.setEnv( MavenSettingsLoader.M2HOME, mavenHome.getAbsolutePath());
-		
+		ove.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 		// 'null'-out all other env settings
 		ove.setEnv(MavenSettingsLoader.ENV_LOCAL_SETTINGS, null); //
 		ove.setEnv(MavenSettingsLoader.ENV_EXCLUSIVE_SETTINGS, null); // 		
@@ -275,6 +278,7 @@ public class RepositoryConfigurationOriginationMavenTest implements HasCommonFil
 		
 		File m2home = new File( input, "initial/m2.home");
 		ove.setEnv( MavenSettingsLoader.M2HOME, m2home.getAbsolutePath());
+		ove.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 	
 		File userHome = new File( input, "initial/user.home");
 		ove.setProperty( MavenSettingsLoader.USERHOME, userHome.getAbsolutePath());

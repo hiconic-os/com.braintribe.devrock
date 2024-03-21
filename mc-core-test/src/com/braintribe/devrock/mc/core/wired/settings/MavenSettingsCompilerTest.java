@@ -21,6 +21,7 @@ import org.junit.experimental.categories.Category;
 import com.braintribe.common.lcd.Pair;
 import com.braintribe.devrock.mc.core.commons.test.HasCommonFilesystemNode;
 import com.braintribe.devrock.mc.core.compiler.RepositoryConfigurationValidator;
+import com.braintribe.devrock.mc.core.configuration.RepositoryConfigurationLoader;
 import com.braintribe.devrock.mc.core.configuration.maven.MavenSettingsLoader;
 import com.braintribe.devrock.mc.core.wirings.configuration.contract.RepositoryConfigurationContract;
 import com.braintribe.devrock.mc.core.wirings.maven.configuration.MavenConfigurationWireModule;
@@ -169,6 +170,7 @@ public class MavenSettingsCompilerTest implements LauncherTrait, HasCommonFilesy
 	public void singleOverloadTest() {
 		String settings = UniversalPath.from(input).push( "remapped").push("single").push( "basic-settings.xml").toFilePath();		
 		OverridingEnvironment ves = new OverridingEnvironment(StandardEnvironment.INSTANCE);
+		ves.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 		ves.setEnv(MavenSettingsLoader.ENV_EXCLUSIVE_SETTINGS,settings);
 		ves.setEnv(MavenSettingsLoader.ENV_LOCAL_SETTINGS, null);
 		ves.setEnv(MavenSettingsLoader.ENV_GLOBAL_SETTINGS, null);
@@ -198,6 +200,7 @@ public class MavenSettingsCompilerTest implements LauncherTrait, HasCommonFilesy
 		String userSettings = UniversalPath.from(input).push( "remapped").push("multiple").push( "user-settings.xml").toFilePath();
 		String installationSettings = UniversalPath.from(input).push( "remapped").push("multiple").push( "installation-settings.xml").toFilePath();
 		OverridingEnvironment ves = new OverridingEnvironment(StandardEnvironment.INSTANCE);
+		ves.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 		ves.setEnv(MavenSettingsLoader.ENV_EXCLUSIVE_SETTINGS, null);
 		ves.setEnv(MavenSettingsLoader.ENV_LOCAL_SETTINGS,userSettings);
 		ves.setEnv(MavenSettingsLoader.ENV_GLOBAL_SETTINGS, installationSettings);
@@ -226,6 +229,7 @@ public class MavenSettingsCompilerTest implements LauncherTrait, HasCommonFilesy
 	public void singleAutoDetectTest() {		
 		OverridingEnvironment ves = new OverridingEnvironment(StandardEnvironment.INSTANCE);
 		ves.setEnv("repo", repo.getAbsolutePath());	
+		ves.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 		String m2_repo = UniversalPath.from(input).push( "autodetect").push("single").push( "user").toFilePath();
 		ves.setProperty("user.home", m2_repo);
 		ves.setEnv( "port", "8080");
@@ -252,7 +256,8 @@ public class MavenSettingsCompilerTest implements LauncherTrait, HasCommonFilesy
 	@Test
 	public void singleMirroredAutoDetectTest() {		
 		OverridingEnvironment ves = new OverridingEnvironment(StandardEnvironment.INSTANCE);
-		ves.setEnv("repo", repo.getAbsolutePath());	
+		ves.setEnv("repo", repo.getAbsolutePath());
+		ves.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 		String m2_repo = UniversalPath.from(input).push( "autodetect").push("mirrored").push( "user").toFilePath();
 		ves.setProperty("user.home", m2_repo);
 		ves.setEnv( "port", "8080");
@@ -279,6 +284,7 @@ public class MavenSettingsCompilerTest implements LauncherTrait, HasCommonFilesy
 	public void multipleAutoDetectTest() {		
 		OverridingEnvironment ves = new OverridingEnvironment(StandardEnvironment.INSTANCE);
 		ves.setEnv("repo", repo.getAbsolutePath());
+		ves.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 		
 		String userHome = UniversalPath.from(input).push( "autodetect").push("multiple").push("user").toFilePath();		
 		ves.setProperty("user.home", userHome);

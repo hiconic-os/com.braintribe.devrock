@@ -33,6 +33,7 @@ import com.braintribe.devrock.mc.api.resolver.DependencyResolver;
 import com.braintribe.devrock.mc.core.commons.test.HasCommonFilesystemNode;
 import com.braintribe.devrock.mc.core.commons.utils.ResolverTestUtils;
 import com.braintribe.devrock.mc.core.commons.utils.TestUtils;
+import com.braintribe.devrock.mc.core.configuration.RepositoryConfigurationLoader;
 import com.braintribe.devrock.mc.core.wirings.maven.configuration.MavenConfigurationWireModule;
 import com.braintribe.devrock.mc.core.wirings.resolver.ArtifactDataResolverModule;
 import com.braintribe.devrock.mc.core.wirings.resolver.contract.ArtifactDataResolverContract;
@@ -143,6 +144,7 @@ public class PreparedCompoundResolvingWithRavenhurstTest implements LauncherTrai
 		ves.setEnv("repo", localRepository.getAbsolutePath());
 		ves.setEnv( "port", Integer.toString( launcher.getAssignedPort()));
 		ves.setEnv("ARTIFACT_REPOSITORIES_EXCLUSIVE_SETTINGS", settings.getAbsolutePath());
+		ves.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
 		
 		try (
 				
