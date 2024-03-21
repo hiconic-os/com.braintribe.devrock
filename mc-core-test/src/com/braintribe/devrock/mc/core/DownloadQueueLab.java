@@ -108,7 +108,6 @@ public class DownloadQueueLab {
 		OverridingEnvironment overridingEnvironment = new OverridingEnvironment(StandardEnvironment.INSTANCE);
 		
 		overridingEnvironment.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, configFile.getAbsolutePath());
-		overridingEnvironment.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);;
 		
 		EventHub eventHub = new EventHub();
 		
