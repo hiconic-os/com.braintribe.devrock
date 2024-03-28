@@ -30,6 +30,7 @@ import com.braintribe.logging.Logger;
 
 /**
  * common base for {@link HttpRepositoryArtifactDataResolver} and {@link HttpRepositoryProbingSupport}
+ * 
  * @author pit / dirk
  *
  */
@@ -40,8 +41,9 @@ public class HttpRepositoryBase {
 	protected String password;
 	protected CloseableHttpClient httpClient;
 	protected String repositoryId = "unknown";
-	
-	@Configurable @Required
+
+	@Configurable
+	@Required
 	public void setRoot(String root) {
 		this.root = root;
 	}
@@ -53,52 +55,67 @@ public class HttpRepositoryBase {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	@Configurable @Required
+	@Configurable
+	@Required
 	public void setHttpClient(CloseableHttpClient httpClient) {
 		this.httpClient = httpClient;
 	}
-	
+
 	@Configurable
 	public void setRepositoryId(String repositoryId) {
 		this.repositoryId = repositoryId;
 	}
-	
-	protected CloseableHttpResponse getResponse( String url, boolean headOnly) throws IOException {		
-		return getResponse( headOnly ? new HttpHead( url) : new HttpGet(url));
+
+	protected CloseableHttpResponse getResponse(String url, boolean headOnly) throws IOException {
+		return getResponse(headOnly ? new HttpHead(url) : new HttpGet(url));
 	}
-	
+
 	/**
-	 * @param url - the URL to use for the HttpGet
+	 * @param url
+	 *            - the URL to use for the HttpGet
 	 * @return - a fresh {@link CloseableHttpResponse}
 	 * @throws IOException
 	 */
-	protected CloseableHttpResponse getResponse( HttpRequestBase requestBase) throws IOException{
-		
+	protected CloseableHttpResponse getResponse(HttpRequestBase requestBase) throws IOException {
+
 		HttpClientContext context = HttpClientContext.create();
 
 		if (userName != null && password != null) {
 			String host = requestBase.getURI().getHost();
 			CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-			credentialsProvider.setCredentials( new AuthScope( host, AuthScope.ANY_PORT), new UsernamePasswordCredentials( userName, password));	
-			context.setCredentialsProvider( credentialsProvider);
-		}						
-		CloseableHttpResponse response = httpClient.execute( requestBase, context);
+			credentialsProvider.setCredentials(new AuthScope(host, AuthScope.ANY_PORT), new UsernamePasswordCredentials(userName, password));
+			context.setCredentialsProvider(credentialsProvider);
+		}
+		CloseableHttpResponse response = httpClient.execute(requestBase, context);
 		return response;
 	}
-	
-	
-	protected CloseableHttpResponse getResponse( String url) throws IOException{
+
+	protected CloseableHttpResponse getResponse(String url) throws IOException {
 		int maxRetries = 3;
 		int retry = 0;
 		while (true) {
 			try {
 				return getResponse(url, false);
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				if ((retry++) > maxRetries)
 					throw e;
-				
+
 				logger.warn("failed try " + retry + " of " + maxRetries + " to open a http request to: " + url, e);
+			}
+		}
+	}
+
+	protected CloseableHttpResponse getResponseWithRetry(HttpGet get) throws IOException {
+		int maxRetries = 3;
+		int retry = 0;
+		while (true) {
+			try {
+				return getResponse(get);
+			} catch (IOException e) {
+				if ((retry++) > maxRetries)
+					throw e;
+
+				logger.warn("failed try " + retry + " of " + maxRetries + " to open a http request to: " + get.getURI(), e);
 			}
 		}
 	}
