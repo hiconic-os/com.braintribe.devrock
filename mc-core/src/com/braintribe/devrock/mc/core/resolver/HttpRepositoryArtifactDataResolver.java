@@ -91,12 +91,19 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 	private ChecksumPolicy checksumPolicy = ChecksumPolicy.ignore;
 	private boolean ignoreHashHeaders;
 
+	private boolean activateGithubHandling = false;
+
 	private final Map<String, Pair<String, String>> hashAlgToHeaderKeyAndExtension = new LinkedHashMap<>();
 
 	public HttpRepositoryArtifactDataResolver() {
 		hashAlgToHeaderKeyAndExtension.put("MD5", Pair.of("X-Checksum-Md5", "md5"));
 		hashAlgToHeaderKeyAndExtension.put("SHA-1", Pair.of("X-Checksum-Sha1", "Sha1"));
 		hashAlgToHeaderKeyAndExtension.put("SHA-256", Pair.of("X-Checksum-Sha256", "Sha256"));
+
+		String githubSuport = System.getenv("MC_GITHUB_SUPPORT");
+		if (githubSuport != null) {
+			activateGithubHandling = Boolean.valueOf(githubSuport).booleanValue();
+		}
 	}
 
 	@Configurable
@@ -153,7 +160,7 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 		public Resource getResource() {
 
 			Matcher matcher = githubPattern.matcher(this.url);
-			if (matcher.matches()) {
+			if (activateGithubHandling && matcher.matches()) {
 				String org = matcher.group(1);
 				String repo = matcher.group(2);
 				log.debug(() -> "Identified a GitHub repository URL: " + this.url + ", Organization: " + org + ", Repository: " + repo);
@@ -536,7 +543,7 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 			try {
 				String htmlData = IOTools.slurp(htmlContent.get().getResource().openStream(), "UTF-8");
 				List<String> filenamesFromHtml = null;
-				if (this.root.startsWith("https://maven.pkg.github.com")) {
+				if (activateGithubHandling && this.root.startsWith("https://maven.pkg.github.com")) {
 					filenamesFromHtml = parseFilenamesFromGitHubHtml(htmlData, compiledArtifactIdentification);
 				} else {
 					filenamesFromHtml = HtmlContentParser.parseFilenamesFromHtml(htmlData);
