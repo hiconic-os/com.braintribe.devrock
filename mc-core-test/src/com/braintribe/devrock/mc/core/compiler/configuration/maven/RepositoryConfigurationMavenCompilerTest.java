@@ -273,6 +273,7 @@ public class RepositoryConfigurationMavenCompilerTest extends AbstractCompilerTe
 	private void test(File file, RepositoryConfiguration expected) {
 		Settings settings = loadSettings( file);
 		MavenSettingsCompiler compiler = new MavenSettingsCompiler();
+		compiler.setIgnoreExternalConfiguration(true);
 		compiler.setSettingsSupplier( () -> settings);
 		RepositoryConfiguration repositoryConfiguration = compiler.get();
 		if (expected != null) {

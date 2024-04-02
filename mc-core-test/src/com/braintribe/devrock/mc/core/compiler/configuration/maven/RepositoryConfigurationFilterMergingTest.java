@@ -17,6 +17,7 @@ import java.io.InputStream;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import com.braintribe.common.lcd.Pair;
 import com.braintribe.devrock.mc.core.commons.test.HasCommonFilesystemNode;
@@ -29,15 +30,19 @@ import com.braintribe.devrock.model.repository.filters.QualifiedArtifactFilter;
 import com.braintribe.marshaller.artifact.maven.settings.DeclaredMavenSettingsMarshaller;
 import com.braintribe.model.artifact.maven.settings.Settings;
 import com.braintribe.model.time.TimeSpan;
+import com.braintribe.testing.category.KnownIssue;
 import com.braintribe.ve.impl.OverridingEnvironment;
 import com.braintribe.ve.impl.StandardEnvironment;
 
 /**
  * tests multi-stage merging of repository configuration  
- *  
+ * 
+ * test are deactived for the CI as it will disregard the variable DEVROCK_REPOSITORY_CONFIGURATION and merge its
+ * own cfg into it. The tests are so only ment to be run locally. REMEMBER THAT!
  * @author pit
  *
  */
+@Category(KnownIssue.class)
 public class RepositoryConfigurationFilterMergingTest implements HasCommonFilesystemNode {
 	private DeclaredMavenSettingsMarshaller marshaller = new DeclaredMavenSettingsMarshaller();
 	protected File repo;
@@ -225,6 +230,9 @@ public class RepositoryConfigurationFilterMergingTest implements HasCommonFilesy
 			ove.setEnv( MavenSettingsCompiler.DEVROCK_REPOSITORY_CONFIGURATION, filterFile.getAbsolutePath());
 			compiler.setVirtualEnvironment(ove);
 		}
+		else {		
+			compiler.setIgnoreExternalConfiguration(true);
+		}
 		
 		RepositoryConfiguration repositoryConfiguration = compiler.get();
 		
@@ -241,13 +249,16 @@ public class RepositoryConfigurationFilterMergingTest implements HasCommonFilesy
 	
 	private void errorHandlingTest(File settingsFile, File filterFile) {
 		Settings settings = loadSettings( settingsFile);
-		MavenSettingsCompiler compiler = new MavenSettingsCompiler();
+		MavenSettingsCompiler compiler = new MavenSettingsCompiler();		
 		compiler.setSettingsSupplier( () -> settings);
 		
 		if (filterFile != null) {
 			OverridingEnvironment ove = new OverridingEnvironment(StandardEnvironment.INSTANCE);
 			ove.setEnv( MavenSettingsCompiler.DEVROCK_REPOSITORY_CONFIGURATION, filterFile.getAbsolutePath());
 			compiler.setVirtualEnvironment(ove);
+		}
+		else {
+			compiler.setIgnoreExternalConfiguration(true);
 		}
 		boolean exceptionThrown = false;
 		

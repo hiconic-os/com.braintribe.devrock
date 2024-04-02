@@ -69,6 +69,7 @@ public class RepositoryConfigurationMavenProfileActivationTest extends AbstractC
 		Settings settings = loadSettings( file);
 		MavenSettingsCompiler compiler = new MavenSettingsCompiler();
 		compiler.setSettingsSupplier( () -> settings);
+		compiler.setIgnoreExternalConfiguration(true);
 		compiler.setVirtualEnvironment( ve);
 		RepositoryConfiguration repositoryConfiguration = compiler.get();
 		if (expected != null) {

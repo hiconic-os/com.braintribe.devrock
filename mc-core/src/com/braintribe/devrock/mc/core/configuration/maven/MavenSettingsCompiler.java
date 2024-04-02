@@ -74,6 +74,7 @@ public class MavenSettingsCompiler implements Supplier<RepositoryConfiguration>,
 	private YamlMarshaller marshaller = new YamlMarshaller();
 	private GmDeserializationOptions options = GmDeserializationOptions.defaultOptions.derive().setInferredRootType(com.braintribe.devrock.model.repository.RepositoryConfiguration.T).absentifyMissingProperties(true).build();	
 	private LazyInitialized<RepositoryConfiguration> repositoryConfiguration = new LazyInitialized<>(this::initializeRepositoryConfiguration);
+	private boolean ignoreExternalConfiguration = false;
 	
 	@Configurable @Required
 	public void setSettingsSupplier(Supplier<Settings> settingsSupplier) {
@@ -83,6 +84,11 @@ public class MavenSettingsCompiler implements Supplier<RepositoryConfiguration>,
 	@Configurable
 	public void setVirtualEnvironment(VirtualEnvironment virtualEnvironment) {
 		this.virtualEnvironment = virtualEnvironment;
+	}
+	
+	@Configurable
+	public void setIgnoreExternalConfiguration(boolean ignoreExternalConfiguration) {
+		this.ignoreExternalConfiguration = ignoreExternalConfiguration;
 	}
 	
 	/**
@@ -464,30 +470,32 @@ public class MavenSettingsCompiler implements Supplier<RepositoryConfiguration>,
 		} // profile
 		
 		// load external configuration
-		RepositoryConfiguration externalRepositoryConfiguration = null;
-		String externalConfigurationFilePath = virtualEnvironment.getEnv( DEVROCK_REPOSITORY_CONFIGURATION);
-		if (externalConfigurationFilePath != null) {
-			File externalConfigurationFile = new File( externalConfigurationFilePath);
-			if (externalConfigurationFile.exists()) {
-			
-				StandaloneRepositoryConfigurationLoader srcl = new StandaloneRepositoryConfigurationLoader();
-				srcl.setVirtualEnvironment(virtualEnvironment);
-				srcl.setAbsentify(true);
-				Maybe<RepositoryConfiguration> loadRepositoryConfigurationMaybe = srcl.loadRepositoryConfiguration(externalConfigurationFile);
-				if (!loadRepositoryConfigurationMaybe.isSatisfied()) {
-					throw new IllegalStateException("cannot load [" + externalConfigurationFilePath + "] as " + loadRepositoryConfigurationMaybe.whyUnsatisfied().stringify());
+		if (!ignoreExternalConfiguration) {
+			RepositoryConfiguration externalRepositoryConfiguration = null;
+			String externalConfigurationFilePath = virtualEnvironment.getEnv( DEVROCK_REPOSITORY_CONFIGURATION);
+			if (externalConfigurationFilePath != null) {
+				File externalConfigurationFile = new File( externalConfigurationFilePath);
+				if (externalConfigurationFile.exists()) {
+				
+					StandaloneRepositoryConfigurationLoader srcl = new StandaloneRepositoryConfigurationLoader();
+					srcl.setVirtualEnvironment(virtualEnvironment);
+					srcl.setAbsentify(true);
+					Maybe<RepositoryConfiguration> loadRepositoryConfigurationMaybe = srcl.loadRepositoryConfiguration(externalConfigurationFile);
+					if (!loadRepositoryConfigurationMaybe.isSatisfied()) {
+						throw new IllegalStateException("cannot load [" + externalConfigurationFilePath + "] as " + loadRepositoryConfigurationMaybe.whyUnsatisfied().stringify());
+					}
+					else {
+						externalRepositoryConfiguration = loadRepositoryConfigurationMaybe.get();
+					}							
 				}
 				else {
-					externalRepositoryConfiguration = loadRepositoryConfigurationMaybe.get();
-				}							
+					throw new IllegalStateException("cannot find external configuration file [" + externalConfigurationFilePath + "]");
+				}		
 			}
-			else {
-				throw new IllegalStateException("cannot find external configuration file [" + externalConfigurationFilePath + "]");
-			}		
-		}
-		// merge external configuration into the one from the settings.xml (and YAML property)
-		if (externalRepositoryConfiguration != null) {
-			mergeRepositoryConfigurations(repositoryConfiguration, externalRepositoryConfiguration);
+			// merge external configuration into the one from the settings.xml (and YAML property)
+			if (externalRepositoryConfiguration != null) {
+				mergeRepositoryConfigurations(repositoryConfiguration, externalRepositoryConfiguration);
+			}
 		}
 		 
 		// if loaded via the standard maven cascade, we might need to inject the maven-central repository

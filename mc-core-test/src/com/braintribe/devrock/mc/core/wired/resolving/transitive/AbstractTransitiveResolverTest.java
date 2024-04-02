@@ -24,10 +24,9 @@ import com.braintribe.devrock.mc.api.transitive.TransitiveResolutionContext;
 import com.braintribe.devrock.mc.core.commons.test.HasCommonFilesystemNode;
 import com.braintribe.devrock.mc.core.commons.utils.TestUtils;
 import com.braintribe.devrock.mc.core.configuration.RepositoryConfigurationLoader;
-import com.braintribe.devrock.mc.core.wirings.maven.configuration.MavenConfigurationWireModule;
+import com.braintribe.devrock.mc.core.wirings.env.configuration.EnvironmentSensitiveConfigurationWireModule;
 import com.braintribe.devrock.mc.core.wirings.transitive.TransitiveResolverWireModule;
 import com.braintribe.devrock.mc.core.wirings.transitive.contract.TransitiveResolverContract;
-import com.braintribe.devrock.mc.core.wirings.venv.contract.VirtualEnvironmentContract;
 import com.braintribe.devrock.model.repolet.content.RepoletContent;
 import com.braintribe.devrock.repolet.generator.RepositoryGenerations;
 import com.braintribe.devrock.repolet.launcher.Launcher;
@@ -54,7 +53,7 @@ public abstract class AbstractTransitiveResolverTest implements LauncherTrait, H
 		repo = new File( output, "repo");			
 	}
 	
-	private File settings = new File( input, "settings.xml");
+	private File settings = new File( input, "repository-configuration.yaml");
 	
 	
 	protected TransitiveResolutionContext standardResolutionContext = TransitiveResolutionContext.build().done();
@@ -102,9 +101,8 @@ public abstract class AbstractTransitiveResolverTest implements LauncherTrait, H
 		if (overrides != null && !overrides.isEmpty()) {
 			ove.setEnvs(overrides);						
 		}
-		ove.setEnv("M2_REPO", repo.getAbsolutePath());
-		ove.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, null);
-		ove.setEnv("ARTIFACT_REPOSITORIES_EXCLUSIVE_SETTINGS", settings.getAbsolutePath());
+		ove.setEnv("repo", repo.getAbsolutePath());
+		ove.setEnv(RepositoryConfigurationLoader.ENV_DEVROCK_REPOSITORY_CONFIGURATION, settings.getAbsolutePath());		
 		ove.setEnv( "port", Integer.toString( launcher.getAssignedPort()));
 				
 		return ove;		
@@ -115,9 +113,9 @@ public abstract class AbstractTransitiveResolverTest implements LauncherTrait, H
 	}
 	
 	public AnalysisArtifactResolution run(CompiledTerminal terminal, TransitiveResolutionContext resolutionContext) {
+		OverridingEnvironment ove = buildVirtualEnvironement(null);
 		try (				
-				WireContext<TransitiveResolverContract> resolverContext = Wire.contextBuilder( TransitiveResolverWireModule.INSTANCE, MavenConfigurationWireModule.INSTANCE)
-				.bindContract(VirtualEnvironmentContract.class, () -> buildVirtualEnvironement(null))				
+				WireContext<TransitiveResolverContract> resolverContext = Wire.contextBuilder( TransitiveResolverWireModule.INSTANCE, new EnvironmentSensitiveConfigurationWireModule( ove))							
 				.build();
 				) {
 			
