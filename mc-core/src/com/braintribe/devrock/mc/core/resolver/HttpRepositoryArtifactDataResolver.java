@@ -150,7 +150,9 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 		private final ArtifactAddressBuilder builder;
 		private String url;
 		private static Pattern githubPattern = Pattern.compile("https:\\/\\/maven.pkg.github.com\\/([^\\/]+)\\/([^\\/]+).*");
-
+		// using {0,4} instead of * to avoid potential stack overflow warning (and because there is no need to support more version levels)
+		private static Pattern versionPattern = Pattern.compile("\\d+(\\.\\d+){0,4}");
+		
 		public HttpArtifactDataResolution(ArtifactAddressBuilder builder) {
 			this.builder = builder;
 			this.url = builder.toPath().toSlashPath();
@@ -164,78 +166,83 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 				String org = matcher.group(1);
 				String repo = matcher.group(2);
 				log.debug(() -> "Identified a GitHub repository URL: " + this.url + ", Organization: " + org + ", Repository: " + repo);
-
-				String token = System.getenv("GITHUB_READ_PACKAGES_TOKEN");
-				if (token == null) {
-					token = System.getProperty("GITHUB_READ_PACKAGES_TOKEN");
-				}
-				if (token != null) {
-					log.debug(() -> "Found GITHUB_READ_PACKAGES_TOKEN value.");
-					// https://api.github.com/orgs/hiconic-os/packages/maven/com.braintribe.codec.dom-codecs
-					final String idUrl = "https://api.github.com/orgs/" + org + "/packages/maven/" + builder.getGroupId() + "."
-							+ builder.getArtifactId();
-					log.debug(() -> "Trying to get artifact ID via " + idUrl);
-
-					HttpGet idGet = new HttpGet(idUrl);
-					idGet.setHeader("Accept", "application/vnd.github+json");
-					idGet.setHeader("Authorization", "Bearer " + token);
-					idGet.setHeader("X-GitHub-Api-Version", "2022-11-28");
-					try (CloseableHttpResponse idResponse = getResponseWithRetry(idGet)) {
-						int idStatusCode = idResponse.getStatusLine().getStatusCode();
-						if (idStatusCode >= 200 && idStatusCode < 300) {
-							String idJson = EntityUtils.toString(idResponse.getEntity(), "UTF-8");
-							log.debug(() -> "Received status code " + idStatusCode + ", JSON Body has length " + idJson.length());
-							JsonParser jsonParser = new JsonFactory().createParser(idJson);
-							String artifactId = null;
-							while (jsonParser.nextToken() != JsonToken.END_OBJECT) {
-								String name = jsonParser.getCurrentName();
-								if ("id".equals(name)) {
-									jsonParser.nextToken();
-									artifactId = jsonParser.getText();
-									break;
-								}
-							}
-							if (artifactId != null) {
-								log.debug("Identified artifact ID " + artifactId);
-								// https://github.com/hiconic-os/maven-repo-dev/packages/1997637?version=2.0.8
-								final String partsUrl = "https://github.com/" + org + "/" + repo + "/packages/" + artifactId + "?version="
-										+ builder.getFileName();
-								log.debug(() -> "Trying to get part information via " + partsUrl);
-
-								HttpGet partsGet = new HttpGet(partsUrl);
-								partsGet.setHeader("Accept", "application/vnd.github+json");
-								partsGet.setHeader("Authorization", "Bearer " + token);
-								partsGet.setHeader("X-GitHub-Api-Version", "2022-11-28");
-
-								try (CloseableHttpResponse partsResponse = getResponseWithRetry(partsGet)) {
-									int partsStatusCode = partsResponse.getStatusLine().getStatusCode();
-									if (partsStatusCode >= 200 && partsStatusCode < 300) {
-										String html = EntityUtils.toString(partsResponse.getEntity(), "UTF-8");
-										log.debug(() -> "Received status code " + partsStatusCode + ", HTML Body has length " + html.length());
-
-										Resource resource = Resource
-												.createTransient(() -> new ByteArrayInputStream(html.getBytes(StandardCharsets.UTF_8)));
-										resource.setName(builder.getFileName());
-										return resource;
-
-									} else {
-										log.debug(() -> "Received status code " + partsStatusCode);
+				
+				String fileName = this.builder.getFileName(); // file name could be the version, if URL ends with e.g. .../1.2.3
+				if (fileName != null && versionPattern.matcher(fileName).matches()) {
+					log.debug(() -> "URL is an artifact version URL.");
+				
+					String token = System.getenv("GITHUB_READ_PACKAGES_TOKEN");
+					if (token == null) {
+						token = System.getProperty("GITHUB_READ_PACKAGES_TOKEN");
+					}
+					if (token != null) {
+						log.debug(() -> "Found GITHUB_READ_PACKAGES_TOKEN value.");
+						// https://api.github.com/orgs/hiconic-os/packages/maven/com.braintribe.codec.dom-codecs
+						final String idUrl = "https://api.github.com/orgs/" + org + "/packages/maven/" + builder.getGroupId() + "."
+								+ builder.getArtifactId();
+						log.debug(() -> "Trying to get artifact ID via " + idUrl);
+	
+						HttpGet idGet = new HttpGet(idUrl);
+						idGet.setHeader("Accept", "application/vnd.github+json");
+						idGet.setHeader("Authorization", "Bearer " + token);
+						idGet.setHeader("X-GitHub-Api-Version", "2022-11-28");
+						try (CloseableHttpResponse idResponse = getResponseWithRetry(idGet)) {
+							int idStatusCode = idResponse.getStatusLine().getStatusCode();
+							if (idStatusCode >= 200 && idStatusCode < 300) {
+								String idJson = EntityUtils.toString(idResponse.getEntity(), "UTF-8");
+								log.debug(() -> "Received status code " + idStatusCode + ", JSON Body has length " + idJson.length());
+								JsonParser jsonParser = new JsonFactory().createParser(idJson);
+								String artifactId = null;
+								while (jsonParser.nextToken() != JsonToken.END_OBJECT) {
+									String name = jsonParser.getCurrentName();
+									if ("id".equals(name)) {
+										jsonParser.nextToken();
+										artifactId = jsonParser.getText();
+										break;
 									}
 								}
-
-								this.url = partsUrl;
-
+								if (artifactId != null) {
+									log.debug("Identified artifact ID " + artifactId);
+									// https://github.com/hiconic-os/maven-repo-dev/packages/1997637?version=2.0.8
+									final String partsUrl = "https://github.com/" + org + "/" + repo + "/packages/" + artifactId + "?version="
+											+ builder.getFileName();
+									log.debug(() -> "Trying to get part information via " + partsUrl);
+	
+									HttpGet partsGet = new HttpGet(partsUrl);
+									partsGet.setHeader("Accept", "application/vnd.github+json");
+									partsGet.setHeader("Authorization", "Bearer " + token);
+									partsGet.setHeader("X-GitHub-Api-Version", "2022-11-28");
+	
+									try (CloseableHttpResponse partsResponse = getResponseWithRetry(partsGet)) {
+										int partsStatusCode = partsResponse.getStatusLine().getStatusCode();
+										if (partsStatusCode >= 200 && partsStatusCode < 300) {
+											String html = EntityUtils.toString(partsResponse.getEntity(), "UTF-8");
+											log.debug(() -> "Received status code " + partsStatusCode + ", HTML Body has length " + html.length());
+	
+											Resource resource = Resource
+													.createTransient(() -> new ByteArrayInputStream(html.getBytes(StandardCharsets.UTF_8)));
+											resource.setName(builder.getFileName());
+											this.url = partsUrl;
+											return resource;
+	
+										} else {
+											log.debug(() -> "Received status code " + partsStatusCode);
+										}
+									}
+								} else {
+									log.debug(() -> "Could not identify an artifact ID");
+								}
 							} else {
-								log.debug(() -> "Could not identify an artifact ID");
+								log.debug(() -> "Received status code " + idStatusCode);
 							}
-						} else {
-							log.debug(() -> "Received status code " + idStatusCode);
+						} catch (IOException ioe) {
+							throw new UncheckedIOException(ioe);
 						}
-					} catch (IOException ioe) {
-						throw new UncheckedIOException(ioe);
+					} else {
+						log.debug(() -> "Found no GITHUB_READ_PACKAGES_TOKEN value.");
 					}
 				} else {
-					log.debug(() -> "Found no GITHUB_READ_PACKAGES_TOKEN value.");
+					log.debug(() -> "URL is not an artifact version URL. No need for special support to look up parts.");
 				}
 			} else {
 				log.debug(() -> "Does not seem to be a GitHub repository URL: " + this.url);
