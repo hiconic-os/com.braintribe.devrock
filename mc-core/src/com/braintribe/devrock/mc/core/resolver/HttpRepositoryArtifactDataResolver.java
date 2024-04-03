@@ -572,7 +572,7 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 		List<String> result = new ArrayList<>();
 		StringTools.getLines(htmlData).forEach(line -> {
 			line = line.trim();
-			if (line.startsWith(expectedStart)) {
+			if (line.startsWith(expectedStart) && !line.matches(".+\\.(md5|sha\\d+)")) {
 				result.add(line);
 			}
 		});
