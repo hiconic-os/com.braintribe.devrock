@@ -575,11 +575,13 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 	private List<String> parseFilenamesFromGitHubHtml(String htmlData, CompiledArtifactIdentification compiledArtifactIdentification) {
 		String artifactId = compiledArtifactIdentification.getArtifactId();
 		String version = compiledArtifactIdentification.getVersion().toString();
-		String expectedStart = artifactId + "-" + version + ".";
+		String expectedStart = artifactId + "-" + version;
 		List<String> result = new ArrayList<>();
 		StringTools.getLines(htmlData).forEach(line -> {
 			line = line.trim();
-			if (line.startsWith(expectedStart) && !line.matches(".+\\.(md5|sha\\d+)")) {
+			// "." -> e.g. example-artifacts-1.2.3.pom
+			// "-" -> e.g. example-artifacts-1.2.3-asset.man
+			if ((line.startsWith(expectedStart + ".") || line.startsWith(expectedStart + "-")) && !line.matches(".+\\.(md5|sha\\d+)")) {
 				result.add(line);
 			}
 		});
