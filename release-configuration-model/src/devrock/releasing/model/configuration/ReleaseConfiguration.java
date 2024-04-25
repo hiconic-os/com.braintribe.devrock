@@ -16,6 +16,7 @@ import java.util.List;
 import com.braintribe.devrock.model.repository.Repository;
 import com.braintribe.devrock.model.repository.filters.ArtifactFilter;
 import com.braintribe.model.generic.GenericEntity;
+import com.braintribe.model.generic.annotation.meta.Mandatory;
 import com.braintribe.model.generic.reflection.EntityType;
 import com.braintribe.model.generic.reflection.EntityTypes;
 
@@ -40,6 +41,7 @@ public interface ReleaseConfiguration extends GenericEntity {
 	 * Prototype for the repository of the final RepositoryView, whose {@link Repository#getArtifactFilter() filter} will be computed based on
 	 * {@link #getIncludes()} and {@link #getExcludes()}.
 	 */
+	@Mandatory
 	Repository getRepositoryPrototype();
 	void setRepositoryPrototype(Repository repositoryPrototype);
 
