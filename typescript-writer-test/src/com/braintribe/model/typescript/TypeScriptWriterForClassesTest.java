@@ -129,7 +129,8 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 		mustContain("methodWithOptionalParams(first: number, second: string, thirdOptional?: string, fourthOptional?: string): void;");
 		mustContain("otherNs(): $tf.test.other.TsOtherNamespaceInterface");
 		mustContain("sameNs(): TsCustomInterface");
-		mustContain("nativeGlobalNamespace(): nativeType;");
+		mustContain("nativeGlobalNamespaceCustomName(): nativeType;");
+		mustContain("nativeGlobalNamespace(): TsNativeGlobalNamespace;");
 		mustContain("nativeCustomNamespace(): ns.TsNativeCustomNamespace;");
 		mustContain("nativeWithGenerics(): NativeWithGenerics<string>;");
 	}

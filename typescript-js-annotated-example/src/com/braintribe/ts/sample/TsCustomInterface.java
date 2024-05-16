@@ -29,6 +29,8 @@ public interface TsCustomInterface {
 
 	TsEnum _enum();
 
+	TsNativeGlobalNamespaceCustomName nativeGlobalNamespaceCustomName();
+
 	TsNativeGlobalNamespace nativeGlobalNamespace();
 
 	TsNativeCustomNamespace nativeCustomNamespace();
@@ -36,5 +38,5 @@ public interface TsCustomInterface {
 	TsNativeWithGenericsGlobalNamespace<String> nativeWithGenerics();
 
 	void methodWithOptionalParams(int first, String second, @JsOptional String thirdOptional, String fourthOptional);
-	
+
 }

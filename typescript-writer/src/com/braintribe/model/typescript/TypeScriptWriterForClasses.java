@@ -125,7 +125,6 @@ public class TypeScriptWriterForClasses extends AbstractStringifier {
 	public NativeTypeDeclaration ANY = new NativeTypeDeclaration(KnownJsType.TS_ANY);
 
 	public void writeTypeScript() {
-
 		for (Class<?> type : classes) {
 			JsType jsType = type.getAnnotation(JsType.class);
 
@@ -279,10 +278,9 @@ public class TypeScriptWriterForClasses extends AbstractStringifier {
 				return ANY;
 		}
 
-		if (jsType.isNative()) {
+		if (jsType.isNative())
 			if (globalOrAuto(jsType.namespace()))
-				return new NativeTypeDeclaration(jsType);
-		}
+				return new NativeTypeDeclaration(clazz, jsType);
 
 		if (clazz.isEnum())
 			return new EnumTypeDeclaration((Class<? extends Enum<?>>) type, jsType);
@@ -571,8 +569,10 @@ public class TypeScriptWriterForClasses extends AbstractStringifier {
 
 		// @formatter:off
 		public NativeTypeDeclaration(KnownJsType type) { this(type.name, type.namespace); }
-		public NativeTypeDeclaration(JsType jsType) { this(jsType.name(), jsType.namespace()); }
-		       NativeTypeDeclaration(String name, String nameSpace) { this.name = name; this.nameSpace = toGlobalIfAuto(nameSpace); }
+		public NativeTypeDeclaration(Class<?> type,  JsType jsType) {
+			this(jsNameOrDefault(jsType.name(), () -> extractSimpleName(type)), jsType.namespace()); 
+		}
+		/* package */ NativeTypeDeclaration(String name, String nameSpace) { this.name = name; this.nameSpace = toGlobalIfAuto(nameSpace); }
 		String toGlobalIfAuto(String s) { return s.equals(JS_INTEROP_AUTO) ? JS_INTEROP_GLOBAL : s; }
 
 		@Override public DeclarationType declarationType() { return DeclarationType.CLASS; }

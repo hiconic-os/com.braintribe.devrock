@@ -11,10 +11,9 @@
 // ============================================================================
 package com.braintribe.ts.sample;
 
-import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 
-@JsType(isNative = true, namespace = JsPackage.GLOBAL)
-public interface TsNativeGlobalNamespace {
+@JsType(isNative = true, name = "nativeType")
+public interface TsNativeGlobalNamespaceCustomName {
 	// empty
 }
