@@ -49,6 +49,7 @@ import java.util.stream.Stream;
 
 	public static String JS_INTEROP_AUTO = "<auto>";
 	public static String JS_INTEROP_GLOBAL = "<global>";
+	public static String JS_INTEROP_GLOBAL_THIS = "globalThis";
 
 	public static final Map<Class<?>, KnownJsType> java2Ts = newIdentityMap();
 	public static final Map<String, String> java2NsWeak = newMap();

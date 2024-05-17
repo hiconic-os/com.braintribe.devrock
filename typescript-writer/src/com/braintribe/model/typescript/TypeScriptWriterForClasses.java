@@ -13,6 +13,7 @@ package com.braintribe.model.typescript;
 
 import static com.braintribe.model.typescript.KnownJsType.JS_INTEROP_AUTO;
 import static com.braintribe.model.typescript.KnownJsType.JS_INTEROP_GLOBAL;
+import static com.braintribe.model.typescript.KnownJsType.JS_INTEROP_GLOBAL_THIS;
 import static com.braintribe.model.typescript.TypeScriptWriterHelper.extractNamespace;
 import static com.braintribe.model.typescript.TypeScriptWriterHelper.extractSimpleName;
 import static com.braintribe.model.typescript.TypeScriptWriterHelper.jsNameOrDefault;
@@ -280,7 +281,7 @@ public class TypeScriptWriterForClasses extends AbstractStringifier {
 
 		if (jsType.isNative())
 			if (globalOrAuto(jsType.namespace()))
-				return new NativeTypeDeclaration(clazz, jsType);
+				return new NativeTypeDeclaration(jsType.name(), clazz);
 
 		if (clazz.isEnum())
 			return new EnumTypeDeclaration((Class<? extends Enum<?>>) type, jsType);
@@ -569,8 +570,8 @@ public class TypeScriptWriterForClasses extends AbstractStringifier {
 
 		// @formatter:off
 		public NativeTypeDeclaration(KnownJsType type) { this(type.name, type.namespace); }
-		public NativeTypeDeclaration(Class<?> type,  JsType jsType) {
-			this(jsNameOrDefault(jsType.name(), () -> extractSimpleName(type)), jsType.namespace()); 
+		public NativeTypeDeclaration(String name, Class<?> type) {
+			this(jsNameOrDefault(name, () -> extractSimpleName(type)), JS_INTEROP_GLOBAL_THIS); 
 		}
 		/* package */ NativeTypeDeclaration(String name, String nameSpace) { this.name = name; this.nameSpace = toGlobalIfAuto(nameSpace); }
 		String toGlobalIfAuto(String s) { return s.equals(JS_INTEROP_AUTO) ? JS_INTEROP_GLOBAL : s; }
