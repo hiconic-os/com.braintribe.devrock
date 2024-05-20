@@ -30,8 +30,6 @@ import com.braintribe.model.generic.GenericEntity;
 import com.braintribe.model.generic.annotation.GmSystemInterface;
 import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.meta.GmMetaModel;
-import com.braintribe.model.meta.GmType;
-import com.braintribe.model.processing.itw.analysis.JavaTypeAnalysis;
 import com.braintribe.model.version.VersionExpression;
 import com.braintribe.utils.ReflectionTools;
 import com.braintribe.utils.lcd.StringTools;
@@ -87,16 +85,6 @@ public class TypeScriptWriterHelper {
 
 	public static String extractSimpleName(Class<?> clazz) {
 		return StringTools.findSuffix(clazz.getName(), ".");
-	}
-
-	public static List<GmType> extractGmTypes(List<Class<?>> classes, ClassLoader classLoader, int rootModelMajor) {
-		JavaTypeAnalysis jta = new JavaTypeAnalysis();
-		jta.setClassLoader(classLoader);
-		jta.setRequireEnumBase(rootModelMajor >= 2);
-
-		return classes.stream() //
-				.map(jta::getGmTypeUnchecked) //
-				.collect(Collectors.toList());
 	}
 
 	public static Predicate<Class<?>> createCustomGmTypeFilter(ClassLoader classLoader) {

@@ -40,11 +40,6 @@ You should have received a copy of the GNU Lesser General Public License along w
         </dependency>
         <dependency>
             <groupId>com.braintribe.gm</groupId>
-            <artifactId>instant-type-weaving</artifactId>
-            <version>${V.com.braintribe.gm}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.braintribe.gm</groupId>
             <artifactId>service-api-model</artifactId>
             <version>${V.com.braintribe.gm}</version>
         </dependency>
