@@ -401,9 +401,11 @@ public class BasicJsLibraryLinker implements JsLibraryLinker, JsResolutionConsta
 		}
 		
 		
+		/**
+		 * Unpacks the resolved zip part to the js artifact cache if required
+		 * @return true if the artifact carried an unpackable zip part resource otherwise false
+		 */
 		private boolean unpack(AnalysisArtifact artifact, Part libPart, File folder, String minOrPretty) {
-			
-			boolean immutablePart = !libPart.getRepositoryOrigin().equals("local");
 			
 			Resource zipResource = Optional.ofNullable(libPart).map(Part::getResource).orElse(null);
 			
@@ -428,28 +430,21 @@ public class BasicJsLibraryLinker implements JsLibraryLinker, JsResolutionConsta
 			
 			try {
 				if (folder.exists()) {
-					if (immutablePart)
-						return true;
-	
-					locker.get();
-					
 					FileResource fileResource = (FileResource)zipResource;
 					
 					File zipFile = new File(fileResource.getPath());
 					zipDate = new Date(zipFile.lastModified());
+
+					// check update requirement low cost
+					if (isUpToDate(fileResource, zipDate, touchedDateFile))
+						return true;
 					
-					if (touchedDateFile.exists()) {
-						try (InputStream in = new FileInputStream( touchedDateFile)) {
-							Date unpackedDate = (Date) marshaller.unmarshall(in);
-							if (unpackedDate.compareTo(zipDate) == 0) {
-								return true;
-							}		
-						}
-						catch (Exception e) {
-							String msg = "cannot read data for [" + getBestName(zipResource) + "] requested by [" + artifact.asString() + "]";
-							log.error(msg);
-						}
-					}
+					// acquire lock
+					locker.get();
+
+					// recheck update requirement in locked mode again to be sure
+					if (isUpToDate(fileResource, zipDate, touchedDateFile))
+						return true;
 				}
 				else {
 					folder.mkdir();
@@ -492,6 +487,23 @@ public class BasicJsLibraryLinker implements JsLibraryLinker, JsResolutionConsta
 			}
 			
 			return true;
+		}
+		
+		private boolean isUpToDate(FileResource resource, Date date, File touchedDateFile) {
+			if (touchedDateFile.exists()) {
+				try (InputStream in = new FileInputStream( touchedDateFile)) {
+					Date unpackedDate = (Date) marshaller.unmarshall(in);
+					if (unpackedDate.compareTo(date) == 0) {
+						return true;
+					}		
+				}
+				catch (Exception e) {
+					String msg = "cannot read data for [" + touchedDateFile.getAbsolutePath() + "]";
+					log.error(msg);
+				}
+			}
+			
+			return false;
 		}
 		
 		private String getBestName(Resource resource) {
