@@ -11,7 +11,6 @@
 // ============================================================================
 package com.braintribe.ts.sample.gwt;
 
-import com.google.gwt.core.client.JsDate;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import jsinterop.annotations.JsType;
@@ -20,7 +19,5 @@ import jsinterop.annotations.JsType;
 public interface TsGwtClasses {
 
 	AsyncCallback<String> asyncCallback();
-
-	JsDate jsDate();
 
 }

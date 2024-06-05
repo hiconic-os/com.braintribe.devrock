@@ -277,13 +277,13 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 
 		print("EvalAndGet");
 		print(evaluatorParam);
-		print("Promise<");
+		print("globalThis.Promise<");
 		printType(evalInfo.gmType, true);
 		println(">;");
 
 		print("EvalAndGetReasoned");
 		print(evaluatorParam);
-		print("Promise<");
+		print("globalThis.Promise<");
 		print(maybeJsName);
 		print("<");
 		printType(evalInfo.gmType, true);
@@ -424,7 +424,32 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 
 	private void printSimpleType(GmSimpleType gmType, boolean nullable) {
 		SimpleType st = gmType.<SimpleType> reflectionType();
-		printKnownType(nullable ? st.getJavaType() : st.getPrimitiveJavaType());
+
+		switch (st.getTypeCode()) {
+			case dateType:
+				print("date");
+				return;
+			case decimalType:
+				print("decimal");
+				return;
+			case doubleType:
+				print("double");
+				return;
+			case floatType:
+				print("float");
+				return;
+			case integerType:
+				print("integer");
+				return;
+			case longType:
+				print("long");
+				return;
+			case booleanType:
+			case stringType:
+			default:
+				printKnownType(nullable ? st.getJavaType() : st.getPrimitiveJavaType());
+				return;
+		}
 	}
 
 	private void printCustomType(GmCustomType gmType) {
@@ -439,8 +464,7 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 	}
 
 	private void printMapType(GmMapType gmType) {
-		print(KnownJsType.TS_MAP.fullName);
-		print("<");
+		print("map<");
 		printNullableType(gmType.getKeyType());
 		print(", ");
 		printNullableType(gmType.getValueType());
@@ -448,12 +472,12 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 	}
 
 	private void printListType(GmListType gmType) {
-		print(KnownJsType.TS_LIST.fullName);
+		print("list");
 		printCollectionTypeParameters(gmType);
 	}
 
 	private void printSetType(GmSetType gmType) {
-		print(KnownJsType.TS_SET.fullName);
+		print("set");
 		printCollectionTypeParameters(gmType);
 	}
 

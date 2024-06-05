@@ -52,7 +52,7 @@ import java.util.stream.Stream;
 	public static String JS_INTEROP_GLOBAL_THIS = "globalThis";
 
 	public static final Map<Class<?>, KnownJsType> java2Ts = newIdentityMap();
-	public static final Map<String, String> java2NsWeak = newMap();
+	public static final Map<String, QualifiedName> java2NsWeak = newMap();
 
 	public static final KnownJsType TS_NUMBER = new KnownJsType("number");
 	public static final KnownJsType TS_BOOLEAN = new KnownJsType("boolean");
@@ -63,9 +63,13 @@ import java.util.stream.Stream;
 	public static final KnownJsType TS_SET;
 	public static final KnownJsType TS_MAP;
 
+	private static record QualifiedName(String name, String namespace) {
+
+	}
+
 	static {
+		final String NS_GM_TYPES = "$T";
 		final String NS_JAVA = "$tf";
-		final String NS_VIEW = "$tf.view";
 		final String NS_ASYNC = "$tf.session";
 
 		java2Ts.put(String.class, TS_STRING);
@@ -85,7 +89,7 @@ import java.util.stream.Stream;
 		registerKnownJsType(Character.class, NS_JAVA);
 		registerKnownJsType(CharSequence.class, NS_JAVA);
 		registerKnownJsType(Date.class, NS_JAVA);
-		registerKnownJsType(BigDecimal.class, NS_JAVA);
+		registerKnownJsType(BigDecimal.class, NS_GM_TYPES, "Decimal");
 		registerKnownJsType(Float.class, NS_JAVA);
 		registerKnownJsType(Integer.class, NS_JAVA);
 		registerKnownJsType(Long.class, NS_JAVA);
@@ -128,8 +132,8 @@ import java.util.stream.Stream;
 		registerKnownJsType(Set.class, NS_JAVA);
 		registerKnownJsType(Stack.class, NS_JAVA);
 
-		registerWeakJsType("com.google.gwt.core.client.JsDate", NS_VIEW);
-		registerWeakJsType("com.google.gwt.user.client.rpc.AsyncCallback", NS_ASYNC);
+		registerWeakJsType("com.google.gwt.core.client.JsDate", "Date", JS_INTEROP_GLOBAL_THIS);
+		registerWeakJsType("com.google.gwt.user.client.rpc.AsyncCallback", "AsyncCallback", NS_ASYNC);
 
 		// This can obviously be only set after we register known JsType for Long.class
 		java2Ts.put(long.class, java2Ts.get(Long.class));
@@ -140,21 +144,26 @@ import java.util.stream.Stream;
 	}
 
 	public static KnownJsType resolveIfTypeKnownByName(Class<?> clazz) {
-		String namespace = KnownJsType.java2NsWeak.get(clazz.getName());
-		if (namespace == null)
+		QualifiedName qn = KnownJsType.java2NsWeak.get(clazz.getName());
+		if (qn == null)
 			return null;
 
-		registerKnownJsType(clazz, namespace);
+		KnownJsType result = new KnownJsType(qn.name, qn.namespace);
+		java2Ts.put(clazz, result);
 
-		return java2Ts.get(clazz);
+		return result;
 	}
 
 	private static void registerKnownJsType(Class<?> clazz, String namespace) {
-		java2Ts.put(clazz, new KnownJsType(extractSimpleName(clazz), namespace));
+		registerKnownJsType(clazz, namespace, extractSimpleName(clazz));
 	}
 
-	private static void registerWeakJsType(String className, String tsNamespace) {
-		java2NsWeak.put(className, tsNamespace);
+	private static void registerKnownJsType(Class<?> clazz, String namespace, String name) {
+		java2Ts.put(clazz, new KnownJsType(name, namespace));
+	}
+
+	private static void registerWeakJsType(String className, String tsName, String tsNamespace) {
+		java2NsWeak.put(className, new QualifiedName(tsName, tsNamespace));
 	}
 
 	public final String name;

@@ -26,6 +26,9 @@ Getting something like:
 	Don't forget to add the import:
 		import java.JsAnnotationsPackageNames;
 
+	JsDate is native
+		@JsType(name = "Date", namespace = JsPackage.GLOBAL, isNative = true)
+
 4. Run GwtUserEmul_CodeMover
 	This moves the classes from gwt-user-emul to the src folder under the "fake" package, adapts their packages and does other changes to make sure the code actually compiles.
 	

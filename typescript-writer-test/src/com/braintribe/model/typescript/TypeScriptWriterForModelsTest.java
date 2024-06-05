@@ -89,20 +89,20 @@ public class TypeScriptWriterForModelsTest extends AbstractWriterTest {
 		mustContain("primitiveBoolean: boolean");
 		mustContain("wrapperBoolean: boolean");
 
-		mustContain("primitiveDouble: number");
-		mustContain("wrapperDouble: number");
+		mustContain("primitiveDouble: double");
+		mustContain("wrapperDouble: double");
 
-		mustContain("primitiveFloat: number");
-		mustContain("wrapperFloat: $tf.Float");
+		mustContain("primitiveFloat: float");
+		mustContain("wrapperFloat: float");
 
-		mustContain("primitiveInteger: number");
-		mustContain("wrapperInteger: $tf.Integer");
+		mustContain("primitiveInteger: integer");
+		mustContain("wrapperInteger: integer");
 
-		mustContain("primitiveLong: $tf.Long");
-		mustContain("wrapperLong: $tf.Long");
+		mustContain("primitiveLong: long");
+		mustContain("wrapperLong: long");
 
-		mustContain("date: $tf.Date;");
-		mustContain("decimal: $tf.BigDecimal;");
+		mustContain("date: date;");
+		mustContain("decimal: decimal;");
 		mustContain("object: any;");
 		mustContain("string: string;");
 
@@ -110,9 +110,9 @@ public class TypeScriptWriterForModelsTest extends AbstractWriterTest {
 		mustContain("otherNamespaceEntity: $T.com.braintribe.model.typescript.model.sub.TsSub;");
 		mustContain("tsEnum: TsEnum;");
 
-		mustContain("listOfStrings: $tf.List<string>;");
-		mustContain("mapOfStrings: $tf.Map<string, string>;");
-		mustContain("setOfStrings: $tf.Set<string>;");
+		mustContain("listOfStrings: list<string>;");
+		mustContain("mapOfStrings: map<string, string>;");
+		mustContain("setOfStrings: set<string>;");
 
 		mustContain("interface TsEnum extends $tf.reflection.EnumBase {}");
 		mustContain("namespace TsEnum {");
@@ -125,10 +125,10 @@ public class TypeScriptWriterForModelsTest extends AbstractWriterTest {
 		mustContain("// Color(value=\"#ff0000\")");
 
 		mustContain(
-				"Eval(evaluator: $tf.eval.Evaluator<$T.com.braintribe.model.service.api.ServiceRequest>): $tf.eval.JsEvalContext<$tf.List<string>>;");
-		mustContain("EvalAndGet(evaluator: $tf.eval.Evaluator<$T.com.braintribe.model.service.api.ServiceRequest>): Promise<$tf.List<string>>;");
+				"Eval(evaluator: $tf.eval.Evaluator<$T.com.braintribe.model.service.api.ServiceRequest>): $tf.eval.JsEvalContext<list<string>>;");
+		mustContain("EvalAndGet(evaluator: $tf.eval.Evaluator<$T.com.braintribe.model.service.api.ServiceRequest>): globalThis.Promise<list<string>>;");
 		mustContain(
-				"EvalAndGetReasoned(evaluator: $tf.eval.Evaluator<$T.com.braintribe.model.service.api.ServiceRequest>): Promise<$tf.reason.Maybe<$tf.List<string>>>;");
+				"EvalAndGetReasoned(evaluator: $tf.eval.Evaluator<$T.com.braintribe.model.service.api.ServiceRequest>): globalThis.Promise<$tf.reason.Maybe<list<string>>>;");
 	}
 
 	@Test
@@ -138,9 +138,9 @@ public class TypeScriptWriterForModelsTest extends AbstractWriterTest {
 		cutTypeFromOutput(TsEvalABB.T);
 
 		mustContain("Eval(evaluator: $tf.eval.Evaluator<$T.com.braintribe.model.service.api.ServiceRequest>): $tf.eval.JsEvalContext<TsEvalB>;");
-		mustContain("EvalAndGet(evaluator: $tf.eval.Evaluator<$T.com.braintribe.model.service.api.ServiceRequest>): Promise<TsEvalB>;");
+		mustContain("EvalAndGet(evaluator: $tf.eval.Evaluator<$T.com.braintribe.model.service.api.ServiceRequest>): globalThis.Promise<TsEvalB>;");
 		mustContain(
-				"EvalAndGetReasoned(evaluator: $tf.eval.Evaluator<$T.com.braintribe.model.service.api.ServiceRequest>): Promise<$tf.reason.Maybe<TsEvalB>>;");
+				"EvalAndGetReasoned(evaluator: $tf.eval.Evaluator<$T.com.braintribe.model.service.api.ServiceRequest>): globalThis.Promise<$tf.reason.Maybe<TsEvalB>>;");
 	}
 
 	private static final Set<String> jsKeywords = jsKeywordsWithout_Class();

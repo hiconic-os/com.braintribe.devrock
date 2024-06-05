@@ -87,7 +87,7 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 	public void simpleTypes() throws Exception {
 		write(TsSimpleTypes.class);
 
-		mustContain("bigDecimal(): $tf.BigDecimal");
+		mustContain("bigDecimal(): $T.Decimal");
 		mustContain("date(): $tf.Date");
 		mustContain("string(): string");
 	}
@@ -312,7 +312,6 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 		write(TsGwtClasses.class);
 
 		mustContain("asyncCallback(): $tf.session.AsyncCallback<string>;");
-		mustContain("jsDate(): $tf.view.JsDate;");
 	}
 
 	@Test

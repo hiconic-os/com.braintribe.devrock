@@ -7,12 +7,13 @@
 
 package java.lang;
 
+import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 
 /**
  * @author peter.gazdik
  */
-@JsType(name = "Iterable", namespace = "globalThis", isNative = true)
+@JsType(name = "Iterable", namespace = JsPackage.GLOBAL, isNative = true)
 public interface JsIterable<E> {
 	// JsIterator<T> [Symbol.iterator]();
 }

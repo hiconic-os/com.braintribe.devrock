@@ -12,6 +12,7 @@ package java;
  */
 public interface JsAnnotationsPackageNames {
 
+	static String GM_TYPES = "$T";
 	static String ASYNC = "$tf.session";
 	static String VIEW = "$tf.view";
 	static String JAVA = "$tf";

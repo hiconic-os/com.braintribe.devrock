@@ -355,23 +355,6 @@ public class Date implements Cloneable, Comparable<Date>, Serializable {
         + minuteOffset + " " + jsdate.getFullYear();
   }
   
-  public String toTimeString() {
-	  return jsdate.toTimeString();
-  }
-  
-  public String toUTCString() {
-	  return jsdate.toUTCString();
-  }
-  
-  public long valueOf() {
-	  return (long) jsdate.valueOf();
-  }
-  
-  @JsMethod
-  public NativeDate dateValue() {
-	  return jsdate;
-  }
-
   private static final long ONE_HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
 
   /*
@@ -502,4 +485,35 @@ public class Date implements Cloneable, Comparable<Date>, Serializable {
     public native String toUTCString();
     public native double valueOf();
   }
+
+  // #################################################
+  // ## . . . . . . Added for hiconic.js . . . . . .##
+  // #################################################
+
+  @JsIgnore
+  public Date(NativeDate jsDate) {
+    jsdate = jsDate;
+  }
+
+  public static Date fromJsDate(NativeDate jsDate) {
+	  return new Date(jsDate);
+  }
+
+  public String toTimeString() {
+	  return jsdate.toTimeString();
+  }
+
+  public String toUTCString() {
+	  return jsdate.toUTCString();
+  }
+
+  public long valueOf() {
+	  return (long) jsdate.valueOf();
+  }
+
+  @JsMethod
+  public NativeDate toJsDate() {
+	  return jsdate;
+  }
+
 }

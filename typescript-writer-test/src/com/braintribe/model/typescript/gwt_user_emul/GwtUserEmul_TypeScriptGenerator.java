@@ -15,6 +15,7 @@ import static com.braintribe.model.typescript.TypeScriptWriterHelper.createCusto
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 import com.braintribe.exception.Exceptions;
 import com.braintribe.model.typescript.TypeScriptWriterForClasses;
 import com.braintribe.utils.FileTools;
+import com.braintribe.utils.IOTools;
 import com.braintribe.utils.ReflectionTools;
 import com.braintribe.utils.StringTools;
 
@@ -58,6 +60,22 @@ public class GwtUserEmul_TypeScriptGenerator {
 	}
 
 	private String writeTypeScript() {
+		String hcBaseString = getHcBaseString();
+		String gwtUserEmulScript = writeGwtUserEmulScriptScript();
+
+		return hcBaseString + "\n\n" + gwtUserEmulScript;
+	}
+
+	private String getHcBaseString() {
+		URL url = getClass().getResource("hc-base.d.ts");
+		try {
+			return IOTools.slurp(url);
+		} catch (IOException e) {
+			throw Exceptions.unchecked(e);
+		}
+	}
+
+	private String writeGwtUserEmulScriptScript() {
 		List<Class<?>> classes = getClasses();
 
 		StringBuilder sb = new StringBuilder();
@@ -67,8 +85,8 @@ public class GwtUserEmul_TypeScriptGenerator {
 		String result = sb.toString();
 
 		result = result.replace("fake.com", "com");
-		result =  result.replace("fake.java", "java");
-		
+		result = result.replace("fake.java", "java");
+
 		return result;
 	}
 

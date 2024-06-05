@@ -53,7 +53,7 @@ import jsinterop.annotations.JsType;
  * precision mantissa (the unscaled value) and a scale. The value of the {@code
  * BigDecimal} is {@code unscaledValue} 10^(-{@code scale}).
  */
-@JsType(namespace = JsAnnotationsPackageNames.JAVA_LANG)
+@JsType(name="Decimal", namespace = JsAnnotationsPackageNames.GM_TYPES)
 @SuppressWarnings("unusable-by-js")
 public class BigDecimal extends Number implements Comparable<BigDecimal>,
     Serializable {
