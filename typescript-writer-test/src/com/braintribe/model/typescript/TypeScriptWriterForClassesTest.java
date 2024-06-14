@@ -44,6 +44,7 @@ import com.braintribe.ts.sample.jsfunction.TsJsFunctionUser;
 import com.braintribe.ts.sample.keyword.TsKeywordInterface;
 import com.braintribe.ts.sample.keyword.TsKeywordsStatic;
 import com.braintribe.ts.sample.keyword.with.TsKeywordPackageInterface;
+import com.braintribe.ts.sample.nointerop.JsTypeWithTsIgnore;
 import com.braintribe.ts.sample.nointerop.TsTypeWithNoInteropRefs;
 import com.braintribe.ts.sample.statics.HasStaticMembers;
 
@@ -384,6 +385,15 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 		mustContain("declare function yieldMethod(yield_: string): void;");
 
 		notContains("$tf.Integer");
+	}
+
+	@Test
+	public void tsIgnore() throws Exception {
+		write(JsTypeWithTsIgnore.class);
+
+		notContains("JsTypeWithTsIgnore");
+		notContains("foobar");
+		notContains("namespace");
 	}
 
 	private void write(Class<?>... classes) {

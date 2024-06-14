@@ -66,6 +66,7 @@ import jsinterop.annotations.JsMethod;
 import jsinterop.annotations.JsOptional;
 import jsinterop.annotations.JsProperty;
 import jsinterop.annotations.JsType;
+import jsinterop.annotations.custom.TsIgnore;
 
 /**
  * @author peter.gazdik
@@ -127,6 +128,10 @@ public class TypeScriptWriterForClasses extends AbstractStringifier {
 
 	public void writeTypeScript() {
 		for (Class<?> type : classes) {
+			TsIgnore tsIgnore = type.getAnnotation(TsIgnore.class);
+			if (tsIgnore != null)
+				continue;
+
 			JsType jsType = type.getAnnotation(JsType.class);
 
 			if (jsType != null)
