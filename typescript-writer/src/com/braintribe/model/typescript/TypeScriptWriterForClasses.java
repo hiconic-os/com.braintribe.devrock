@@ -223,7 +223,7 @@ public class TypeScriptWriterForClasses extends AbstractStringifier {
 			while (clazz.isArray())
 				clazz = clazz.getComponentType();
 
-			if (clazz != Object.class)
+			if (clazz != Object.class && !"com.google.gwt.core.client.JavaScriptObject".equals(clazz.getName()))
 				nonJsTypes.add(clazz);
 		}
 	}

@@ -46,6 +46,7 @@ import com.braintribe.ts.sample.keyword.TsKeywordsStatic;
 import com.braintribe.ts.sample.keyword.with.TsKeywordPackageInterface;
 import com.braintribe.ts.sample.nointerop.JsTypeWithTsIgnore;
 import com.braintribe.ts.sample.nointerop.TsTypeWithNoInteropRefs;
+import com.braintribe.ts.sample.nointerop.TsWithJavaScriptObject;
 import com.braintribe.ts.sample.statics.HasStaticMembers;
 
 /**
@@ -327,6 +328,14 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 		mustContain("nonJsGenericParam3(t: $tf.List<any>): void; // JS-WARN: com.braintribe.ts.sample.nointerop.NoInterop");
 		mustContain("nonJsParam(param: any): void; // JS-WARN: com.braintribe.ts.sample.nointerop.NoInterop");
 		mustContain("nonJsReturnType(): any; // JS-WARN: com.braintribe.ts.sample.nointerop.NoInterop");
+	}
+
+	@Test
+	public void noJsWarnForJavaScriptObject() throws Exception {
+		write(TsWithJavaScriptObject.class);
+
+		mustContain("newJsObject(): any;");
+		notContains("JS-WARN");
 	}
 
 	@Test
