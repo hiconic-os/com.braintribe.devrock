@@ -73,6 +73,7 @@ declare namespace $T {
         //    es2015.iterable
         // ###################
 
+        [Symbol.iterator](): IterableIterator<T>;
         entries(): IterableIterator<[number, T]>;
         keys(): IterableIterator<number>;
         values(): IterableIterator<T>;
@@ -107,6 +108,7 @@ declare namespace $T {
         //   es2015.iterable
         // ###################
 
+        [Symbol.iterator](): IterableIterator<T>;
         entries(): IterableIterator<[T, T]>;
         keys(): IterableIterator<T>;
         values(): IterableIterator<T>;
@@ -131,6 +133,7 @@ declare namespace $T {
         //   es2015.iterable
         // ###################
 
+        [Symbol.iterator](): IterableIterator<[K, V]>;
         entries(): IterableIterator<[K, V]>;
         keys(): IterableIterator<K>;
         values(): IterableIterator<V>;
