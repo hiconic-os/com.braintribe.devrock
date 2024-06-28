@@ -25,7 +25,7 @@ import com.braintribe.model.generic.reflection.EntityTypes;
  * @author pit
  *
  */
-@SelectiveInformation("while probing at ${timestamp}, at least one repository had issues")
+//@SelectiveInformation("while probing at ${timestamp}, at least one repository had issues")
 public interface ProbingFailed extends McReason {
 		
 	final EntityType<ProbingFailed> T = EntityTypes.T(ProbingFailed.class);

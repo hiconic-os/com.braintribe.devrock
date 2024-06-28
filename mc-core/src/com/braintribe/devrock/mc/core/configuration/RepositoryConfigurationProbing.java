@@ -45,6 +45,7 @@ import com.braintribe.devrock.model.repository.filters.ArtifactFilter;
 import com.braintribe.devrock.model.repository.filters.ConjunctionArtifactFilter;
 import com.braintribe.gm.model.reason.Reason;
 import com.braintribe.gm.model.reason.Reasons;
+import com.braintribe.gm.model.reason.essential.Canceled;
 import com.braintribe.gm.model.reason.essential.InternalError;
 import com.braintribe.gm.reason.TemplateReasons;
 import com.braintribe.logging.Logger;
@@ -156,11 +157,13 @@ public class RepositoryConfigurationProbing implements Supplier<RepositoryConfig
 					IllegalStateException ilsException = new IllegalStateException( "error while probing [" + repository.getName() + "]", e);
 					throwables.add( ilsException);
 					
-					Reason reason = InternalError.from(ilsException, "probing error");
+					Reason reason = Reasons.build(Canceled.T).text("Unexpected interruption: " + e.getMessage()).toReason(); 											
 					repository.setFailure(reason);
 					
 				} catch (ExecutionException e) {
 					Repository repository = entry.getKey();
+					Throwable cause = e.getCause();
+					
 					IllegalStateException ilsException = new IllegalStateException( "error while probing [" + repository.getName() + "]", e.getCause());				
 					throwables.add( ilsException);
 					
