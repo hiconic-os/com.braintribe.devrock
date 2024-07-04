@@ -252,23 +252,24 @@ class BasicArtifactDataPathBuilder implements ArtifactAddressBuilder {
 				throw new IllegalStateException( "artifactId required when addressing part");
 			}
 			sb.append( artifactId);
-			String partVersion = version;
-			if (partVersionOverride != null)
-				partVersion = partVersionOverride;
-			
-			if (partVersion == null) {				
+
+			String partVersion = partVersionOverride != null ? partVersionOverride : version;
+			if (partVersion == null)				
 				throw new IllegalStateException( "version required when addressing part");
-			}
+
 			sb.append( '-');		
 			sb.append( partVersion);
 			
-			if (part.getClassifier() != null) {
+			String classifier = part.getClassifier();
+			if (classifier != null && !classifier.isEmpty()) {
 				sb.append( '-');
-				sb.append( part.getClassifier());
+				sb.append( classifier);
 			}
-			if (part.getType() != null) {
+
+			String type = part.getType();
+			if (type != null && !type.isEmpty()) {
 				sb.append( '.');
-				sb.append( part.getType());
+				sb.append( type);
 			}
 			return sb.toString();
 		};
