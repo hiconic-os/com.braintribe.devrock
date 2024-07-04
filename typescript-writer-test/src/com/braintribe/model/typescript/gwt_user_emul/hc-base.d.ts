@@ -4,9 +4,9 @@ type double = $T.Double;
 type float = $T.Float;
 type decimal = $T.Decimal;
 type date = globalThis.Date;
-type list<T> = $T.Arrayish<T>;
-type set<T> = $T.Setish<T>;
-type map<K, V> = $T.Mapish<K, V>;
+type list<T> = $T.Array<T>;
+type set<T> = $T.Set<T>;
+type map<K, V> = $T.Map<K, V>;
 
 declare namespace $T {
 
@@ -20,7 +20,7 @@ declare namespace $T {
         type(): string; // returns 'f'
     }
 
-    class Arrayish<T> {
+    class Array<T> {
 
         // ###################
         //        es5
@@ -91,7 +91,7 @@ declare namespace $T {
         at(index: number): T | undefined;
    }
 
-   class Setish<T> {
+   class Set<T> {
 
         // ###################
         // es2015.collections
@@ -115,7 +115,7 @@ declare namespace $T {
 
    }
 
-   class Mapish<K, V> {
+   class Map<K, V> {
 
         // ###################
         // es2015.collections

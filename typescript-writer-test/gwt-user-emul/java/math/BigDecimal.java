@@ -2878,4 +2878,13 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>,
     // math.08=Rounding necessary
     throw new ArithmeticException("Rounding necessary"); //$NON-NLS-1$
   }
+
+  // #################################################
+  // ## . . . . . . Added for hiconic.js . . . . . .##
+  // #################################################
+
+  public static BigDecimal fromString(String str) {
+	return new BigDecimal(str);
+  }
+
 }
