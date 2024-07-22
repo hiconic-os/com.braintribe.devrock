@@ -19,7 +19,7 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum AnnotationValueContainerType implements EnumBase {
+public enum AnnotationValueContainerType implements EnumBase<AnnotationValueContainerType> {
 	collection,
 	annotation,
 	s_string,
@@ -30,10 +30,10 @@ public enum AnnotationValueContainerType implements EnumBase {
 	s_boolean,
 	s_date;
 
-	public static final EnumType T = EnumTypes.T(AnnotationValueContainerType.class);
+	public static final EnumType<AnnotationValueContainerType> T = EnumTypes.T(AnnotationValueContainerType.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<AnnotationValueContainerType> type() {
 		return T;
 	}
 

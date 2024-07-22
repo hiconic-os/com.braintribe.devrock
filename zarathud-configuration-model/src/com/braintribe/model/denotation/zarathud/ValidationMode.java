@@ -19,17 +19,17 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum ValidationMode implements EnumBase {
+public enum ValidationMode implements EnumBase<ValidationMode> {
 	standard, // standard mode - no tests
 	model, // model mode - model test apply, plus a full containment test
 	persistence, // mode mode plus specific persistence logic testing
 	containment, // full containment only mode
 	quickContainment; // short circuit containment only mode
 
-	public static final EnumType T = EnumTypes.T(ValidationMode.class);
+	public static final EnumType<ValidationMode> T = EnumTypes.T(ValidationMode.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<ValidationMode> type() {
 		return T;
 	}
 

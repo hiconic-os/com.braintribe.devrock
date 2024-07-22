@@ -24,7 +24,7 @@ import com.braintribe.model.generic.reflection.EnumTypes;
  * 
  * @author pit / dirk
  */
-public enum RepositoryProbeStatus implements EnumBase {
+public enum RepositoryProbeStatus implements EnumBase<RepositoryProbeStatus> {
     available,
     unauthorized,
     unauthenticated,
@@ -32,10 +32,10 @@ public enum RepositoryProbeStatus implements EnumBase {
     unavailable,
     unprobed;
 
-    public static final EnumType T = EnumTypes.T(RepositoryProbeStatus.class);
+    public static final EnumType<RepositoryProbeStatus> T = EnumTypes.T(RepositoryProbeStatus.class);
 
     @Override
-    public EnumType type() {
+    public EnumType<RepositoryProbeStatus> type() {
         return T;
     }
 

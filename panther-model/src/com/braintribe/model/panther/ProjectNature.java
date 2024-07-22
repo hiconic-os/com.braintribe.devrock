@@ -19,13 +19,13 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum ProjectNature implements EnumBase {
+public enum ProjectNature implements EnumBase<ProjectNature> {
 	ant, gradle, eclipse, intellij;
 	
-	final EnumType T = EnumTypes.T(ProjectNature.class);
+	final EnumType<ProjectNature> T = EnumTypes.T(ProjectNature.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<ProjectNature> type() {
 		return T;
 	}
 }

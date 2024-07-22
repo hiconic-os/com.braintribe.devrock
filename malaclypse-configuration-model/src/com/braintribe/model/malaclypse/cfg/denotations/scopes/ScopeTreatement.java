@@ -24,14 +24,14 @@ import com.braintribe.model.generic.reflection.EnumTypes;
  * @author pit
  *
  */
-public enum ScopeTreatement implements EnumBase {
+public enum ScopeTreatement implements EnumBase<ScopeTreatement> {
 	INCLUDE, EXCLUDE;
 	
 	
-	final EnumType T = EnumTypes.T(ScopeTreatement.class);
+	final EnumType<ScopeTreatement> T = EnumTypes.T(ScopeTreatement.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<ScopeTreatement> type() {
 		return T;
 	}
 }

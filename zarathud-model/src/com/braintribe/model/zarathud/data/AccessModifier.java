@@ -19,16 +19,16 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum AccessModifier implements EnumBase {
+public enum AccessModifier implements EnumBase<AccessModifier> {
 
 	PUBLIC,
 	PRIVATE,
 	PROTECTED;
 
-	public static final EnumType T = EnumTypes.T(AccessModifier.class);
+	public static final EnumType<AccessModifier> T = EnumTypes.T(AccessModifier.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<AccessModifier> type() {
 		return T;
 	}
 

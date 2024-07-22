@@ -22,7 +22,7 @@ import com.braintribe.model.generic.reflection.EnumTypes;
 /**
  * @author peter.gazdik
  */
-public enum TsKeywordEnum implements EnumBase {
+public enum TsKeywordEnum implements EnumBase<TsKeywordEnum> {
 
 	arguments,
 	await,
@@ -40,7 +40,7 @@ public enum TsKeywordEnum implements EnumBase {
 	yield;
 
 	@Override
-	public EnumType type() {
+	public EnumType<TsKeywordEnum> type() {
 		return EnumTypes.T(TsKeywordEnum.class);
 	}
 

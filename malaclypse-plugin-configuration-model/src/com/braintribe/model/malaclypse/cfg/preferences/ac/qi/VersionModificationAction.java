@@ -19,15 +19,15 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum VersionModificationAction implements EnumBase {
+public enum VersionModificationAction implements EnumBase<VersionModificationAction> {
 	untouched,
 	rangified,
 	referenced;
 
-	public static final EnumType T = EnumTypes.T(VersionModificationAction.class);
+	public static final EnumType<VersionModificationAction> T = EnumTypes.T(VersionModificationAction.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<VersionModificationAction> type() {
 		return T;
 	}
 

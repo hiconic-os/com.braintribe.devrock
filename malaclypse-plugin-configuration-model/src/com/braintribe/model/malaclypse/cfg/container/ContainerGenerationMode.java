@@ -19,14 +19,14 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum ContainerGenerationMode implements EnumBase {
+public enum ContainerGenerationMode implements EnumBase<ContainerGenerationMode> {
 	standard, combined, gwtonly;
 	
 	
-	final EnumType T = EnumTypes.T(ContainerGenerationMode.class);
+	final EnumType<ContainerGenerationMode> T = EnumTypes.T(ContainerGenerationMode.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<ContainerGenerationMode> type() {
 		return T;
 	}
 }

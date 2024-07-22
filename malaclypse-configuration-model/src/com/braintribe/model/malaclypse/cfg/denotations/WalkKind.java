@@ -26,14 +26,14 @@ import com.braintribe.model.generic.reflection.EnumTypes;
  * @author Pit
  *
  */
-public enum WalkKind implements EnumBase {
+public enum WalkKind implements EnumBase<WalkKind> {
 	classpath, buildOrder, hierarchy;
 	
 	
-	final EnumType T = EnumTypes.T(WalkKind.class);
+	final EnumType<WalkKind> T = EnumTypes.T(WalkKind.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<WalkKind> type() {
 		return T;
 	}
 }

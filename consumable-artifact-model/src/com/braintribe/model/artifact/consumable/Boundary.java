@@ -19,15 +19,15 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum Boundary implements EnumBase {
+public enum Boundary implements EnumBase<Boundary> {
 	open,
 	closed,
 	none;
 
-	public static final EnumType T = EnumTypes.T(Boundary.class);
+	public static final EnumType<Boundary> T = EnumTypes.T(Boundary.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<Boundary> type() {
 		return T;
 	}
 

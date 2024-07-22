@@ -19,14 +19,14 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum ResolverKind implements EnumBase {
+public enum ResolverKind implements EnumBase<ResolverKind> {
 	optimistic, index, hierarchy;
 	
 	
-	final EnumType T = EnumTypes.T(ResolverKind.class);
+	final EnumType<ResolverKind> T = EnumTypes.T(ResolverKind.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<ResolverKind> type() {
 		return T;
 	}
 }

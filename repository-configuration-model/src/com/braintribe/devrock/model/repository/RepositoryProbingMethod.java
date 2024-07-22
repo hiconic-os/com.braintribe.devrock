@@ -24,16 +24,16 @@ import com.braintribe.model.generic.reflection.EnumTypes;
  * 
  * @author pit
  */
-public enum RepositoryProbingMethod implements EnumBase {
+public enum RepositoryProbingMethod implements EnumBase<RepositoryProbingMethod> {
 	options,
 	head,
 	get,
 	none;
 
-	public static final EnumType T = EnumTypes.T(RepositoryProbingMethod.class);
+	public static final EnumType<RepositoryProbingMethod> T = EnumTypes.T(RepositoryProbingMethod.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<RepositoryProbingMethod> type() {
 		return T;
 	}
 

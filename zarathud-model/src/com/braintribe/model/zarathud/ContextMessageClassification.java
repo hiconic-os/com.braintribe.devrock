@@ -19,7 +19,7 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum ContextMessageClassification implements EnumBase {
+public enum ContextMessageClassification implements EnumBase<ContextMessageClassification> {
 	Miscellaneous,
 	MissingGetter,
 	MissingSetter,
@@ -35,10 +35,10 @@ public enum ContextMessageClassification implements EnumBase {
 	ContainmentError,
 	CollectionInCollection;
 
-	public static final EnumType T = EnumTypes.T(ContextMessageClassification.class);
+	public static final EnumType<ContextMessageClassification> T = EnumTypes.T(ContextMessageClassification.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<ContextMessageClassification> type() {
 		return T;
 	}
 

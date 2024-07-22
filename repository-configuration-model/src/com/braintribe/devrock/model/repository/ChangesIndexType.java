@@ -19,14 +19,14 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum ChangesIndexType implements EnumBase {
+public enum ChangesIndexType implements EnumBase<ChangesIndexType> {
 	incremental, 
 	total;
 
 	public final static EnumType T = EnumTypes.T(ChangesIndexType.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<ChangesIndexType> type() {
 		return T;
 	}
 

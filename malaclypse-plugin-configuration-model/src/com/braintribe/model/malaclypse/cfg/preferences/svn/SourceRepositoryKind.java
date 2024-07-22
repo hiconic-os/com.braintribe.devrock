@@ -19,14 +19,14 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum SourceRepositoryKind implements EnumBase {
+public enum SourceRepositoryKind implements EnumBase<SourceRepositoryKind> {
 	svn,
 	git;
 
-	public static final EnumType T = EnumTypes.T(SourceRepositoryKind.class);
+	public static final EnumType<SourceRepositoryKind> T = EnumTypes.T(SourceRepositoryKind.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<SourceRepositoryKind> type() {
 		return T;
 	}
 

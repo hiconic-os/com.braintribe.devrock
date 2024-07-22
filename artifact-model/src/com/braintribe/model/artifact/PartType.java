@@ -30,7 +30,7 @@ import com.braintribe.model.generic.reflection.EnumTypes;
  * @author Pit
  *
  */
-public enum PartType implements EnumBase {
+public enum PartType implements EnumBase<PartType> {
 	JAR,
 	JAVADOC,
 	META,
@@ -46,10 +46,10 @@ public enum PartType implements EnumBase {
 	MODEL,
 	_UNKNOWN_;
 
-	public static final EnumType T = EnumTypes.T(PartType.class);
+	public static final EnumType<PartType> T = EnumTypes.T(PartType.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<PartType> type() {
 		return T;
 	}
 

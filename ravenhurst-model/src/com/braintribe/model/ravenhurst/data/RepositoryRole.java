@@ -19,17 +19,17 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum RepositoryRole implements EnumBase {
+public enum RepositoryRole implements EnumBase<RepositoryRole> {
 
 	release,
 	snapshot,
 	both,
 	none;
 
-	final EnumType T = EnumTypes.T(RepositoryRole.class);
+	final EnumType<RepositoryRole> T = EnumTypes.T(RepositoryRole.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<RepositoryRole> type() {
 		return T;
 	}
 }

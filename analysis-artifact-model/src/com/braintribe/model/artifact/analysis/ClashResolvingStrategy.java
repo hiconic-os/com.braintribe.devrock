@@ -27,14 +27,14 @@ import com.braintribe.model.generic.reflection.EnumTypes;
  * @author pit
  *
  */
-public enum ClashResolvingStrategy implements EnumBase {
+public enum ClashResolvingStrategy implements EnumBase<ClashResolvingStrategy> {
 		
 	firstOccurrence, highestVersion;
 	
 	EnumType T = EnumTypes.T(ClashResolvingStrategy.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<ClashResolvingStrategy> type() {
 		return T;
 	}
 

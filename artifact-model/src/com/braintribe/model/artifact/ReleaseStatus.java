@@ -19,15 +19,15 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum ReleaseStatus implements EnumBase{
+public enum ReleaseStatus implements EnumBase<ReleaseStatus>{
 
 	SNAPSHOT, TENTATIVE, RELEASED;
 	
 
-	final EnumType T = EnumTypes.T(ReleaseStatus.class);
+	final EnumType<ReleaseStatus> T = EnumTypes.T(ReleaseStatus.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<ReleaseStatus> type() {
 		return T;
 	}
 }

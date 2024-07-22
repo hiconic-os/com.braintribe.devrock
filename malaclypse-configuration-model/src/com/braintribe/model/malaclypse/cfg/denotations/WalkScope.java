@@ -19,14 +19,14 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum WalkScope implements EnumBase{
+public enum WalkScope implements EnumBase<WalkScope>{
 	compile, launch;
 	
 	
-	final EnumType T = EnumTypes.T(WalkScope.class);
+	final EnumType<WalkScope> T = EnumTypes.T(WalkScope.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<WalkScope> type() {
 		return T;
 	}
 }

@@ -19,14 +19,14 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum ContainerKind implements EnumBase {
+public enum ContainerKind implements EnumBase<ContainerKind> {
 	dynamicContainer, staticContainer;
 	
 	
-	final EnumType T = EnumTypes.T(ContainerKind.class);
+	final EnumType<ContainerKind> T = EnumTypes.T(ContainerKind.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<ContainerKind> type() {
 		return T;
 	}
 }

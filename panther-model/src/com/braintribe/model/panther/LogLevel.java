@@ -19,13 +19,13 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum LogLevel implements EnumBase {
+public enum LogLevel implements EnumBase<LogLevel> {
 	info, warn, error;
 
 	EnumType T = EnumTypes.T(LogLevel.class);
 	
 	@Override
-	public EnumType type() {
+	public EnumType<LogLevel> type() {
 		return T;
 	}
 }

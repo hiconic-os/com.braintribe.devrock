@@ -26,14 +26,14 @@ import com.braintribe.model.generic.reflection.EnumTypes;
  * @author Pit
  *
  */
-public enum WalkDomain implements EnumBase{
+public enum WalkDomain implements EnumBase<WalkDomain>{
 	repository, workingCopy;
 	
 	
-	final EnumType T = EnumTypes.T(WalkDomain.class);
+	final EnumType<WalkDomain> T = EnumTypes.T(WalkDomain.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<WalkDomain> type() {
 		return T;
 	}
 }

@@ -19,14 +19,14 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum CrcFailBehavior implements EnumBase{
+public enum CrcFailBehavior implements EnumBase<CrcFailBehavior>{
 	ignore, fail, warn;
 	
 	
-	final EnumType T = EnumTypes.T(CrcFailBehavior.class);
+	final EnumType<CrcFailBehavior> T = EnumTypes.T(CrcFailBehavior.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<CrcFailBehavior> type() {
 		return T;
 	}
 	

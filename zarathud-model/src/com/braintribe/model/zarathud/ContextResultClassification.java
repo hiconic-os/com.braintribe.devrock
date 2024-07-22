@@ -19,15 +19,15 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum ContextResultClassification implements EnumBase {
+public enum ContextResultClassification implements EnumBase<ContextResultClassification> {
 	Clean,
 	Warnings,
 	Errors;
 
-	public static final EnumType T = EnumTypes.T(ContextResultClassification.class);
+	public static final EnumType<ContextResultClassification> T = EnumTypes.T(ContextResultClassification.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<ContextResultClassification> type() {
 		return T;
 	}
 

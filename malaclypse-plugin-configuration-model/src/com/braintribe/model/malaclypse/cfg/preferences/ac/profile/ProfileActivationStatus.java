@@ -19,14 +19,14 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum ProfileActivationStatus implements EnumBase {
+public enum ProfileActivationStatus implements EnumBase<ProfileActivationStatus> {
 	active, inactive, actual;
 	
 	
-	final EnumType T = EnumTypes.T(ProfileActivationStatus.class);
+	final EnumType<ProfileActivationStatus> T = EnumTypes.T(ProfileActivationStatus.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<ProfileActivationStatus> type() {
 		return T;
 	}
 }

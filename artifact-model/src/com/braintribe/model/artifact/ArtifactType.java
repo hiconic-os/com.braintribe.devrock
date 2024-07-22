@@ -19,13 +19,13 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum ArtifactType implements EnumBase {
+public enum ArtifactType implements EnumBase<ArtifactType> {
 	PLAIN, PLUGIN, GWT_TERMINAL, GWT_LIBRARY, EXCLUSION, BUILD;
 	
-	final EnumType T = EnumTypes.T(ArtifactType.class);
+	final EnumType<ArtifactType> T = EnumTypes.T(ArtifactType.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<ArtifactType> type() {
 		return T;
 	}
 }

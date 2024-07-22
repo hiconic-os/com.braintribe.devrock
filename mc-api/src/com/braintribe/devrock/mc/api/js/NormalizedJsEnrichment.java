@@ -19,13 +19,13 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum NormalizedJsEnrichment implements EnumBase {
+public enum NormalizedJsEnrichment implements EnumBase<NormalizedJsEnrichment> {
 	none, preferMin, preferPretty;
 	
-	public static final EnumType T = EnumTypes.T(NormalizedJsEnrichment.class);
+	public static final EnumType<NormalizedJsEnrichment> T = EnumTypes.T(NormalizedJsEnrichment.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<NormalizedJsEnrichment> type() {
 		return T;
 	}
 }

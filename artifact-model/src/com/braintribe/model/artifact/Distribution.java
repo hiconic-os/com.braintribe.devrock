@@ -19,13 +19,13 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum Distribution implements EnumBase {
+public enum Distribution implements EnumBase<Distribution> {
 	repo, manual, unexpected;
 
-	final EnumType T = EnumTypes.T(Distribution.class);
+	final EnumType<Distribution> T = EnumTypes.T(Distribution.class);
 		
 	@Override
-	public EnumType type() {
+	public EnumType<Distribution> type() {
 		return T;
 	}
 }

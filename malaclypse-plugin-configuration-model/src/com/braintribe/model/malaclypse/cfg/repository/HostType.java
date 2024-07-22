@@ -19,15 +19,15 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum HostType implements EnumBase {
+public enum HostType implements EnumBase<HostType> {
 	release,
 	snapshot,
 	both;
 
-	public static final EnumType T = EnumTypes.T(HostType.class);
+	public static final EnumType<HostType> T = EnumTypes.T(HostType.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<HostType> type() {
 		return T;
 	}
 

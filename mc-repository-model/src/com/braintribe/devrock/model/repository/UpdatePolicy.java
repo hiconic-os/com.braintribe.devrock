@@ -25,17 +25,17 @@ import com.braintribe.model.generic.reflection.EnumTypes;
  * 
  * @author pit
  */
-public enum UpdatePolicy implements EnumBase {
+public enum UpdatePolicy implements EnumBase<UpdatePolicy> {
 	never,
 	always,
 	daily,
 	interval,
 	dynamic;
 
-	public static final EnumType T = EnumTypes.T(UpdatePolicy.class);
+	public static final EnumType<UpdatePolicy> T = EnumTypes.T(UpdatePolicy.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<UpdatePolicy> type() {
 		return T;
 	}
 

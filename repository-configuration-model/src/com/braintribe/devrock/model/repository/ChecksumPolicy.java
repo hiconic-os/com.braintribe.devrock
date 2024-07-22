@@ -28,7 +28,7 @@ import com.braintribe.model.generic.reflection.EnumTypes;
  * @author pit
  *
  */
-public enum ChecksumPolicy implements EnumBase {
+public enum ChecksumPolicy implements EnumBase<ChecksumPolicy> {
 	ignore,
 	warn,
 	fail;
@@ -36,7 +36,7 @@ public enum ChecksumPolicy implements EnumBase {
 	public final static EnumType T = EnumTypes.T(ChecksumPolicy.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<ChecksumPolicy> type() {
 		return T;
 	}
 

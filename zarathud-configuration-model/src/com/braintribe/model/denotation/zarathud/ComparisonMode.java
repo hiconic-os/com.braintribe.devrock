@@ -19,14 +19,14 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum ComparisonMode implements EnumBase {
+public enum ComparisonMode implements EnumBase<ComparisonMode> {
 	lenient,
 	strict;
 
-	public static final EnumType T = EnumTypes.T(ComparisonMode.class);
+	public static final EnumType<ComparisonMode> T = EnumTypes.T(ComparisonMode.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<ComparisonMode> type() {
 		return T;
 	}
 

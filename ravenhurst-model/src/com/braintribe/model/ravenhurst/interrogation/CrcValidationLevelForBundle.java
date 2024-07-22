@@ -19,15 +19,15 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum CrcValidationLevelForBundle implements EnumBase {
+public enum CrcValidationLevelForBundle implements EnumBase<CrcValidationLevelForBundle> {
 	fail,
 	warn,
 	ignore;
 
-	public static final EnumType T = EnumTypes.T(CrcValidationLevelForBundle.class);
+	public static final EnumType<CrcValidationLevelForBundle> T = EnumTypes.T(CrcValidationLevelForBundle.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<CrcValidationLevelForBundle> type() {
 		return T;
 	}
 

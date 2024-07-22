@@ -30,14 +30,14 @@ import com.braintribe.model.generic.reflection.EnumTypes;
  * @author pit / dirk
  *
  */
-public enum RepositoryRestSupport implements EnumBase {
+public enum RepositoryRestSupport implements EnumBase<RepositoryRestSupport> {
 	none,
 	artifactory;
 
-	public static final EnumType T = EnumTypes.T(RepositoryRestSupport.class);
+	public static final EnumType<RepositoryRestSupport> T = EnumTypes.T(RepositoryRestSupport.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<RepositoryRestSupport> type() {
 		return T;
 	}
 

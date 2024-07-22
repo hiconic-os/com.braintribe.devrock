@@ -19,15 +19,15 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum FilterType implements EnumBase {
+public enum FilterType implements EnumBase<FilterType> {
 	simple,
 	regexp;
 	
 	
-	final EnumType T = EnumTypes.T(FilterType.class);
+	final EnumType<FilterType> T = EnumTypes.T(FilterType.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<FilterType> type() {
 		return T;
 	}
 }

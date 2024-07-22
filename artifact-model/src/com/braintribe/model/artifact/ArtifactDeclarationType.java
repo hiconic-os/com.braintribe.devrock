@@ -19,13 +19,13 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
-public enum ArtifactDeclarationType implements EnumBase {
+public enum ArtifactDeclarationType implements EnumBase<ArtifactDeclarationType> {
 		TRANSIENT, FLAT;
 			
-	final EnumType T = EnumTypes.T(ArtifactDeclarationType.class);
+	final EnumType<ArtifactDeclarationType> T = EnumTypes.T(ArtifactDeclarationType.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<ArtifactDeclarationType> type() {
 		return T;
 	}
 }

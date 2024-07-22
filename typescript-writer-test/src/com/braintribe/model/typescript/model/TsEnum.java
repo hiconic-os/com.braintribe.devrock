@@ -22,15 +22,15 @@ import com.braintribe.model.generic.reflection.EnumTypes;
 /**
  * @author peter.gazdik
  */
-public enum TsEnum implements EnumBase {
+public enum TsEnum implements EnumBase<TsEnum> {
 	ModelS,
 	Model3,
 	ModelX;
 
-	public static final EnumType T = EnumTypes.T(TsEnum.class);
+	public static final EnumType<TsEnum> T = EnumTypes.T(TsEnum.class);
 
 	@Override
-	public EnumType type() {
+	public EnumType<TsEnum> type() {
 		return T;
 	}
 }
