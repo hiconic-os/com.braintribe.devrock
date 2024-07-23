@@ -38,6 +38,7 @@ import com.braintribe.model.generic.base.EnumBase;
 import com.braintribe.model.generic.eval.Evaluator;
 import com.braintribe.model.generic.eval.JsEvalContext;
 import com.braintribe.model.generic.reflection.EntityType;
+import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.SimpleType;
 import com.braintribe.model.generic.tools.AbstractStringifier;
 import com.braintribe.model.meta.GmCustomType;
@@ -60,7 +61,8 @@ import com.braintribe.utils.lcd.StringTools;
 import jsinterop.context.JsKeywords;
 
 /**
- * Properties with names that are reserved words in JS (one of: {@value JsKeywords#jsKeywords}) are escaped (here and in tf.js).
+ * Properties with names that are reserved words in JS (one of: {@value JsKeywords#jsKeywords}) are escaped (here and in
+ * tf.js).
  * 
  * @author peter.gazdik
  */
@@ -81,8 +83,9 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 
 	/** Writes .d.ts information for given GM types. Assumes the triple-slash references were already written */
 	public static void write(Collection<GmType> gmTypes, Function<Class<?>, String> jsNameResolver, Appendable writer) {
-		if (!gmTypes.isEmpty())
+		if (!gmTypes.isEmpty()) {
 			new TypeScriptWriterForModels(gmTypes, jsNameResolver, writer).writeNamespaceDeclarationForTheModel();
+		}
 	}
 
 	// ####################################################
@@ -98,7 +101,9 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 	private CustomTypeDescriptor currentCtd;
 
 	private final String entityTypeJsName;
+	private final String enumTypeJsName;
 	private final String enumBaseJsName;
+	private final String enumName;
 
 	private final String evalContextJsName;
 	private final String evaluatorJsName;
@@ -110,7 +115,9 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 		this.jsNameResolver = jsNameResolver;
 
 		this.entityTypeJsName = jsNameResolver.apply(EntityType.class);
+		this.enumTypeJsName = jsNameResolver.apply(EnumType.class);
 		this.enumBaseJsName = jsNameResolver.apply(EnumBase.class);
+		this.enumName = KnownJsType.java2Ts.get(Enum.class).fullName;
 
 		this.evalContextJsName = jsNameResolver.apply(JsEvalContext.class);
 		this.evaluatorJsName = jsNameResolver.apply(Evaluator.class);
@@ -120,9 +127,11 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 	}
 
 	private void indexTypes() {
-		for (GmType gmType : gmTypes)
-			if (gmType.isGmCustom())
+		for (GmType gmType : gmTypes) {
+			if (gmType.isGmCustom()) {
 				indexType((GmCustomType) gmType);
+			}
+		}
 	}
 
 	private void indexType(GmCustomType gmType) {
@@ -185,10 +194,11 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 
 	private void writeTypeDeclarationForCustomType(CustomTypeDescriptor ctd) {
 		printEssentialMdAnnotations(ctd.gmType);
-		if (ctd.gmType.isGmEnum())
+		if (ctd.gmType.isGmEnum()) {
 			writeEnumTypeDeclaration(ctd);
-		else
+		} else {
 			writeEntityTypeDeclaration(ctd);
+		}
 	}
 
 	private void writeEnumTypeDeclaration(CustomTypeDescriptor ctd) {
@@ -196,25 +206,44 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 		print(ctd.simpleName);
 		print(" extends ");
 		print(enumBaseJsName);
-		println(" {}");
-
-		print("namespace ");
+		print("<");
 		print(ctd.simpleName);
-		println(" {");
+		print(">, ");
+		print(enumName);
+		print("<");
+		print(ctd.simpleName);
+		println("> {}");
+
+		print("const ");
+		print(ctd.simpleName);
+		println(": {");
 
 		levelUp();
-		((GmEnumType) ctd.gmType).getConstants().forEach(c -> writeConstant(c, ctd));
+		{
+			writeEnumTypeSymbol(ctd);
+			((GmEnumType) ctd.gmType).getConstants().forEach(c -> writeConstant(c, ctd));
+		}
 		levelDown();
 
 		println("}\n");
 	}
 
+	private void writeEnumTypeSymbol(CustomTypeDescriptor ctd) {
+		print("readonly [");
+		print(KnownJsType.SYMBOL_ENUM_TYPE);
+		print("]: ");
+		print(enumTypeJsName);
+		print("<");
+		print(ctd.simpleName);
+		println(">,");
+	}
+
 	private void writeConstant(GmEnumConstant c, CustomTypeDescriptor cType) {
-		print("const ");
+		print("readonly ");
 		print(JsKeywords.javaIdentifierToJs(c.getName()));
 		print(": ");
 		print(cType.simpleName);
-		println(";");
+		println(",");
 	}
 
 	private void writeEntityTypeDeclaration(CustomTypeDescriptor ctd) {
@@ -236,8 +265,9 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 			print(" extends ");
 			int i = 0;
 			for (GmEntityType superType : gmEntityType.getSuperTypes()) {
-				if (i++ > 0)
+				if (i++ > 0) {
 					print(", ");
+				}
 				printNullableType(superType);
 			}
 
@@ -267,8 +297,9 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 
 	private void writeEvalIfNeeded(GmEntityType gmEntityType) {
 		EvalInfo evalInfo = resolveEvaluatesTo(gmEntityType);
-		if (evalInfo == null || !evalInfo.needsDeclarationInTs)
+		if (evalInfo == null || !evalInfo.needsDeclarationInTs) {
 			return;
+		}
 
 		String evaluatorParam = "(evaluator: " + evaluatorJsName + "<$T." + ServiceRequest.T.getTypeSignature() + ">): ";
 
@@ -308,26 +339,30 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 
 	private EvalInfo resolveEvaluatesTo(GmEntityType gmEntityType) {
 		EvalInfo info = evaluatesTo.get(gmEntityType);
-		if (info == null)
+		if (info == null) {
 			evaluatesTo.put(gmEntityType, info = newEvalInfoFor(gmEntityType));
+		}
 
 		return info;
 	}
 
 	private EvalInfo newEvalInfoFor(GmEntityType gmEntityType) {
 		GmType evaluatesTo = gmEntityType.getEvaluatesTo();
-		if (evaluatesTo != null)
+		if (evaluatesTo != null) {
 			return new EvalInfo(evaluatesTo, true);
+		}
 
 		List<GmEntityType> superTypes = gmEntityType.getSuperTypes();
 		EvalInfo result = null;
 		for (GmEntityType superType : superTypes) {
 			EvalInfo superInfo = resolveEvaluatesTo(superType);
-			if (superInfo == null)
+			if (superInfo == null) {
 				continue;
+			}
 
-			if (result == null)
+			if (result == null) {
 				result = new EvalInfo(superInfo.gmType, false);
+			}
 
 			if (result.gmType != superInfo.gmType) {
 				result.gmType = pickMoreSpecificType(result.gmType, superInfo.gmType);
@@ -340,21 +375,25 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 
 	private GmType pickMoreSpecificType(GmType t1, GmType t2) {
 		if (t1.isGmCollection()) {
-			if (t2.isGmBase())
+			if (t2.isGmBase()) {
 				return t1;
+			}
 
-			if (t1.typeKind() == GmTypeKind.MAP)
+			if (t1.typeKind() == GmTypeKind.MAP) {
 				return pickMoreSpecificMapType((GmMapType) t1, (GmMapType) t2);
+			}
 
 			t1 = ((GmLinearCollectionType) t1).getElementType();
 			t2 = ((GmLinearCollectionType) t2).getElementType();
 		}
 
-		if (t1.isGmBase())
+		if (t1.isGmBase()) {
 			return t2;
+		}
 
-		if (t2.isGmBase())
+		if (t2.isGmBase()) {
 			return t1;
+		}
 
 		if (t1.isGmEntity() && t2.isGmEntity()) {
 			return isFirstSuperOfSecond((GmEntityType) t1, (GmEntityType) t2) ? t2 : t1;
@@ -380,12 +419,15 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 
 	private boolean isFirstSuperOfSecond(GmEntityType t1, GmEntityType t2) {
 		List<GmEntityType> superTypes = t2.getSuperTypes();
-		if (superTypes.contains(t1))
+		if (superTypes.contains(t1)) {
 			return true;
+		}
 
-		for (GmEntityType superType : superTypes)
-			if (isFirstSuperOfSecond(t1, superType))
+		for (GmEntityType superType : superTypes) {
+			if (isFirstSuperOfSecond(t1, superType)) {
 				return true;
+			}
+		}
 
 		return false;
 	}
@@ -509,8 +551,9 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 	}
 
 	private void printEssentialMdAnnotations(HasMetaData modelElement) {
-		for (AnnotationDescriptor ad : MdaSynthesis.synthesizeMetaDataAnnotations(modelElement))
+		for (AnnotationDescriptor ad : MdaSynthesis.synthesizeMetaDataAnnotations(modelElement)) {
 			ad.withSourceCode(s -> println("// " + s));
+		}
 	}
 
 }

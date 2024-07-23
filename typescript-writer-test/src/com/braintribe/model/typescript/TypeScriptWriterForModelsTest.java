@@ -118,11 +118,11 @@ public class TypeScriptWriterForModelsTest extends AbstractWriterTest {
 		mustContain("mapOfStrings: map<string, string>;");
 		mustContain("setOfStrings: set<string>;");
 
-		mustContain("interface TsEnum extends $tf.reflection.EnumBase {}");
-		mustContain("namespace TsEnum {");
-		mustContain("const ModelS: TsEnum;");
-		mustContain("const Model3: TsEnum;");
-		mustContain("const ModelX: TsEnum;");
+		mustContain("interface TsEnum extends $tf.reflection.EnumBase<TsEnum>, $tf.Enum<TsEnum> {}");
+		mustContain("const TsEnum: {");
+		mustContain("readonly [$tf.Symbol.enumType]: $tf.reflection.EnumType<TsEnum>,");
+		mustContain("readonly ModelS: TsEnum,");
+		mustContain("readonly ModelX: TsEnum,");
 
 		mustContain("// Mandatory");
 		mustContain("// Unique");
@@ -161,8 +161,9 @@ public class TypeScriptWriterForModelsTest extends AbstractWriterTest {
 	public void tsWriter_JsKeywords() throws Exception {
 		write(TsKeywordEntity.T, TsKeywordPackageEntity.T);
 
-		for (String jsKeyword : jsKeywords)
+		for (String jsKeyword : jsKeywords) {
 			mustContain(jsKeyword + "_: string");
+		}
 
 		mustContain("yield__: string");
 		mustContain("keywordPackage: $T.com.braintribe.model.typescript.model.keyword.with_.TsKeywordPackageEntity;");
@@ -173,10 +174,12 @@ public class TypeScriptWriterForModelsTest extends AbstractWriterTest {
 	public void tsWriter_JsKeywords_Enum() throws Exception {
 		write(TsKeywordEnumOwner.T);
 
-		mustContain("interface TsKeywordEnum extends $tf.reflection.EnumBase {}");
-		mustContain("namespace TsKeywordEnum {");
-		for (TsKeywordEnum e : TsKeywordEnum.class.getEnumConstants())
-			mustContain("const " + e.name() + "_: TsKeywordEnum;");
+		mustContain("interface TsKeywordEnum extends $tf.reflection.EnumBase<TsKeywordEnum>, $tf.Enum<TsKeywordEnum> {}");
+		mustContain("const TsKeywordEnum: {");
+		mustContain("readonly [$tf.Symbol.enumType]: $tf.reflection.EnumType<TsKeywordEnum>,");
+		for (TsKeywordEnum e : TsKeywordEnum.class.getEnumConstants()) {
+			mustContain("readonly " + e.name() + "_: TsKeywordEnum,");
+		}
 	}
 
 	private void cutTypeFromOutput(EntityType<?> et) {

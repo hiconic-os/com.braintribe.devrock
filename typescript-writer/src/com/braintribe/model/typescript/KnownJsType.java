@@ -55,6 +55,8 @@ import java.util.stream.Stream;
 	public static String JS_INTEROP_GLOBAL = "<global>";
 	public static String JS_INTEROP_GLOBAL_THIS = "globalThis";
 
+	public static String SYMBOL_ENUM_TYPE = "$tf.Symbol.enumType";
+	
 	public static final Map<Class<?>, KnownJsType> java2Ts = newIdentityMap();
 	public static final Map<String, QualifiedName> java2NsWeak = newMap();
 
@@ -149,8 +151,9 @@ import java.util.stream.Stream;
 
 	public static KnownJsType resolveIfTypeKnownByName(Class<?> clazz) {
 		QualifiedName qn = KnownJsType.java2NsWeak.get(clazz.getName());
-		if (qn == null)
+		if (qn == null) {
 			return null;
+		}
 
 		KnownJsType result = new KnownJsType(qn.name, qn.namespace);
 		java2Ts.put(clazz, result);
