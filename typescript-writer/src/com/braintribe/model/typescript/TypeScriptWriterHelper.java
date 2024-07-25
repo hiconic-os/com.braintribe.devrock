@@ -29,6 +29,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.braintribe.exception.Exceptions;
+import com.braintribe.model.artifact.essential.ArtifactIdentification;
 import com.braintribe.model.artifact.essential.VersionedArtifactIdentification;
 import com.braintribe.model.generic.GenericEntity;
 import com.braintribe.model.generic.annotation.GmSystemInterface;
@@ -53,8 +54,9 @@ public class TypeScriptWriterHelper {
 		return clazz -> TypeScriptWriterHelper.resolveJsName(clazz, classLoader);
 	}
 
-	// Just to be safe, but we expect this to be called with EntityBase, EntityType and EnumType and those should be annotated with JsType.
-	public static String resolveJsName(Class<?> type, ClassLoader classLoader) {
+	// Just to be safe, but we expect this to be called with EntityBase, EntityType and EnumType and those should be
+	// annotated with JsType.
+	private static String resolveJsName(Class<?> type, ClassLoader classLoader) {
 		Class<?> clazz = ReflectionTools.getClassOrNull(type.getName(), classLoader);
 		if (clazz == null)
 			return "Object";
@@ -72,7 +74,8 @@ public class TypeScriptWriterHelper {
 	/**
 	 * <tt>jsName</tt> is a value read from a js-interop annotation,
 	 * <p>
-	 * This method returns given jsName as long as it is not {@code <auto>}, in which case it returns the value from <tt>defaultValueSupplier</tt>
+	 * This method returns given jsName as long as it is not {@code <auto>}, in which case it returns the value from
+	 * <tt>defaultValueSupplier</tt>
 	 */
 	public static String jsNameOrDefault(String jsName, Supplier<String> defaultValueSupplier) {
 		return jsName.equals(JS_INTEROP_AUTO) ? defaultValueSupplier.get() : jsName;
@@ -96,9 +99,9 @@ public class TypeScriptWriterHelper {
 		Class<?> enm = findBaseClass(EnumBase.class.getName(), classLoader);
 		Class<? extends Annotation> gsi = findBaseClass(GmSystemInterface.class.getName(), classLoader);
 
-		/* We actually expect either none of them to be null or all of them, as the findBaseClass method returns null iff it cannot find the class
-		 * with given class-loader. As all these classes come from "gm-core-api", they will either all be there or none. But just to be sure, we check
-		 * if either of them was not found. */
+		/* We actually expect either none of them to be null or all of them, as the findBaseClass method returns null iff it
+		 * cannot find the class with given class-loader. As all these classes come from "gm-core-api", they will either all be
+		 * there or none. But just to be sure, we check if either of them was not found. */
 		if (ge == null || enm == null || gsi == null)
 			return c -> Boolean.FALSE;
 		else
@@ -130,7 +133,7 @@ public class TypeScriptWriterHelper {
 
 	public static void writeTripleSlashReferences(List<VersionedArtifactIdentification> dependencies, Appendable writer) throws IOException {
 		for (VersionedArtifactIdentification d : dependencies)
-			writer.append("/// <reference path=\"" + relativePathTo(d) + "" + dtsFileName(d.getArtifactId()) + "\" />\n");
+			writeTripleSlashReference(relativePathTo(d) + dtsFileName(d.getArtifactId()), writer);
 
 		if (!dependencies.isEmpty())
 			writer.append("\n");
@@ -140,8 +143,45 @@ public class TypeScriptWriterHelper {
 		return artifactId + ".d.ts";
 	}
 
+	public static void writeTripleSlashReferenceToMain(String aid, Appendable writer) throws IOException {
+		writeTripleSlashReference(mainDtsFileName(aid), writer);
+		writer.append("\n");
+	}
+		
+	public static void writeTripleSlashReference(String path, Appendable writer) throws IOException {
+		writer.append("/// <reference path=\"" + path + "\" />\n");
+	}
+
+	public static String mainDtsFileName(String artifactId) {
+		return artifactId + ".d.ts";		
+	}
+
+	public static String staticDtsFileName(String artifactId) {
+		return artifactId + ".static.d.ts";
+	}
+
+	public static String typesDtsFileName(String artifactId) {
+		return artifactId + ".types.d.ts";
+	}
+	
+	public static String jsinteropDtsFileName(String artifactId) {
+		return artifactId + ".jsinterop.d.ts";
+	}
+
 	/* package */ static String nameBaseOfEnsure(String artifactId) {
 		return "ensure-" + artifactId;
+	}
+
+	public static String npmPackageFullName(String namespace, ArtifactIdentification aa) {
+		return "@" + namespace + "/" + npmPackageName(aa);
+	}
+
+	/* package */  static String npmPackageName(ArtifactIdentification aa) {
+		return npmPackageName(aa.getArtifactId(), aa.getGroupId());
+	}
+
+	/* package */  static String npmPackageName(String artifactId, String groupId) {
+		return groupId + "--" + artifactId;
 	}
 
 	public static String relativePathTo(VersionedArtifactIdentification depInfo) {

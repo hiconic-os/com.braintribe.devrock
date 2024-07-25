@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import com.braintribe.codec.marshaller.jse.JseMarshaller;
+import com.braintribe.model.artifact.essential.ArtifactIdentification;
 import com.braintribe.model.artifact.essential.VersionedArtifactIdentification;
 import com.braintribe.model.generic.GenericEntity;
 import com.braintribe.model.generic.GmCoreApiInteropNamespaces;
@@ -73,8 +74,15 @@ public class ModelEnsuringJsWriter extends AbstractStringifier {
 	}
 
 	private void writeDependencyImports() {
-		for (VersionedArtifactIdentification d : context.dependencies())
-			println("import \"" + TypeScriptWriterHelper.relativePathTo(d) + nameBaseOfEnsure(d.getArtifactId()) + ".js\";");
+		if (context.forNpm()) {
+			String ns = context.npmNamespace();
+			for (ArtifactIdentification d : context.dependencies())
+				println("import \"" + TypeScriptWriterHelper.npmPackageFullName(ns, d) + "\";");
+
+		} else {
+			for (VersionedArtifactIdentification d : context.dependencies())
+				println("import \"" + TypeScriptWriterHelper.relativePathTo(d) + nameBaseOfEnsure(d.getArtifactId()) + ".js\";");
+		}
 
 		if (!context.dependencies().isEmpty())
 			println();

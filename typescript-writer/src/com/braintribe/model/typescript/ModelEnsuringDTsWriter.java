@@ -18,6 +18,7 @@ package com.braintribe.model.typescript;
 import java.util.List;
 import java.util.Map.Entry;
 
+import com.braintribe.model.artifact.essential.ArtifactIdentification;
 import com.braintribe.model.generic.GmCoreApiInteropNamespaces;
 import com.braintribe.model.generic.tools.AbstractStringifier;
 import com.braintribe.model.meta.GmType;
@@ -44,13 +45,30 @@ public class ModelEnsuringDTsWriter extends AbstractStringifier {
 
 	public void writeDTs() {
 		writeTripleSlashReferenceToModelDTs();
+		writeImports();
 		writeMeta();
 		writeShortAliasesForTypes();
 	}
 
 	private void writeTripleSlashReferenceToModelDTs() {
-		println("/// <reference path=\"./" + context.aid() + ".d.ts\" />\n");
+		if (context.forNpm())
+			println("/// <reference path=\"" + context.aid() + ".types.d.ts\" />\n");
+		else
+			println("/// <reference path=\"./" + context.aid() + ".d.ts\" />\n");
 	}
+
+	private void writeImports() {
+		if (!context.forNpm())
+			return;
+
+		String ns = context.npmNamespace();
+		for (ArtifactIdentification d : context.dependencies())
+			println("import \"" + TypeScriptWriterHelper.npmPackageFullName(ns, d) + "\";");
+
+		if (!context.dependencies().isEmpty())
+			println();
+	}
+
 
 	private void writeMeta() {
 		println("export declare namespace meta {");
