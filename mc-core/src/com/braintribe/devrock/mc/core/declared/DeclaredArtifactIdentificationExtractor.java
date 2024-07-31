@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Optional;
 
 import com.braintribe.artifact.declared.marshaller.DeclaredArtifactMarshaller;
@@ -47,15 +48,16 @@ public class DeclaredArtifactIdentificationExtractor {
 		String explicitVersion = artifact.getVersion();
 		String explicitGroupId = artifact.getGroupId();
 		String artifactId = artifact.getArtifactId();
+		Map<String, String> properties = artifact.getProperties();
 		
 		VersionedArtifactIdentification ai = VersionedArtifactIdentification.create(explicitGroupId, artifactId, explicitVersion);
 		
 		try {
-			
+
 			Optional<VersionedArtifactIdentification> parentRef = Optional.ofNullable(artifact.getParentReference());
-			
+
 			final String version;
-			
+
 			if (explicitVersion != null) {
 				version = declaredArtifactPropertyResolver.resolve(explicitVersion);
 			}
@@ -76,27 +78,29 @@ public class DeclaredArtifactIdentificationExtractor {
 					return Reasons.build(MalformedArtifactDescriptor.T).text("version not present in: " + ai.asString()).toMaybe();
 				}
 			}
-			
+
 			String groupId = explicitGroupId != null? declaredArtifactPropertyResolver.resolve(explicitGroupId): 
 				parentRef.map(VersionedArtifactIdentification::getGroupId).orElse(null);
-			
+
 			if (artifactId == null || groupId == null || version == null)
 				return Reasons.build(MalformedArtifactDescriptor.T).text("invalid artifact identification: " + ai.asString()).toMaybe();
-			
+
 			artifactId = declaredArtifactPropertyResolver.resolve(artifact.getArtifactId());
-			
+
 			CompiledArtifact compiledArtifact = CompiledArtifact.T.create();
 			compiledArtifact.setGroupId(groupId);
 			compiledArtifact.setArtifactId(artifactId);
 			compiledArtifact.setVersion(Version.parse(version));
 			compiledArtifact.setPackaging(artifact.getPackaging());
-			compiledArtifact.getProperties().putAll(artifact.getProperties());
-			
+			compiledArtifact.getProperties().putAll(properties);
+			compiledArtifact.setArchetype(properties.get("archetype"));
+
 			return Maybe.complete(compiledArtifact);
+
 		} catch (Exception e) {
 			return InternalError.from(e, "invalid artifact identification: " + ai.asString()).asMaybe();
 		}
-		
+
 	}
 
 	public static Maybe<CompiledArtifactIdentification> extractIdentification(DeclaredArtifact artifact) {
