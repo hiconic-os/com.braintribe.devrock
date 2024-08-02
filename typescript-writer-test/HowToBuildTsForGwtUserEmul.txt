@@ -39,7 +39,10 @@ Getting something like:
 
 -------
 
-6. Place the generated [jsinterop-base.d.ts] file into [com.braintribe.common:jsinterop-base/res] folder
+6. Place the generated [jsinterop-base.d.ts] file into [com.braintribe.gm:gm-core-api/npm] folder as [gm-core-api.static.d.ts]
+
+7. Slowly becoming deprecated:
+   Place the generated [jsinterop-base.d.ts] file into [com.braintribe.common:jsinterop-base/res] folder
 
 #########################################################
 MAKE SURE METHOD PARAMETER NAMES ARE WRITTEN OUT PROPERLY
