@@ -69,7 +69,6 @@ public class ModelEnsuringDTsWriter extends AbstractStringifier {
 			println();
 	}
 
-
 	private void writeMeta() {
 		println("export declare namespace meta {");
 		levelUp();
@@ -86,7 +85,7 @@ public class ModelEnsuringDTsWriter extends AbstractStringifier {
 		List<ShortNameEntry<GmType>> defaultNs = shortNames.paths.get("");
 		if (defaultNs != null) {
 			println();
-			printNs(defaultNs, true);
+			printNs(defaultNs);
 		}
 
 		for (Entry<String, List<ShortNameEntry<GmType>>> e : shortNames.paths.entrySet()) {
@@ -96,16 +95,15 @@ public class ModelEnsuringDTsWriter extends AbstractStringifier {
 			println("");
 			println("export declare namespace " + JsKeywords.packageToJsNamespace(e.getKey()) + " {");
 			levelUp();
-			printNs(e.getValue(), false);
+			printNs(e.getValue());
 			levelDown();
 			println("}");
 		}
 	}
 
-	private void printNs(List<ShortNameEntry<GmType>> list, boolean topLevel) {
+	private void printNs(List<ShortNameEntry<GmType>> list) {
 		for (ShortNameEntry<GmType> e : list) {
-			if (topLevel)
-				print("export import ");
+			print("export import ");
 			println(e.simpleName + " = " + jsSignatureWith$T(e) + ";");
 		}
 	}
