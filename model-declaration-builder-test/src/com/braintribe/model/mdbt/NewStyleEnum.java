@@ -20,14 +20,14 @@ import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.EnumTypes;
 
 public enum NewStyleEnum implements EnumBase<NewStyleEnum> {
-	first,second;
-	
-	EnumType T = EnumTypes.T(NewStyleEnum.class);
+	first,
+	second;
+
+	EnumType<NewStyleEnum> T = EnumTypes.T(NewStyleEnum.class);
 
 	@Override
 	public EnumType<NewStyleEnum> type() {
 		return T;
 	}
-
 
 }

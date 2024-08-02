@@ -38,18 +38,10 @@ limitations under the License.
             <groupId>com.braintribe.devrock</groupId>
             <artifactId>model-declaration-builder-ng</artifactId>
             <version>${V.com.braintribe.devrock}</version>
-            <?group functional?>
-        </dependency>
-        <dependency>
-            <groupId>com.braintribe.gm</groupId>
-            <artifactId>gm-core4-jvm</artifactId>
-            <?group functional?>
-            <version>${V.com.braintribe.gm}</version>
         </dependency>
         <dependency>
             <groupId>com.braintribe.testing</groupId>
             <artifactId>unit-test-deps</artifactId>
-            <?group functional?>
             <version>${V.com.braintribe.testing}</version>
         </dependency>
         <dependency>

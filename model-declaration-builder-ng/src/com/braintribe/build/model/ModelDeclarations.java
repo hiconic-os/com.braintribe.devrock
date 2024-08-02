@@ -90,10 +90,14 @@ public class ModelDeclarations {
 		}
 	}
 
-	public static Reason buildModelDeclaration(Function<File,Maybe<CompiledArtifact>> reader, List<URL> cp, List<File> buildFolders, File pomFile, File targetFolder) {
+	public static Reason buildModelDeclaration(Function<File, Maybe<CompiledArtifact>> reader, List<URL> cp, List<File> buildFolders, //
+			File pomFile, File targetFolder) {
 		return buildModelDeclaration(reader, cp, buildFolders, pomFile, targetFolder, false);
 	}
-	public static Reason buildModelDeclaration(Function<File,Maybe<CompiledArtifact>> reader, List<URL> cp, List<File> buildFolders, File pomFile, File targetFolder,  boolean classLoaderReflection) {
+
+	public static Reason buildModelDeclaration(Function<File, Maybe<CompiledArtifact>> reader, List<URL> cp, List<File> buildFolders, //
+			File pomFile, File targetFolder, boolean classLoaderReflection) {
+
 		try {
 			Maybe<CompiledArtifact> potential = reader.apply( pomFile);
 			if (potential.isUnsatisfied()) {				

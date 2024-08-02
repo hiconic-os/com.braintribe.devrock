@@ -27,9 +27,10 @@ public class ModelAsmReflection implements ModelReflection {
 	private static String enumName = "java/lang/Enum";
 	private static String genericEntityName = "com/braintribe/model/generic/GenericEntity";
 	private static String forwardAnnotationName = "com/braintribe/model/generic/annotation/ForwardDeclaration";
+	private static String gmSystemInterface = "com/braintribe/model/generic/annotation/GmSystemInterface";
 	
-	private Map<String, Entity> nameToEntityMap = new HashMap<>();
-	private ClassLoader classLoader;
+	private final Map<String, Entity> nameToEntityMap = new HashMap<>();
+	private final ClassLoader classLoader;
 	
 	public ModelAsmReflection( ClassLoader classloader) {
 		this.classLoader = classloader;
@@ -69,7 +70,11 @@ public class ModelAsmReflection implements ModelReflection {
 						String name = node.name;						
 						
 						nameToEntityMap.put(name, en);
-					
+
+						// ignore system interfaces 
+						if (findAnnotationByDesc(classNode, gmSystemInterface) != null)
+							return;
+
 						// genericity 
 						List<String> interfaces = node.interfaces;				
 						if (interfaces != null) {
@@ -99,18 +104,11 @@ public class ModelAsmReflection implements ModelReflection {
 						}
 								
 						// forwards
-						List<AnnotationNode> visibleAnnotations = node.visibleAnnotations;
-						if (visibleAnnotations != null) {
-							for (AnnotationNode an : visibleAnnotations) {
-								String desc = an.desc;
-								List<Object> values = an.values;
-								
-								if (desc.equals( forwardAnnotationName)) {
-									String forward = (String) values.get(0); // only one value
-									en.setForwardDeclaration(forward);
-								}
-							}
-						}						
+						AnnotationNode an = findAnnotationByDesc(node, forwardAnnotationName);
+						if (an != null) {
+							String forward = (String) an.values.get(0); // only one value
+							en.setForwardDeclaration(forward);
+						}
 					}
 				}
 			});
@@ -123,6 +121,14 @@ public class ModelAsmReflection implements ModelReflection {
 		return null;
 	}
 
+	private AnnotationNode findAnnotationByDesc(ClassNode node, String desc) {
+		if (node.visibleAnnotations != null)
+			for (AnnotationNode an : node.visibleAnnotations)
+				if (an.desc.contains(desc))
+					return an;
+
+		return null;
+	}
 	
 	protected boolean isEnum(String superType) {
 		Entity en = nameToEntityMap.get(superType);
