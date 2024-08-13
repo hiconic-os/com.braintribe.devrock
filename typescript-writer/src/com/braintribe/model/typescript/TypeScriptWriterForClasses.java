@@ -71,6 +71,7 @@ import jsinterop.annotations.JsOptional;
 import jsinterop.annotations.JsProperty;
 import jsinterop.annotations.JsType;
 import jsinterop.annotations.custom.TsIgnore;
+import jsinterop.annotations.custom.TsUnignoreMethod;
 
 /**
  * @author peter.gazdik
@@ -954,7 +955,7 @@ public class TypeScriptWriterForClasses extends AbstractStringifier {
 				return false;
 
 			if (method.isAnnotationPresent(JsIgnore.class))
-				return false;
+				return method.isAnnotationPresent(TsUnignoreMethod.class);
 
 			if (method.isBridge())
 				return false;
@@ -987,8 +988,13 @@ public class TypeScriptWriterForClasses extends AbstractStringifier {
 
 		private TsMethod toTsMethod(Method method) {
 			JsMethod jsMethod = method.getAnnotation(JsMethod.class);
-			if (jsMethod == null)
-				return new TsMethod(method.getName(), method);
+			if (jsMethod == null) {
+				TsUnignoreMethod unignoreMethod = method.getAnnotation(TsUnignoreMethod.class);
+				if (unignoreMethod == null)
+					return new TsMethod(method.getName(), method);
+
+				jsMethod = unignoreMethod.jsMethod();
+			}
 
 			if (isStatic(method) && !jsMethod.namespace().equals(JS_INTEROP_AUTO))
 				return null;

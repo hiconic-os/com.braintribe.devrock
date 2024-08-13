@@ -50,6 +50,7 @@ import com.braintribe.ts.sample.keyword.TsKeywordsStatic;
 import com.braintribe.ts.sample.keyword.with.TsKeywordPackageInterface;
 import com.braintribe.ts.sample.nointerop.JsTypeWithTsIgnore;
 import com.braintribe.ts.sample.nointerop.TsTypeWithNoInteropRefs;
+import com.braintribe.ts.sample.nointerop.TsTypeWithUnignores;
 import com.braintribe.ts.sample.nointerop.TsWithJavaScriptObject;
 import com.braintribe.ts.sample.statics.HasStaticMembers;
 
@@ -407,6 +408,15 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 		notContains("JsTypeWithTsIgnore");
 		notContains("foobar");
 		notContains("namespace");
+	}
+
+	@Test
+	public void tsUnignore() throws Exception {
+		write(TsTypeWithUnignores.class);
+
+		mustContain("TsTypeWithUnignores");
+		mustContain("unignored(): string;");
+		mustContain("unignoredAndMapped(): string;");
 	}
 
 	private void write(Class<?>... classes) {
