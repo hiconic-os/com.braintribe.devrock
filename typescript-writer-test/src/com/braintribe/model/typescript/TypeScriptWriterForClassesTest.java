@@ -417,6 +417,18 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 		mustContain("TsTypeWithUnignores");
 		mustContain("unignored(): string;");
 		mustContain("unignoredAndMapped(): string;");
+		mustContain("create(): string;");
+
+		ensureBridgeCreateMethodNotPresent();
+	}
+
+	/**
+	 * This could fail when run from command line, but not from Eclips.
+	 *
+	 * @see TsTypeWithUnignores#create()
+	 */
+	private void ensureBridgeCreateMethodNotPresent() {
+		notContains("create(): any");
 	}
 
 	private void write(Class<?>... classes) {

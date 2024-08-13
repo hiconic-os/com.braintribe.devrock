@@ -954,11 +954,11 @@ public class TypeScriptWriterForClasses extends AbstractStringifier {
 			if (!(isPublic(method) || isProtected(method)))
 				return false;
 
-			if (method.isAnnotationPresent(JsIgnore.class))
-				return method.isAnnotationPresent(TsUnignoreMethod.class);
-
 			if (method.isBridge())
 				return false;
+
+			if (method.isAnnotationPresent(JsIgnore.class))
+				return method.isAnnotationPresent(TsUnignoreMethod.class);
 
 			return !isTsDeclarationInherited(method);
 		}
