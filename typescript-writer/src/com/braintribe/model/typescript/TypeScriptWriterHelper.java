@@ -74,8 +74,7 @@ public class TypeScriptWriterHelper {
 	/**
 	 * <tt>jsName</tt> is a value read from a js-interop annotation,
 	 * <p>
-	 * This method returns given jsName as long as it is not {@code <auto>}, in which case it returns the value from
-	 * <tt>defaultValueSupplier</tt>
+	 * This method returns given jsName as long as it is not {@code <auto>}, in which case it returns the value from <tt>defaultValueSupplier</tt>
 	 */
 	public static String jsNameOrDefault(String jsName, Supplier<String> defaultValueSupplier) {
 		return jsName.equals(JS_INTEROP_AUTO) ? defaultValueSupplier.get() : jsName;
@@ -99,9 +98,9 @@ public class TypeScriptWriterHelper {
 		Class<?> enm = findBaseClass(EnumBase.class.getName(), classLoader);
 		Class<? extends Annotation> gsi = findBaseClass(GmSystemInterface.class.getName(), classLoader);
 
-		/* We actually expect either none of them to be null or all of them, as the findBaseClass method returns null iff it
-		 * cannot find the class with given class-loader. As all these classes come from "gm-core-api", they will either all be
-		 * there or none. But just to be sure, we check if either of them was not found. */
+		/* We actually expect either none of them to be null or all of them, as the findBaseClass method returns null iff it cannot find the class
+		 * with given class-loader. As all these classes come from "gm-core-api", they will either all be there or none. But just to be sure, we check
+		 * if either of them was not found. */
 		if (ge == null || enm == null || gsi == null)
 			return c -> Boolean.FALSE;
 		else
@@ -147,13 +146,13 @@ public class TypeScriptWriterHelper {
 		writeTripleSlashReference(mainDtsFileName(aid), writer);
 		writer.append("\n");
 	}
-		
+
 	public static void writeTripleSlashReference(String path, Appendable writer) throws IOException {
 		writer.append("/// <reference path=\"" + path + "\" />\n");
 	}
 
 	public static String mainDtsFileName(String artifactId) {
-		return artifactId + ".d.ts";		
+		return artifactId + ".d.ts";
 	}
 
 	public static String staticDtsFileName(String artifactId) {
@@ -163,7 +162,7 @@ public class TypeScriptWriterHelper {
 	public static String typesDtsFileName(String artifactId) {
 		return artifactId + ".types.d.ts";
 	}
-	
+
 	public static String jsinteropDtsFileName(String artifactId) {
 		return artifactId + ".jsinterop.d.ts";
 	}
@@ -172,16 +171,58 @@ public class TypeScriptWriterHelper {
 		return "ensure-" + artifactId;
 	}
 
-	public static String npmPackageFullName(String namespace, ArtifactIdentification aa) {
-		return "@" + namespace + "/" + npmPackageName(aa);
+	public static String npmPackageFullName(ArtifactIdentification aa) {
+		return npmPackageFullName(aa.getGroupId(), aa.getArtifactId());
 	}
 
-	/* package */  static String npmPackageName(ArtifactIdentification aa) {
-		return npmPackageName(aa.getArtifactId(), aa.getGroupId());
+	/**
+	 * Creates a full NPM package name for given artifact, using the convention:<br>
+	 * <code>my.company.some.project:xyz-model -> @my.company/some.project_xyz-model</code>
+	 * 
+	 * From the groupId, the first two dot-separated parts are used as a package scope.
+	 * 
+	 * The rest of the groupId and the artifactId is used as a package name.
+	 * 
+	 * However, in some cases we don't use the artifactId, but configure a different value (e.g. for the pretty version of hc.js we use hc-js-dev).
+	 * Hence the parameter is called "packageSuffix".
+	 */
+	public static String npmPackageFullName(String groupId, String packageSuffix) {
+		String[] scopeAndPrefix = deriveScopeNameAndPackagePrefixFromGroupId(groupId);
+
+		String scope = scopeAndPrefix[0];
+		String prefix = scopeAndPrefix[1] == null ? "" : scopeAndPrefix[1] + "_";
+
+		return "@" + scope + "/" + prefix + packageSuffix;
 	}
 
-	/* package */  static String npmPackageName(String artifactId, String groupId) {
-		return groupId + "--" + artifactId;
+	private static String[] deriveScopeNameAndPackagePrefixFromGroupId(String groupId) {
+		groupId = replacePrefixIfNeeded(groupId, "com.braintribe", "dev.hiconic");
+		groupId = replacePrefixIfNeeded(groupId, "tribefire", "dev.hiconic.tf");
+		groupId = replacePrefixIfNeeded(groupId, "hiconic", "dev.hiconic");
+
+		String[] parts = groupId.split("\\.");
+		if (parts.length == 0)
+			throw new IllegalArgumentException("Cannot derive NPM scope from invalid groupId: " + groupId);
+
+		if (parts.length == 1)
+			return new String[] { parts[0], null };
+
+		String scope = parts[0] + "." + parts[1];
+
+		int n = parts.length > 2 ? 1 : 0;
+		String prefix = groupId.substring(scope.length() + n);
+
+		if (scope.equals("com.braintribe") || scope.startsWith("tribefire"))
+			scope = "dev.hiconic";
+
+		return new String[] { scope, prefix };
+	}
+
+	private static String replacePrefixIfNeeded(String groupId, String prefix, String newPrefix) {
+		if (groupId.startsWith(prefix))
+			return newPrefix + groupId.substring(prefix.length());
+		else
+			return groupId;
 	}
 
 	public static String relativePathTo(VersionedArtifactIdentification depInfo) {

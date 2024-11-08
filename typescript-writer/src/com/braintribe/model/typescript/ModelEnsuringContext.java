@@ -34,7 +34,6 @@ import com.braintribe.model.shortener.NameShortener.ShortNames;
 public class ModelEnsuringContext {
 
 	private final boolean forNpm;
-	private final String npmNamespace;	
 	private final GmMetaModel model;
 	private final String gid;
 	private final String aid;
@@ -43,9 +42,8 @@ public class ModelEnsuringContext {
 	private final ShortNames<GmType> shortNames;
 	private final String fileNameBase;
 
-	public ModelEnsuringContext(boolean forNpm, String npmNamespace, GmMetaModel model, String gid, String aid, String version, List<VersionedArtifactIdentification> dependencies) {
+	public ModelEnsuringContext(boolean forNpm, GmMetaModel model, String gid, String aid, String version, List<VersionedArtifactIdentification> dependencies) {
 		this.forNpm = forNpm;
-		this.npmNamespace = npmNamespace;
 		this.model = model;
 		this.gid = gid;
 		this.aid = aid;
@@ -57,7 +55,6 @@ public class ModelEnsuringContext {
 
 	// @formatter:off
 	public boolean forNpm() { return forNpm; }
-	public String npmNamespace() {return npmNamespace; }
 	public GmMetaModel model() { return model; }
 	public String aid() { return aid; }
 	public String gid() { return gid; }
@@ -73,7 +70,7 @@ public class ModelEnsuringContext {
 		List<VersionedArtifactIdentification> deps = getDependencyIdentifications(model, versionRangifier);
 		VersionedArtifactIdentification vai = TypeScriptWriterHelper.modelToArtifactInfo(model);
 
-		return new ModelEnsuringContext(false, null, model, vai.getGroupId(), vai.getArtifactId(), vai.getVersion(), deps);
+		return new ModelEnsuringContext(false, model, vai.getGroupId(), vai.getArtifactId(), vai.getVersion(), deps);
 	}
 
 	private static List<VersionedArtifactIdentification> getDependencyIdentifications(GmMetaModel model, Function<String, String> versionRangifier) {
@@ -86,15 +83,15 @@ public class ModelEnsuringContext {
 			List<GmType> gmTypes, String gid, String aid, String version, List<VersionedArtifactIdentification> dependencies) {
 
 		GmMetaModel model = toModel(gmTypes, gid, aid, version);
-		return new ModelEnsuringContext(false, null, model, gid, aid, version, dependencies);
+		return new ModelEnsuringContext(false, model, gid, aid, version, dependencies);
 	}
 
-	public static ModelEnsuringContext createForNpm( String npmNamespace, //
+	public static ModelEnsuringContext createForNpm( //
 			List<GmType> gmTypes, String gid, String aid, String version, List<? extends VersionedArtifactIdentification> dependencies) {
 
 		GmMetaModel model = toModel(gmTypes, gid, aid, version);
 		List<VersionedArtifactIdentification> deps = (List<VersionedArtifactIdentification>) dependencies;
-		return new ModelEnsuringContext(true, npmNamespace, model, gid, aid, version, deps);
+		return new ModelEnsuringContext(true, model, gid, aid, version, deps);
 	}
 
 	private static GmMetaModel toModel(Collection<GmType> gmTypes, String gid, String aid, String v) {

@@ -61,9 +61,8 @@ public class ModelEnsuringDTsWriter extends AbstractStringifier {
 		if (!context.forNpm())
 			return;
 
-		String ns = context.npmNamespace();
 		for (ArtifactIdentification d : context.dependencies())
-			println("import \"" + TypeScriptWriterHelper.npmPackageFullName(ns, d) + "\";");
+			println("import \"" + TypeScriptWriterHelper.npmPackageFullName(d) + "\";");
 
 		if (!context.dependencies().isEmpty())
 			println();
