@@ -38,6 +38,7 @@ import com.braintribe.model.meta.GmType;
 import com.braintribe.model.shortener.NameShortener.ShortNameEntry;
 import com.braintribe.model.shortener.NameShortener.ShortNames;
 
+import jsinterop.context.JsInteropNamespaces;
 import jsinterop.context.JsKeywords;
 
 /**
@@ -85,6 +86,11 @@ public class ModelEnsuringJsWriter extends AbstractStringifier {
 
 		if (!context.dependencies().isEmpty())
 			println();
+
+		if (context.forNpm()) {
+			println("import {" + JsInteropNamespaces.type + ", " + JsInteropNamespaces.gm + "} from '@dev.hiconic/hc-js-base';");
+			println();
+		}
 	}
 
 	private void writeMeta() {

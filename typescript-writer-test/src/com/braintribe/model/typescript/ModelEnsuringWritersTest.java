@@ -63,6 +63,7 @@ public class ModelEnsuringWritersTest extends AbstractWriterTest {
 		writeJs(TypeScriptWriterForModelsTest.buildTsModel());
 
 		mustContain("import '@dev.hiconic/gm_absence-information-model';");
+		mustContain("import {T, hc} from '@dev.hiconic/hc-js-base';");
 
 		mustContain("export const meta = {");
 		mustContain("groupId: \"test\",");
