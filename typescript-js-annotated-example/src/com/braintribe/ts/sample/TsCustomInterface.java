@@ -18,7 +18,7 @@ package com.braintribe.ts.sample;
 import jsinterop.annotations.JsOptional;
 import jsinterop.annotations.JsType;
 
-@JsType(namespace = "$tf.test")
+@JsType(namespace = "hc.test")
 public interface TsCustomInterface {
 
 	static String STATIC_FIELD = "STATIC_FIELD";

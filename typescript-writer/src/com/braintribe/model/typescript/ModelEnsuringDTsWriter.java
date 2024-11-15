@@ -51,9 +51,7 @@ public class ModelEnsuringDTsWriter extends AbstractStringifier {
 	}
 
 	private void writeTripleSlashReferenceToModelDTs() {
-		if (context.forNpm())
-			println("/// <reference path=\"" + context.aid() + ".types.d.ts\" />\n");
-		else
+		if (!context.forNpm())
 			println("/// <reference path=\"./" + context.aid() + ".d.ts\" />\n");
 	}
 
@@ -62,10 +60,13 @@ public class ModelEnsuringDTsWriter extends AbstractStringifier {
 			return;
 
 		for (ArtifactIdentification d : context.dependencies())
-			println("import \"" + TypeScriptWriterHelper.npmPackageFullName(d) + "\";");
+			println("import '" + TypeScriptWriterHelper.npmPackageFullName(d) + "';");
 
 		if (!context.dependencies().isEmpty())
 			println();
+
+		println("import { T } from '@dev.hiconic/hc-js-base';");
+		println();
 	}
 
 	private void writeMeta() {
@@ -103,11 +104,11 @@ public class ModelEnsuringDTsWriter extends AbstractStringifier {
 	private void printNs(List<ShortNameEntry<GmType>> list) {
 		for (ShortNameEntry<GmType> e : list) {
 			print("export import ");
-			println(e.simpleName + " = " + jsSignatureWith$T(e) + ";");
+			println(e.simpleName + " = " + jsSignatureWithTypeNamespacePrefix(e) + ";");
 		}
 	}
 
-	/* package */ static String jsSignatureWith$T(ShortNameEntry<GmType> e) {
+	/* package */ static String jsSignatureWithTypeNamespacePrefix(ShortNameEntry<GmType> e) {
 		return GmCoreApiInteropNamespaces.type + "." + JsKeywords.classNameToJs(e.value.getTypeSignature());
 	}
 }

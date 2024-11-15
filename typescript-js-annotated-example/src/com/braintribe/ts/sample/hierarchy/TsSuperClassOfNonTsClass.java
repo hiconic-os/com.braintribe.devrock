@@ -22,7 +22,7 @@ import jsinterop.annotations.JsType;
  * 
  * @author peter.gazdik
  */
-@JsType(namespace = "$tf.test")
+@JsType(namespace = "hc.test")
 public abstract class TsSuperClassOfNonTsClass<T> {
 
 	// To avoid warning for unused generic type

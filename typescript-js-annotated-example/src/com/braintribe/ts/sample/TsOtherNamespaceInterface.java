@@ -20,7 +20,7 @@ import jsinterop.annotations.JsType;
 /**
  * @author peter.gazdik
  */
-@JsType(namespace = "$tf.test.other")
+@JsType(namespace = "hc.test.other")
 public interface TsOtherNamespaceInterface {
 
 	TsOtherNamespaceInterface myself();

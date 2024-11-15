@@ -71,8 +71,8 @@ public class TypeScriptWriterForModelsTest extends AbstractWriterTest {
 	public void rootMdel() throws Exception {
 		write(GenericEntity.T.getModel().getMetaModel());
 
-		mustContain("declare namespace $T.com.braintribe.model.generic {");
-		mustContain("interface GenericEntity extends $tf.reflection.EntityBase {");
+		mustContain("namespace T.com.braintribe.model.generic {");
+		mustContain("interface GenericEntity extends hc.reflection.EntityBase {");
 		mustContain("globalId: string;");
 		mustContain("id: any;");
 		mustContain("partition: string;");
@@ -86,9 +86,9 @@ public class TypeScriptWriterForModelsTest extends AbstractWriterTest {
 		write(buildTsModel());
 
 		mustContain("/// <reference path=\"../com.braintribe.gm.absence-information-model-1.420~/absence-information-model.d.ts\" />");
-		mustContain("const TsJoat: $tf.reflection.EntityType<TsJoat>;");
+		mustContain("const TsJoat: hc.reflection.EntityType<TsJoat>;");
 		mustContain(
-				"interface TsJoat extends $T.com.braintribe.model.typescript.model.sub.TsSub, $T.com.braintribe.model.generic.pr.AbsenceInformation {");
+				"interface TsJoat extends T.com.braintribe.model.typescript.model.sub.TsSub, T.com.braintribe.model.generic.pr.AbsenceInformation {");
 
 		mustContain("primitiveBoolean: boolean");
 		mustContain("wrapperBoolean: boolean");
@@ -111,16 +111,16 @@ public class TypeScriptWriterForModelsTest extends AbstractWriterTest {
 		mustContain("string: string;");
 
 		mustContain("entity: TsJoat;");
-		mustContain("otherNamespaceEntity: $T.com.braintribe.model.typescript.model.sub.TsSub;");
+		mustContain("otherNamespaceEntity: T.com.braintribe.model.typescript.model.sub.TsSub;");
 		mustContain("tsEnum: TsEnum;");
 
 		mustContain("listOfStrings: list<string>;");
 		mustContain("mapOfStrings: map<string, string>;");
 		mustContain("setOfStrings: set<string>;");
 
-		mustContain("interface TsEnum extends $tf.reflection.EnumBase<TsEnum>, $tf.Enum<TsEnum> {}");
+		mustContain("interface TsEnum extends hc.reflection.EnumBase<TsEnum>, hc.Enum<TsEnum> {}");
 		mustContain("const TsEnum: {");
-		mustContain("readonly [$tf.Symbol.enumType]: $tf.reflection.EnumType<TsEnum>,");
+		mustContain("readonly [hc.Symbol.enumType]: hc.reflection.EnumType<TsEnum>,");
 		mustContain("readonly ModelS: TsEnum,");
 		mustContain("readonly ModelX: TsEnum,");
 
@@ -129,10 +129,10 @@ public class TypeScriptWriterForModelsTest extends AbstractWriterTest {
 		mustContain("// Color(value=\"#ff0000\")");
 
 		mustContain(
-				"Eval(evaluator: $tf.eval.Evaluator<$T.com.braintribe.model.service.api.ServiceRequest>): $tf.eval.JsEvalContext<list<string>>;");
-		mustContain("EvalAndGet(evaluator: $tf.eval.Evaluator<$T.com.braintribe.model.service.api.ServiceRequest>): globalThis.Promise<list<string>>;");
+				"Eval(evaluator: hc.eval.Evaluator<T.com.braintribe.model.service.api.ServiceRequest>): hc.eval.JsEvalContext<list<string>>;");
+		mustContain("EvalAndGet(evaluator: hc.eval.Evaluator<T.com.braintribe.model.service.api.ServiceRequest>): globalThis.Promise<list<string>>;");
 		mustContain(
-				"EvalAndGetReasoned(evaluator: $tf.eval.Evaluator<$T.com.braintribe.model.service.api.ServiceRequest>): globalThis.Promise<$tf.reason.Maybe<list<string>>>;");
+				"EvalAndGetReasoned(evaluator: hc.eval.Evaluator<T.com.braintribe.model.service.api.ServiceRequest>): globalThis.Promise<hc.reason.Maybe<list<string>>>;");
 	}
 
 	@Test
@@ -141,10 +141,10 @@ public class TypeScriptWriterForModelsTest extends AbstractWriterTest {
 
 		cutTypeFromOutput(TsEvalABB.T);
 
-		mustContain("Eval(evaluator: $tf.eval.Evaluator<$T.com.braintribe.model.service.api.ServiceRequest>): $tf.eval.JsEvalContext<TsEvalB>;");
-		mustContain("EvalAndGet(evaluator: $tf.eval.Evaluator<$T.com.braintribe.model.service.api.ServiceRequest>): globalThis.Promise<TsEvalB>;");
+		mustContain("Eval(evaluator: hc.eval.Evaluator<T.com.braintribe.model.service.api.ServiceRequest>): hc.eval.JsEvalContext<TsEvalB>;");
+		mustContain("EvalAndGet(evaluator: hc.eval.Evaluator<T.com.braintribe.model.service.api.ServiceRequest>): globalThis.Promise<TsEvalB>;");
 		mustContain(
-				"EvalAndGetReasoned(evaluator: $tf.eval.Evaluator<$T.com.braintribe.model.service.api.ServiceRequest>): globalThis.Promise<$tf.reason.Maybe<TsEvalB>>;");
+				"EvalAndGetReasoned(evaluator: hc.eval.Evaluator<T.com.braintribe.model.service.api.ServiceRequest>): globalThis.Promise<hc.reason.Maybe<TsEvalB>>;");
 	}
 
 	private static final Set<String> jsKeywords = jsKeywordsWithout_Class();
@@ -166,17 +166,17 @@ public class TypeScriptWriterForModelsTest extends AbstractWriterTest {
 		}
 
 		mustContain("yield__: string");
-		mustContain("keywordPackage: $T.com.braintribe.model.typescript.model.keyword.with_.TsKeywordPackageEntity;");
-		mustContain("declare namespace $T.com.braintribe.model.typescript.model.keyword.with_");
+		mustContain("keywordPackage: T.com.braintribe.model.typescript.model.keyword.with_.TsKeywordPackageEntity;");
+		mustContain("namespace T.com.braintribe.model.typescript.model.keyword.with_");
 	}
 
 	@Test
 	public void tsWriter_JsKeywords_Enum() throws Exception {
 		write(TsKeywordEnumOwner.T);
 
-		mustContain("interface TsKeywordEnum extends $tf.reflection.EnumBase<TsKeywordEnum>, $tf.Enum<TsKeywordEnum> {}");
+		mustContain("interface TsKeywordEnum extends hc.reflection.EnumBase<TsKeywordEnum>, hc.Enum<TsKeywordEnum> {}");
 		mustContain("const TsKeywordEnum: {");
-		mustContain("readonly [$tf.Symbol.enumType]: $tf.reflection.EnumType<TsKeywordEnum>,");
+		mustContain("readonly [hc.Symbol.enumType]: hc.reflection.EnumType<TsKeywordEnum>,");
 		for (TsKeywordEnum e : TsKeywordEnum.class.getEnumConstants()) {
 			mustContain("readonly " + e.name() + "_: TsKeywordEnum,");
 		}
@@ -203,6 +203,9 @@ public class TypeScriptWriterForModelsTest extends AbstractWriterTest {
 		output = sb.toString();
 
 		spOut(2, "File content:\n" + output);
+
+		mustContain("declare module '@dev.hiconic/hc-js-base' {");
+		notContains("declare namespace");
 	}
 
 	private String resolveJsName(Class<?> clazz) {

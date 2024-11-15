@@ -71,7 +71,7 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 		mustContain("_double(): number");
 		mustContain("_float(): number");
 		mustContain("_int(): number");
-		mustContain("_long(): $tf.Long");
+		mustContain("_long(): hc.Long");
 		mustContain("_short(): number");
 		mustContain("_void(): void");
 	}
@@ -81,12 +81,12 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 		write(TsWrappers.class);
 
 		mustContain("_Boolean(): boolean");
-		mustContain("_Byte(): $tf.Byte");
-		mustContain("_Char(): $tf.Character");
+		mustContain("_Byte(): hc.Byte");
+		mustContain("_Char(): hc.Character");
 		mustContain("_Double(): number");
-		mustContain("_Float(): $tf.Float");
-		mustContain("_Integer(): $tf.Integer");
-		mustContain("_Long(): $tf.Long");
+		mustContain("_Float(): hc.Float");
+		mustContain("_Integer(): hc.Integer");
+		mustContain("_Long(): hc.Long");
 		mustContain("_Short(): any");
 	}
 
@@ -94,8 +94,8 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 	public void simpleTypes() throws Exception {
 		write(TsSimpleTypes.class);
 
-		mustContain("bigDecimal(): $T.Decimal");
-		mustContain("date(): $tf.Date");
+		mustContain("bigDecimal(): T.Decimal");
+		mustContain("date(): hc.Date");
 		mustContain("string(): string");
 	}
 
@@ -103,8 +103,8 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 	public void arrays() throws Exception {
 		write(TsArrays.class);
 
-		mustContain("arrayWithGenerifiedComponent(): $tf.Enum<$tf.Enum<any>>[];");
-		mustContain("dates(): $tf.Date[];");
+		mustContain("arrayWithGenerifiedComponent(): hc.Enum<hc.Enum<any>>[];");
+		mustContain("dates(): hc.Date[];");
 		mustContain("objects(objects: any[]): any[];");
 		mustContain("stringsVarArgs(...strings: string[]): string[];");
 		mustContain("es(eArray: E[]): E[];");
@@ -134,7 +134,7 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 		output = tsOutputParts[1];
 		mustContain("_enum(): TsEnum");
 		mustContain("methodWithOptionalParams(first: number, second: string, thirdOptional?: string, fourthOptional?: string): void;");
-		mustContain("otherNs(): $tf.test.other.TsOtherNamespaceInterface");
+		mustContain("otherNs(): hc.test.other.TsOtherNamespaceInterface");
 		mustContain("sameNs(): TsCustomInterface");
 		mustContain("nativeGlobalNamespaceCustomName(): globalThis.nativeType;");
 		mustContain("nativeGlobalNamespace(): globalThis.TsNativeGlobalNamespace;");
@@ -157,7 +157,7 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 		write(TsEnum.class);
 
 		mustContain("// enum com.braintribe.ts.sample.TsEnum");
-		mustContain("interface TsEnum extends $tf.Comparable<TsEnum>{}");
+		mustContain("interface TsEnum extends hc.Comparable<TsEnum>{}");
 		mustContain("class TsEnum {");
 		mustContain("static spade: TsEnum;");
 		mustContain("static club: TsEnum;");
@@ -171,7 +171,7 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 		write(TsEnumWithIface.class);
 
 		mustContain("// enum com.braintribe.ts.sample.TsEnumWithIface");
-		mustContain("interface TsEnumWithIface extends TsEnumInterface, $tf.Comparable<TsEnumWithIface>{}");
+		mustContain("interface TsEnumWithIface extends TsEnumInterface, hc.Comparable<TsEnumWithIface>{}");
 		mustContain("class TsEnumWithIface {");
 		mustContain("static low: TsEnumWithIface;");
 		mustContain("static middle: TsEnumWithIface;");
@@ -183,8 +183,8 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 		write(TsCustomGmTypes.class);
 
 		mustContain("interface TsCustomGmTypes {");
-		mustContain("gmEntity(): $T.com.braintribe.model.resource.Resource;");
-		mustContain("gmEnum(): $T.com.braintribe.model.time.TimeUnit;");
+		mustContain("gmEntity(): T.com.braintribe.model.resource.Resource;");
+		mustContain("gmEnum(): T.com.braintribe.model.time.TimeUnit;");
 	}
 
 	@Test
@@ -219,38 +219,38 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 
 		mustContainOnce("function run(): void;");
 		mustContainOnce("function jsRun(): void;");
-		mustContainOnce("function asList<T extends $tf.Collection<any>>(): $tf.List<T>;");
-		mustContainOnce("function getStaticAutoCast<T extends $tf.Collection<any>>(): T;");
-		mustContainOnce("function getStaticListString(): $tf.List<string>;");
+		mustContainOnce("function asList<T extends hc.Collection<any>>(): hc.List<T>;");
+		mustContainOnce("function getStaticAutoCast<T extends hc.Collection<any>>(): T;");
+		mustContainOnce("function getStaticListString(): hc.List<string>;");
 		mustContainOnce("function getStaticString(): string;");
 
 		mustContainOnce("// com.braintribe.ts.sample.statics.HasStaticMembers#hasParameters(Integer, int)");
-		mustContainOnce("function hasParams(i: $tf.Integer, ii: number): string;");
+		mustContainOnce("function hasParams(i: hc.Integer, ii: number): string;");
 	}
 
 	@Test
 	public void genericsInFileds() throws Exception {
 		write(TsGenericsInFields.class);
 
-		mustContainOnce("static listString: $tf.List<string>;");
+		mustContainOnce("static listString: hc.List<string>;");
 	}
 
 	@Test
 	public void genericsInMethods() throws Exception {
 		write(TsGenericsInMethods.class);
 
-		mustContain("genericMethod<K extends TsGenericsInMethods, V extends $tf.List<string>>(k: K, v: V): $tf.Map<K, V>");
-		mustContain("genericMethod_MultiExtends<R extends $tf.Iterable<any> & TsGenericsInMethods>(): R");
-		mustContain("genericMethod_MultiExtends2<R extends $tf.Map<any, any>>(): R");
-		mustContain("genericMethod_MultiExtends3<R extends $tf.Map<TsGenericsInMethods, any>>(): $tf.List<R>");
-		mustContain("genericMethod_NonJsParam<E>(e1: E, e2: E): $tf.List<E>");
+		mustContain("genericMethod<K extends TsGenericsInMethods, V extends hc.List<string>>(k: K, v: V): hc.Map<K, V>");
+		mustContain("genericMethod_MultiExtends<R extends hc.Iterable<any> & TsGenericsInMethods>(): R");
+		mustContain("genericMethod_MultiExtends2<R extends hc.Map<any, any>>(): R");
+		mustContain("genericMethod_MultiExtends3<R extends hc.Map<TsGenericsInMethods, any>>(): hc.List<R>");
+		mustContain("genericMethod_NonJsParam<E>(e1: E, e2: E): hc.List<E>");
 		mustContain("genericMethod_Simple<R extends TsGenericsInMethods>(): R");
 
-		mustContain("listConsumer(list: $tf.List<TsGenericsInMethods>): void;");
-		mustContain("listOfListsProducer(): $tf.List<$tf.List<TsGenericsInMethods>>;");
-		mustContain("listProducer(): $tf.List<TsGenericsInMethods>;");
-		mustContain("listString(): $tf.List<string>;");
-		mustContain("mapStringInteger(): $tf.Map<string, $tf.Integer>;");
+		mustContain("listConsumer(list: hc.List<TsGenericsInMethods>): void;");
+		mustContain("listOfListsProducer(): hc.List<hc.List<TsGenericsInMethods>>;");
+		mustContain("listProducer(): hc.List<TsGenericsInMethods>;");
+		mustContain("listString(): hc.List<string>;");
+		mustContain("mapStringInteger(): hc.Map<string, hc.Integer>;");
 	}
 
 	@Test
@@ -266,7 +266,7 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 	public void genericTypes_WithBounds() throws Exception {
 		write(TsGenericInterfaceWithBounds.class);
 
-		mustContain("interface TsGenericInterfaceWithBounds<T extends TsPrimitives & $tf.Map<string, $tf.Integer>> {");
+		mustContain("interface TsGenericInterfaceWithBounds<T extends TsPrimitives & hc.Map<string, hc.Integer>> {");
 		mustContain("getValue(): T;");
 		mustContain("setValue(value: T): void;");
 	}
@@ -278,9 +278,9 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 
 		mustContain("interface TsGenericInterfaceExtending<W>");
 		// mustContain("nonTsFirstElement(): W;");
-		// mustContain("nonTsGet(): $tf.List<W>;");
-		// mustContain("nonTsMapKeys(): $tf.Set<string>;");
-		// mustContain("nonTsMapValues(): $tf.Collection<W>;");
+		// mustContain("nonTsGet(): hc.List<W>;");
+		// mustContain("nonTsMapKeys(): hc.Set<string>;");
+		// mustContain("nonTsMapValues(): hc.Collection<W>;");
 		mustContain("value(): W;");
 		mustContain("value(value: W): void;");
 	}
@@ -289,36 +289,36 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 	public void classLiterals() throws Exception {
 		write(TsClassLiterals.class);
 
-		mustContain("static absenceInformationClass: $tf.Class<$T.com.braintribe.model.generic.pr.AbsenceInformation>;");
-		mustContain("static myClass: $tf.Class<TsClassLiterals>;");
-		mustContain("get(clazz: $tf.Class<$T.com.braintribe.model.generic.GenericEntity>): string;");
+		mustContain("static absenceInformationClass: hc.Class<T.com.braintribe.model.generic.pr.AbsenceInformation>;");
+		mustContain("static myClass: hc.Class<TsClassLiterals>;");
+		mustContain("get(clazz: hc.Class<T.com.braintribe.model.generic.GenericEntity>): string;");
 	}
 
 	@Test
 	public void jsFunctions() throws Exception {
 		write(TsJsFunctionUser.class);
 
-		mustContain("static staticWithGenericsOfMethod<A, B>(fun: (t: A) => B): $tf.Map<A, B>;");
+		mustContain("static staticWithGenericsOfMethod<A, B>(fun: (t: A) => B): hc.Map<A, B>;");
 
 		mustContain("interface TsJsFunctionUser<X> {");
 		mustContain("apply(function_: (s: string) => number): void;");
-		mustContain("applyWithGenerics(fun: (t: string) => $tf.Integer): void;");
+		mustContain("applyWithGenerics(fun: (t: string) => hc.Integer): void;");
 		mustContain("applyWithGenericsOfClass(fun: (t: X) => string): void;");
-		mustContain("applyWithGenericsOfMethod<A, B>(fun: (t: A) => B): $tf.Map<A, B>;");
+		mustContain("applyWithGenericsOfMethod<A, B>(fun: (t: A) => B): hc.Map<A, B>;");
 	}
 
 	@Test
 	public void knownTypeExtensions() throws Exception {
 		write(TsKnownTypeExtension.class);
 
-		mustContain("class TsKnownTypeExtension extends $tf.RuntimeException {");
+		mustContain("class TsKnownTypeExtension extends hc.RuntimeException {");
 	}
 
 	@Test
 	public void gwtClasses() throws Exception {
 		write(TsGwtClasses.class);
 
-		mustContain("asyncCallback(): $tf.session.AsyncCallback<string>;");
+		mustContain("asyncCallback(): hc.session.AsyncCallback<string>;");
 	}
 
 	@Test
@@ -330,7 +330,7 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 
 		mustContain("nonJsGenericParam<T>(): T; // JS-WARN: com.braintribe.ts.sample.nointerop.NoInterop");
 		mustContain("nonJsGenericParam2<T>(t: T): void; // JS-WARN: com.braintribe.ts.sample.nointerop.NoInterop");
-		mustContain("nonJsGenericParam3(t: $tf.List<any>): void; // JS-WARN: com.braintribe.ts.sample.nointerop.NoInterop");
+		mustContain("nonJsGenericParam3(t: hc.List<any>): void; // JS-WARN: com.braintribe.ts.sample.nointerop.NoInterop");
 		mustContain("nonJsParam(param: any): void; // JS-WARN: com.braintribe.ts.sample.nointerop.NoInterop");
 		mustContain("nonJsReturnType(): any; // JS-WARN: com.braintribe.ts.sample.nointerop.NoInterop");
 	}
@@ -365,9 +365,9 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 
 		notContains("number");
 
-		mustContain("declare namespace com.braintribe.ts.sample.keyword.with_");
+		mustContain("namespace com.braintribe.ts.sample.keyword.with_");
 		mustContain("packageKeyword(): com.braintribe.ts.sample.keyword.with_.TsKeywordPackageInterface;");
-		mustContain("packageKeywordEntity(): $T.com.braintribe.ts.sample.keyword.with_.TsKeywordPackageEntity_NotInModel;");
+		mustContain("packageKeywordEntity(): T.com.braintribe.ts.sample.keyword.with_.TsKeywordPackageEntity_NotInModel;");
 		mustContain("packageKeywordEnum(): com.braintribe.ts.sample.keyword.with_.TsKeywordPackageEnum;");
 		mustContain("static packageKeywordStatic(): com.braintribe.ts.sample.keyword.with_.TsKeywordPackageInterface;");
 	}
@@ -377,10 +377,10 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 		write(TsKeywordsStatic.class);
 
 		mustContain("declare let STATIC_KEYWORD_PACKAGE: com.braintribe.ts.sample.keyword.with_.TsKeywordPackageInterface;");
-		mustContain("declare let STATIC_KEYWORD_PACKAGE_ENTITY: $T.com.braintribe.ts.sample.keyword.with_.TsKeywordPackageEntity_NotInModel");
+		mustContain("declare let STATIC_KEYWORD_PACKAGE_ENTITY: T.com.braintribe.ts.sample.keyword.with_.TsKeywordPackageEntity_NotInModel");
 
 		mustContain("declare function pckgKeywordFun(arg: com.braintribe.ts.sample.keyword.with_.TsKeywordPackageInterface): void;");
-		mustContain("declare function pckgKeywordEntityFun(arg: $T.com.braintribe.ts.sample.keyword.with_.TsKeywordPackageEntity_NotInModel): void;");
+		mustContain("declare function pckgKeywordEntityFun(arg: T.com.braintribe.ts.sample.keyword.with_.TsKeywordPackageEntity_NotInModel): void;");
 
 		mustContain("declare function arguments_Method(arguments__: string): void;");
 		mustContain("declare function argumentsMethod(arguments_: string): void;");
@@ -398,7 +398,7 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 		mustContain("declare function withMethod(with_: string): void;");
 		mustContain("declare function yieldMethod(yield_: string): void;");
 
-		notContains("$tf.Integer");
+		notContains("hc.Integer");
 	}
 
 	@Test
@@ -439,6 +439,9 @@ public class TypeScriptWriterForClassesTest extends AbstractWriterTest {
 		output = sb.toString();
 
 		spOut(1, "File content:\n" + output);
+
+		mustContain("declare module '@dev.hiconic/hc-js-base' {");
+		notContains("declare namespace");
 	}
 
 }

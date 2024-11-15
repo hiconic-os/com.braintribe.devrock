@@ -19,7 +19,7 @@ import java.util.List;
 
 import jsinterop.annotations.JsType;
 
-@JsType(namespace = "$tf.test")
+@JsType(namespace = "hc.test")
 public class TsGenericsInFields {
 
 	public static List<String> listString;

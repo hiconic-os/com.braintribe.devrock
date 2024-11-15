@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 
 import jsinterop.annotations.JsType;
 
-@JsType(namespace = "$tf.test")
+@JsType(namespace = "hc.test")
 public interface TsSimpleTypes {
 
 	String string();

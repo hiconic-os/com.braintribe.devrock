@@ -24,7 +24,7 @@ import jsinterop.annotations.JsType;
 /**
  * @author peter.gazdik
  */
-@JsType(namespace = "$tf.test")
+@JsType(namespace = "hc.test")
 public interface TsGenericInterfaceWithBounds<T extends TsPrimitives & Map<String, Integer>> {
 
 	T getValue();

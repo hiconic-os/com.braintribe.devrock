@@ -16,9 +16,13 @@
 package com.braintribe.model.typescript;
 
 import static com.braintribe.utils.SysPrint.spOut;
+import static com.braintribe.utils.lcd.CollectionTools2.asList;
+
+import java.util.ArrayList;
 
 import org.junit.Test;
 
+import com.braintribe.model.artifact.essential.VersionedArtifactIdentification;
 import com.braintribe.model.meta.GmMetaModel;
 
 /**
@@ -30,21 +34,24 @@ public class ModelEnsuringWritersTest extends AbstractWriterTest {
 	public void tsWriterWorks() throws Exception {
 		writeDTs(TypeScriptWriterForModelsTest.buildTsModel());
 
-		mustContain("/// <reference path=\"./ts-test-model.d.ts\" />");
+		notContains("///");
+
+		mustContain("import '@dev.hiconic/gm_absence-information-model';");
+		mustContain("import { T } from '@dev.hiconic/hc-js-base';");
 		mustContain("export declare namespace meta {");
 		mustContain("const groupId: string;");
 		mustContain("const artifactId: string;");
 		mustContain("const version: string;");
 		mustContain("}");
-		mustContain("export import TsJoat = $T.com.braintribe.model.typescript.model.TsJoat;");
-		mustContain("export import TsSub = $T.com.braintribe.model.typescript.model.sub.TsSub;");
-		mustContain("export import TsEnum = $T.com.braintribe.model.typescript.model.TsEnum;");
-		mustContain("export import TsStringEval = $T.com.braintribe.model.typescript.model.TsStringEval;");
+		mustContain("export import TsJoat = T.com.braintribe.model.typescript.model.TsJoat;");
+		mustContain("export import TsSub = T.com.braintribe.model.typescript.model.sub.TsSub;");
+		mustContain("export import TsEnum = T.com.braintribe.model.typescript.model.TsEnum;");
+		mustContain("export import TsStringEval = T.com.braintribe.model.typescript.model.TsStringEval;");
 
 		mustContain("export declare namespace with_ {");
-		mustContain("TsKeywordPackageEntity = $T.com.braintribe.model.typescript.model.keyword.with_.TsKeywordPackageEntity;");
+		mustContain("TsKeywordPackageEntity = T.com.braintribe.model.typescript.model.keyword.with_.TsKeywordPackageEntity;");
 		mustContain("export declare namespace await_ {");
-		mustContain("TsKeywordPackageEntity = $T.com.braintribe.model.typescript.model.keyword.await_.TsKeywordPackageEntity;");
+		mustContain("TsKeywordPackageEntity = T.com.braintribe.model.typescript.model.keyword.await_.TsKeywordPackageEntity;");
 	}
 
 	private void writeDTs(GmMetaModel model) {
@@ -55,28 +62,29 @@ public class ModelEnsuringWritersTest extends AbstractWriterTest {
 	public void jsWriterWorks() throws Exception {
 		writeJs(TypeScriptWriterForModelsTest.buildTsModel());
 
-		mustContain("import \"../com.braintribe.gm.absence-information-model-1.420~/ensure-absence-information-model.js\";");
+		mustContain("import '@dev.hiconic/gm_absence-information-model';");
 
 		mustContain("export const meta = {");
 		mustContain("groupId: \"test\",");
 		mustContain("artifactId: \"ts-test-model\",");
 		mustContain("version: \"1.42.1\",");
 		mustContain("function modelAssembler($, P, _) {");
-		mustContain("$tf.reflection.internal.ensureModel(modelAssembler)");
 
-		mustContain("export const TsStringEval = $T.com.braintribe.model.typescript.model.TsStringEval;");
-		mustContain("export const TsJoat = $T.com.braintribe.model.typescript.model.TsJoat;");
-		mustContain("export const TsSub = $T.com.braintribe.model.typescript.model.sub.TsSub;");
-		mustContain("export const TsEnum = $T.com.braintribe.model.typescript.model.TsEnum;");
+		mustContain("hc.reflection.internal.ensureModel(modelAssembler)");
+
+		mustContain("export const TsStringEval = T.com.braintribe.model.typescript.model.TsStringEval;");
+		mustContain("export const TsJoat = T.com.braintribe.model.typescript.model.TsJoat;");
+		mustContain("export const TsSub = T.com.braintribe.model.typescript.model.sub.TsSub;");
+		mustContain("export const TsEnum = T.com.braintribe.model.typescript.model.TsEnum;");
 
 		mustContain("export const duplicate_name = {");
-		mustContain("TsJoat: $T.com.braintribe.model.typescript.model.duplicate_name.TsJoat");
+		mustContain("TsJoat: T.com.braintribe.model.typescript.model.duplicate_name.TsJoat");
 
 		mustContain("export const await_ = {");
-		mustContain("TsKeywordPackageEntity: $T.com.braintribe.model.typescript.model.keyword.await_.TsKeywordPackageEntity");
+		mustContain("TsKeywordPackageEntity: T.com.braintribe.model.typescript.model.keyword.await_.TsKeywordPackageEntity");
 
 		mustContain("export const with_ = {");
-		mustContain("TsKeywordPackageEntity: $T.com.braintribe.model.typescript.model.keyword.with_.TsKeywordPackageEntity");
+		mustContain("TsKeywordPackageEntity: T.com.braintribe.model.typescript.model.keyword.with_.TsKeywordPackageEntity");
 
 		// We had a bug that these properties were not cloned
 		mustContain("com.braintribe.model.meta.GmListType");
@@ -105,7 +113,16 @@ public class ModelEnsuringWritersTest extends AbstractWriterTest {
 	}
 
 	private ModelEnsuringContext meContext(GmMetaModel model) {
-		return ModelEnsuringContext.create(model, this::rangifyModelVersion);
+		VersionedArtifactIdentification vai = TypeScriptWriterHelper.modelToArtifactInfo(model);
+
+		ArrayList<VersionedArtifactIdentification> deps = asList();
+		for (GmMetaModel depModel : model.getDependencies()) {
+			String depName = depModel.getName() + "#" + depModel.getVersion();
+			VersionedArtifactIdentification depVai = VersionedArtifactIdentification.parse(depName);
+			deps.add(depVai);
+		}
+
+		return ModelEnsuringContext.createForNpm(model.getTypes(), vai.getGroupId(), vai.getArtifactId(), vai.getVersion(), deps);
 	}
 
 }

@@ -23,7 +23,7 @@ import jsinterop.annotations.JsType;
 /**
  * @author peter.gazdik
  */
-@JsType(namespace = "$tf.test")
+@JsType(namespace = "hc.test")
 public abstract class TsClassLiterals {
 
 	public static Class<AbsenceInformation> absenceInformationClass = AbsenceInformation.class;

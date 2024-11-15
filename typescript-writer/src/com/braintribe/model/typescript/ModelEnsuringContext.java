@@ -87,7 +87,7 @@ public class ModelEnsuringContext {
 	}
 
 	public static ModelEnsuringContext createForNpm( //
-			List<GmType> gmTypes, String gid, String aid, String version, List<? extends VersionedArtifactIdentification> dependencies) {
+			Collection<GmType> gmTypes, String gid, String aid, String version, List<? extends VersionedArtifactIdentification> dependencies) {
 
 		GmMetaModel model = toModel(gmTypes, gid, aid, version);
 		List<VersionedArtifactIdentification> deps = (List<VersionedArtifactIdentification>) dependencies;

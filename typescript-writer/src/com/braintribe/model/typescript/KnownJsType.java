@@ -51,12 +51,16 @@ import java.util.stream.Stream;
  */
 /* package */class KnownJsType {
 
-	public static String JS_INTEROP_AUTO = "<auto>";
-	public static String JS_INTEROP_GLOBAL = "<global>";
-	public static String JS_INTEROP_GLOBAL_THIS = "globalThis";
+	public static final String JS_INTEROP_AUTO = "<auto>";
+	public static final String JS_INTEROP_GLOBAL = "<global>";
+	public static final String JS_INTEROP_GLOBAL_THIS = "globalThis";
 
-	public static String SYMBOL_ENUM_TYPE = "$tf.Symbol.enumType";
-	
+	public static final String NS_TYPE = "T";
+	public static final String NS_HC = "hc";
+	public static final String NS_ASYNC = NS_HC + ".session";
+
+	public static final String SYMBOL_ENUM_TYPE = NS_HC + ".Symbol.enumType";
+
 	public static final Map<Class<?>, KnownJsType> java2Ts = newIdentityMap();
 	public static final Map<String, QualifiedName> java2NsWeak = newMap();
 
@@ -74,10 +78,6 @@ import java.util.stream.Stream;
 	}
 
 	static {
-		final String NS_GM_TYPES = "$T";
-		final String NS_JAVA = "$tf";
-		final String NS_ASYNC = "$tf.session";
-
 		java2Ts.put(String.class, TS_STRING);
 
 		java2Ts.put(int.class, TS_NUMBER);
@@ -91,52 +91,52 @@ import java.util.stream.Stream;
 		java2Ts.put(boolean.class, TS_BOOLEAN);
 		java2Ts.put(Boolean.class, TS_BOOLEAN);
 
-		registerKnownJsType(Byte.class, NS_JAVA);
-		registerKnownJsType(Character.class, NS_JAVA);
-		registerKnownJsType(CharSequence.class, NS_JAVA);
-		registerKnownJsType(Date.class, NS_JAVA);
-		registerKnownJsType(BigDecimal.class, NS_GM_TYPES, "Decimal");
-		registerKnownJsType(Float.class, NS_JAVA);
-		registerKnownJsType(Integer.class, NS_JAVA);
-		registerKnownJsType(Long.class, NS_JAVA);
+		registerKnownJsType(Byte.class, NS_HC);
+		registerKnownJsType(Character.class, NS_HC);
+		registerKnownJsType(CharSequence.class, NS_HC);
+		registerKnownJsType(Date.class, NS_HC);
+		registerKnownJsType(BigDecimal.class, NS_TYPE, "Decimal");
+		registerKnownJsType(Float.class, NS_HC);
+		registerKnownJsType(Integer.class, NS_HC);
+		registerKnownJsType(Long.class, NS_HC);
 
-		registerKnownJsType(Class.class, NS_JAVA);
-		registerKnownJsType(Enum.class, NS_JAVA);
+		registerKnownJsType(Class.class, NS_HC);
+		registerKnownJsType(Enum.class, NS_HC);
 
-		registerKnownJsType(Comparable.class, NS_JAVA);
-		registerKnownJsType(Exception.class, NS_JAVA);
-		registerKnownJsType(Iterable.class, NS_JAVA);
-		registerKnownJsType(RuntimeException.class, NS_JAVA);
-		registerKnownJsType(StackTraceElement.class, NS_JAVA);
-		registerKnownJsType(Throwable.class, NS_JAVA);
-		registerKnownJsType(Void.class, NS_JAVA);
+		registerKnownJsType(Comparable.class, NS_HC);
+		registerKnownJsType(Exception.class, NS_HC);
+		registerKnownJsType(Iterable.class, NS_HC);
+		registerKnownJsType(RuntimeException.class, NS_HC);
+		registerKnownJsType(StackTraceElement.class, NS_HC);
+		registerKnownJsType(Throwable.class, NS_HC);
+		registerKnownJsType(Void.class, NS_HC);
 
-		registerKnownJsType(InputStream.class, NS_JAVA);
-		registerKnownJsType(OutputStream.class, NS_JAVA);
+		registerKnownJsType(InputStream.class, NS_HC);
+		registerKnownJsType(OutputStream.class, NS_HC);
 
-		registerKnownJsType(BiConsumer.class, NS_JAVA);
-		registerKnownJsType(BiFunction.class, NS_JAVA);
-		registerKnownJsType(BinaryOperator.class, NS_JAVA);
-		registerKnownJsType(Consumer.class, NS_JAVA);
-		registerKnownJsType(Function.class, NS_JAVA);
-		registerKnownJsType(Predicate.class, NS_JAVA);
-		registerKnownJsType(Supplier.class, NS_JAVA);
-		registerKnownJsType(UnaryOperator.class, NS_JAVA);
+		registerKnownJsType(BiConsumer.class, NS_HC);
+		registerKnownJsType(BiFunction.class, NS_HC);
+		registerKnownJsType(BinaryOperator.class, NS_HC);
+		registerKnownJsType(Consumer.class, NS_HC);
+		registerKnownJsType(Function.class, NS_HC);
+		registerKnownJsType(Predicate.class, NS_HC);
+		registerKnownJsType(Supplier.class, NS_HC);
+		registerKnownJsType(UnaryOperator.class, NS_HC);
 
-		registerKnownJsType(Stream.class, NS_JAVA);
-		registerKnownJsType(Collector.class, NS_JAVA);
-		registerKnownJsType(Collector.Characteristics.class, NS_JAVA);
+		registerKnownJsType(Stream.class, NS_HC);
+		registerKnownJsType(Collector.class, NS_HC);
+		registerKnownJsType(Collector.Characteristics.class, NS_HC);
 
-		registerKnownJsType(Collection.class, NS_JAVA);
-		registerKnownJsType(Comparator.class, NS_JAVA);
-		registerKnownJsType(Iterator.class, NS_JAVA);
-		registerKnownJsType(List.class, NS_JAVA);
-		registerKnownJsType(ListIterator.class, NS_JAVA);
-		registerKnownJsType(Map.class, NS_JAVA);
-		registerKnownJsType(Map.Entry.class, NS_JAVA);
-		registerKnownJsType(Optional.class, NS_JAVA);
-		registerKnownJsType(Set.class, NS_JAVA);
-		registerKnownJsType(Stack.class, NS_JAVA);
+		registerKnownJsType(Collection.class, NS_HC);
+		registerKnownJsType(Comparator.class, NS_HC);
+		registerKnownJsType(Iterator.class, NS_HC);
+		registerKnownJsType(List.class, NS_HC);
+		registerKnownJsType(ListIterator.class, NS_HC);
+		registerKnownJsType(Map.class, NS_HC);
+		registerKnownJsType(Map.Entry.class, NS_HC);
+		registerKnownJsType(Optional.class, NS_HC);
+		registerKnownJsType(Set.class, NS_HC);
+		registerKnownJsType(Stack.class, NS_HC);
 
 		registerWeakJsType("com.google.gwt.core.client.JsDate", "Date", JS_INTEROP_GLOBAL_THIS);
 		registerWeakJsType("com.google.gwt.user.client.rpc.AsyncCallback", "AsyncCallback", NS_ASYNC);

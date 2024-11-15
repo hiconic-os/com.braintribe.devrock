@@ -19,7 +19,7 @@ import com.google.gwt.core.client.JavaScriptObject;
 
 import jsinterop.annotations.JsType;
 
-@JsType(namespace = "$tf.test")
+@JsType(namespace = "hc.test")
 public interface TsWithJavaScriptObject {
 
 	JavaScriptObject newJsObject();

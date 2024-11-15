@@ -15,7 +15,7 @@
 // ============================================================================
 package com.braintribe.model.typescript;
 
-import static com.braintribe.model.typescript.ModelEnsuringDTsWriter.jsSignatureWith$T;
+import static com.braintribe.model.typescript.ModelEnsuringDTsWriter.jsSignatureWithTypeNamespacePrefix;
 import static com.braintribe.model.typescript.TypeScriptWriterHelper.nameBaseOfEnsure;
 
 import java.util.Iterator;
@@ -76,7 +76,7 @@ public class ModelEnsuringJsWriter extends AbstractStringifier {
 	private void writeDependencyImports() {
 		if (context.forNpm()) {
 			for (ArtifactIdentification d : context.dependencies())
-				println("import \"" + TypeScriptWriterHelper.npmPackageFullName(d) + "\";");
+				println("import '" + TypeScriptWriterHelper.npmPackageFullName(d) + "';");
 
 		} else {
 			for (VersionedArtifactIdentification d : context.dependencies())
@@ -121,7 +121,7 @@ public class ModelEnsuringJsWriter extends AbstractStringifier {
 
 	private void printTopLevelNs(List<ShortNameEntry<GmType>> list) {
 		for (ShortNameEntry<GmType> e : list)
-			println("export const " + e.simpleName + " = " + jsSignatureWith$T(e) + ";");
+			println("export const " + e.simpleName + " = " + jsSignatureWithTypeNamespacePrefix(e) + ";");
 	}
 
 	private void printInnerNs(List<ShortNameEntry<GmType>> list) {
@@ -129,7 +129,7 @@ public class ModelEnsuringJsWriter extends AbstractStringifier {
 		while (it.hasNext()) {
 			ShortNameEntry<GmType> e = it.next();
 			String ending = it.hasNext() ? "," : "";
-			println(e.simpleName + ": " + jsSignatureWith$T(e) + ending);
+			println(e.simpleName + ": " + jsSignatureWithTypeNamespacePrefix(e) + ending);
 		}
 	}
 

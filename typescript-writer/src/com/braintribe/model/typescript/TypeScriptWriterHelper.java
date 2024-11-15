@@ -50,6 +50,8 @@ public class TypeScriptWriterHelper {
 	/** Actually JS reserved words, but keywords is shorter and cooler */
 	public static final Set<String> jsKeywords = newSet(JsKeywords.jsKeywords);
 
+	public static final String HC_JS_MODULE_AUGMENTATION_OPENING = "declare module '@dev.hiconic/hc-js-base' {";
+
 	public static Function<Class<?>, String> jsNameResolver(ClassLoader classLoader) {
 		return clazz -> TypeScriptWriterHelper.resolveJsName(clazz, classLoader);
 	}
@@ -142,29 +144,12 @@ public class TypeScriptWriterHelper {
 		return artifactId + ".d.ts";
 	}
 
-	public static void writeTripleSlashReferenceToMain(String aid, Appendable writer) throws IOException {
-		writeTripleSlashReference(mainDtsFileName(aid), writer);
-		writer.append("\n");
-	}
-
-	public static void writeTripleSlashReference(String path, Appendable writer) throws IOException {
+	private static void writeTripleSlashReference(String path, Appendable writer) throws IOException {
 		writer.append("/// <reference path=\"" + path + "\" />\n");
 	}
 
 	public static String mainDtsFileName(String artifactId) {
 		return artifactId + ".d.ts";
-	}
-
-	public static String staticDtsFileName(String artifactId) {
-		return artifactId + ".static.d.ts";
-	}
-
-	public static String typesDtsFileName(String artifactId) {
-		return artifactId + ".types.d.ts";
-	}
-
-	public static String jsinteropDtsFileName(String artifactId) {
-		return artifactId + ".jsinterop.d.ts";
 	}
 
 	/* package */ static String nameBaseOfEnsure(String artifactId) {

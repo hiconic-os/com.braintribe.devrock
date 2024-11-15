@@ -26,40 +26,40 @@ import jsinterop.annotations.JsProperty;
  */
 public class HasStaticMembers {
 
-	@JsProperty(namespace = "$tf.test.static")
+	@JsProperty(namespace = "hc.test.static")
 	public static String STATIC_STRING;
 
-	@JsMethod(namespace = "$tf.test.static")
+	@JsMethod(namespace = "hc.test.static")
 	public static void run() {
 		// no op
 	}
 
-	@JsMethod(namespace = "$tf.test.static", name = "jsRun")
+	@JsMethod(namespace = "hc.test.static", name = "jsRun")
 	public static void hasDifferentJsName() {
 		// no op
 	}
 
-	@JsMethod(namespace = "$tf.test.static")
+	@JsMethod(namespace = "hc.test.static")
 	public static String getStaticString() {
 		return STATIC_STRING;
 	}
 
-	@JsMethod(namespace = "$tf.test.static")
+	@JsMethod(namespace = "hc.test.static")
 	public static <T extends Collection<?>> T getStaticAutoCast() {
 		return null;
 	}
 
-	@JsMethod(namespace = "$tf.test.static")
+	@JsMethod(namespace = "hc.test.static")
 	public static <T extends Collection<?>> List<T> asList() {
 		return null;
 	}
 
-	@JsMethod(namespace = "$tf.test.static")
+	@JsMethod(namespace = "hc.test.static")
 	public static List<String> getStaticListString() {
 		return null;
 	}
 
-	@JsMethod(namespace = "$tf.test.static", name = "hasParams")
+	@JsMethod(namespace = "hc.test.static", name = "hasParams")
 	public static String hasParameters(Integer i, int ii) {
 		return i + " " + ii;
 	}

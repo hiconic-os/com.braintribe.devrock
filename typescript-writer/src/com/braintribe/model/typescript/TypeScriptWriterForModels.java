@@ -61,8 +61,7 @@ import com.braintribe.utils.lcd.StringTools;
 import jsinterop.context.JsKeywords;
 
 /**
- * Properties with names that are reserved words in JS (one of: {@value JsKeywords#jsKeywords}) are escaped (here and in
- * tf.js).
+ * Properties with names that are reserved words in JS (one of: {@value JsKeywords#jsKeywords}) are escaped (here and in tf.js).
  * 
  * @author peter.gazdik
  */
@@ -175,11 +174,19 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 	}
 
 	private void writeNamespaceDeclarationForTheModel() {
-		typesByNamespace.forEach(this::writeNamespace);
+		println();
+		println(TypeScriptWriterHelper.HC_JS_MODULE_AUGMENTATION_OPENING);
+		println();
+		levelUp();
+		{
+			typesByNamespace.forEach(this::writeNamespace);
+		}
+		levelDown();
+		println("}");
 	}
 
 	private void writeNamespace(String namespace, Set<CustomTypeDescriptor> types) {
-		print("declare namespace ");
+		print("namespace ");
 		print(namespace);
 		println(" {\n");
 
@@ -301,7 +308,7 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 			return;
 		}
 
-		String evaluatorParam = "(evaluator: " + evaluatorJsName + "<$T." + ServiceRequest.T.getTypeSignature() + ">): ";
+		String evaluatorParam = "(evaluator: " + evaluatorJsName + "<" + KnownJsType.NS_TYPE + "." + ServiceRequest.T.getTypeSignature() + ">): ";
 
 		print("Eval");
 		print(evaluatorParam);

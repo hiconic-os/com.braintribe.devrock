@@ -22,14 +22,14 @@ import jsinterop.annotations.JsType;
  */
 public interface TopLevel {
 
-	@JsType(namespace = "$tf.test.inner", name = "NamedIface")
+	@JsType(namespace = "hc.test.inner", name = "NamedIface")
 	public static interface NamedIface {
 
 		String name();
 
 	}
 
-	@JsType(namespace = "$tf.test.inner")
+	@JsType(namespace = "hc.test.inner")
 	public static interface NonNamedIface {
 
 		String nonName();

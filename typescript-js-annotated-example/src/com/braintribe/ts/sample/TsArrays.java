@@ -17,7 +17,7 @@ package com.braintribe.ts.sample;
 
 import jsinterop.annotations.JsType;
 
-@JsType(namespace = "$tf.test")
+@JsType(namespace = "hc.test")
 public interface TsArrays<E> {
 
 	Object[] objects(Object[] objects);

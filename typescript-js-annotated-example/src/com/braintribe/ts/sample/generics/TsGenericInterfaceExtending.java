@@ -20,7 +20,7 @@ import jsinterop.annotations.JsType;
 /**
  * @author peter.gazdik
  */
-@JsType(namespace = "$tf.test")
+@JsType(namespace = "hc.test")
 public interface TsGenericInterfaceExtending<W> extends NonTsMap<String, W>, NonTsListSupllier<W> {
 
 	W value();

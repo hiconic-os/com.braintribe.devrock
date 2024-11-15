@@ -106,7 +106,7 @@ public class TypeScriptWriterForClasses extends AbstractStringifier {
 	 * 
 	 * We also have a method <X, Y> Function<X, Y> toJavaFunction(JsUnaryFunction<X, Y> jsFunction);
 	 * 
-	 * We want the result to be toJavaFunction(jsFunction: (X)=>Y): $tf.util.Function<X, Y>
+	 * We want the result to be toJavaFunction(jsFunction: (X)=>Y): hc.util.Function<X, Y>
 	 * 
 	 * But When writing the apply method, we see parameters A and B, so this context type helps us figure out that A is here X and B is Y. */
 
@@ -145,7 +145,14 @@ public class TypeScriptWriterForClasses extends AbstractStringifier {
 				handleJsMembersOfNonJsType(type);
 		}
 
-		namespaces.values().forEach(Namespace::generate);
+		println(TypeScriptWriterHelper.HC_JS_MODULE_AUGMENTATION_OPENING);
+		println();
+		levelUp();
+		{
+			namespaces.values().forEach(Namespace::generate);
+		}
+		levelDown();
+		println("}");
 	}
 
 	/** <tt>type</tt> was given to the top level method; is therefore class, interface or enum. */
@@ -379,10 +386,10 @@ public class TypeScriptWriterForClasses extends AbstractStringifier {
 
 			if (!global) {
 				// write namespace opening
-				print("declare namespace ");
+				print("namespace ");
 				print(name);
 				println(" {");
-				println("");
+				println();
 				levelUp();
 			}
 

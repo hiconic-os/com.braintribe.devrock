@@ -23,7 +23,7 @@ import jsinterop.annotations.JsType;
 /**
  * @author peter.gazdik
  */
-@JsType(namespace = "$tf.test")
+@JsType(namespace = "hc.test")
 public interface TsJsFunctionUser<X> {
 
 	void apply(TsJsFunction function);

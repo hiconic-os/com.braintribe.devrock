@@ -22,7 +22,7 @@ import com.braintribe.ts.sample.nointerop.NoInterop;
 
 import jsinterop.annotations.JsType;
 
-@JsType(namespace = "$tf.test")
+@JsType(namespace = "hc.test")
 public interface TsGenericsInMethods {
 
 	List<String> listString();

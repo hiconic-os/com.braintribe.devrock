@@ -21,7 +21,7 @@ import jsinterop.annotations.JsType;
 /**
  * @author peter.gazdik
  */
-@JsType(namespace = "$tf.test")
+@JsType(namespace = "hc.test")
 public class TsClass implements TsInterface1, TsInterface2 {
 
 	@JsIgnore

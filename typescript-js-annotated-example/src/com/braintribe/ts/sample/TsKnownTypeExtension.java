@@ -17,7 +17,7 @@ package com.braintribe.ts.sample;
 
 import jsinterop.annotations.JsType;
 
-@JsType(namespace = "$tf.test")
+@JsType(namespace = "hc.test")
 public class TsKnownTypeExtension extends RuntimeException {
 
 	private static final long serialVersionUID = 243762255081483051L;

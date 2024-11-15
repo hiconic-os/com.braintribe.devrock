@@ -20,7 +20,7 @@ import com.braintribe.model.time.TimeUnit;
 
 import jsinterop.annotations.JsType;
 
-@JsType(namespace = "$tf.test")
+@JsType(namespace = "hc.test")
 public interface TsCustomGmTypes {
 
 	Resource gmEntity();

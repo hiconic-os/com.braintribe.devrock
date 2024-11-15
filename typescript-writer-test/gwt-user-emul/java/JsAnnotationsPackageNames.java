@@ -12,10 +12,10 @@ package java;
  */
 public interface JsAnnotationsPackageNames {
 
-	static String GM_TYPES = "$T";
-	static String ASYNC = "$tf.session";
-	static String VIEW = "$tf.view";
-	static String JAVA = "$tf";
+	static String GM_TYPES = "T";
+	static String ASYNC = "hc.session";
+	static String VIEW = "hc.view";
+	static String JAVA = "hc";
 	static String JAVA_IO = JAVA;
 	static String JAVA_LANG = JAVA;
 	static String JAVA_MATH = JAVA;
