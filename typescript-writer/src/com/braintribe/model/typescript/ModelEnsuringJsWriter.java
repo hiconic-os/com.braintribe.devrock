@@ -47,19 +47,26 @@ import jsinterop.context.JsKeywords;
 public class ModelEnsuringJsWriter extends AbstractStringifier {
 
 	public static void writeJs(ModelEnsuringContext context, Appendable writer) {
-		new ModelEnsuringJsWriter(context, writer).writeJs();
+		writeJs(context, writer, false);
+	}
+
+	public static void writeJs(ModelEnsuringContext context, Appendable writer, boolean checkHcJsInitialized) {
+		new ModelEnsuringJsWriter(context, writer, checkHcJsInitialized).writeJs();
 	}
 
 	private final ModelEnsuringContext context;
 	private final GmMetaModel model;
+	private final boolean checkHcJsInitialized;
+
 	private final String gid;
 	private final String aid;
 	private final String version;
 
-	public ModelEnsuringJsWriter(ModelEnsuringContext context, Appendable writer) {
+	public ModelEnsuringJsWriter(ModelEnsuringContext context, Appendable writer, boolean checkHcJsInitialized) {
 		super(writer, "", "\t");
 
 		this.context = context;
+		this.checkHcJsInitialized = checkHcJsInitialized;
 
 		this.model = context.model();
 		this.gid = context.gid();
@@ -90,6 +97,12 @@ public class ModelEnsuringJsWriter extends AbstractStringifier {
 		if (context.forNpm()) {
 			println("import {" + JsInteropNamespaces.type + ", " + JsInteropNamespaces.gm + "} from '@dev.hiconic/hc-js-base';");
 			println();
+
+			if (checkHcJsInitialized) {
+				println("if (!hc.reflection)");
+				println("	throw new Error('Hiconic.js not initialized!!! Make sure your entry point file imports hiconic implementation before it imports any model.');");
+				println();
+			}
 		}
 	}
 
