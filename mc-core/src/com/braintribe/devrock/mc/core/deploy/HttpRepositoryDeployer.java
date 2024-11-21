@@ -24,7 +24,6 @@ import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -66,6 +65,7 @@ import com.braintribe.devrock.mc.api.commons.ArtifactAddress;
 import com.braintribe.devrock.mc.api.commons.ArtifactAddressBuilder;
 import com.braintribe.devrock.mc.api.commons.PartIdentifications;
 import com.braintribe.devrock.mc.core.http.OutputStreamerEntity;
+import com.braintribe.devrock.model.mc.reason.PartAlreadyExists;
 import com.braintribe.devrock.model.mc.reason.PartUploadFailed;
 import com.braintribe.devrock.model.repository.MavenHttpRepository;
 import com.braintribe.exception.CommunicationException;
@@ -83,7 +83,6 @@ import com.braintribe.model.generic.session.OutputStreamer;
 import com.braintribe.model.resource.Resource;
 import com.braintribe.utils.IOTools;
 import com.braintribe.utils.StringTools;
-import com.braintribe.utils.encryption.Md5Tools;
 import com.braintribe.utils.stream.NullOutputStream;
 
 public class HttpRepositoryDeployer extends AbstractArtifactDeployer<MavenHttpRepository> {
@@ -381,6 +380,9 @@ public class HttpRepositoryDeployer extends AbstractArtifactDeployer<MavenHttpRe
 							appendToProtocol("successfully uploaded to " + url + ". Note: Actually received a 409 status code but still succesfully checked existence.", 0);
 							return null;
 						}
+						
+						error = Reasons.build(PartAlreadyExists.T) //
+								.text("Part already exists (HTTP repo returned 409)").toReason();
 					}
 					
 					appendProtocolLevel(2);
