@@ -21,7 +21,7 @@ declare module "@dev.hiconic/hc-js-base" {
             type(): string; // returns 'f'
         }
 
-        class Array<T> {
+        interface Array<T> {
 
             // ###################
             //        es5
@@ -92,7 +92,7 @@ declare module "@dev.hiconic/hc-js-base" {
             at(index: number): T | undefined;
        }
 
-       class Set<T> {
+       interface Set<T> {
 
             // ###################
             // es2015.collections
@@ -116,7 +116,7 @@ declare module "@dev.hiconic/hc-js-base" {
 
        }
 
-       class Map<K, V> {
+       interface Map<K, V> {
 
             // ###################
             // es2015.collections
