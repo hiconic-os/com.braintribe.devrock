@@ -50,23 +50,23 @@ public class ModelEnsuringJsWriter extends AbstractStringifier {
 		writeJs(context, writer, false);
 	}
 
-	public static void writeJs(ModelEnsuringContext context, Appendable writer, boolean checkHcJsInitialized) {
-		new ModelEnsuringJsWriter(context, writer, checkHcJsInitialized).writeJs();
+	public static void writeJs(ModelEnsuringContext context, Appendable writer, boolean initHcJs) {
+		new ModelEnsuringJsWriter(context, writer, initHcJs).writeJs();
 	}
 
 	private final ModelEnsuringContext context;
 	private final GmMetaModel model;
-	private final boolean checkHcJsInitialized;
+	private final boolean initHcJs;
 
 	private final String gid;
 	private final String aid;
 	private final String version;
 
-	public ModelEnsuringJsWriter(ModelEnsuringContext context, Appendable writer, boolean checkHcJsInitialized) {
+	public ModelEnsuringJsWriter(ModelEnsuringContext context, Appendable writer, boolean initHcJs) {
 		super(writer, "", "\t");
 
 		this.context = context;
-		this.checkHcJsInitialized = checkHcJsInitialized;
+		this.initHcJs = initHcJs;
 
 		this.model = context.model();
 		this.gid = context.gid();
@@ -96,13 +96,12 @@ public class ModelEnsuringJsWriter extends AbstractStringifier {
 
 		if (context.forNpm()) {
 			println("import {" + JsInteropNamespaces.type + ", " + JsInteropNamespaces.gm + "} from '@dev.hiconic/hc-js-base';");
-			println();
 
-			if (checkHcJsInitialized) {
-				println("if (!hc.reflection)");
-				println("	throw new Error('Hiconic.js not initialized!!! Make sure your entry point file imports hiconic implementation before it imports any model.');");
-				println();
+			if (initHcJs) {
+				println("import { initHcJs } from '@dev.hiconic/runtime';");
+				println("initHcJs(" + JsInteropNamespaces.type + ", " + JsInteropNamespaces.gm + ");");
 			}
+			println();
 		}
 	}
 
