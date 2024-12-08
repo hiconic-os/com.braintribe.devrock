@@ -416,9 +416,9 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 	    }
 	  }
 
-		// ################################################
-		// ## . . . . . . . TFJS Additions . . . . . . . ##
-		// ################################################
+	  // #################################################
+	  // ## . . . . . . Added for hiconic.js . . . . . .##
+	  // #################################################
 
 		/** Returns a native java iterable whose implementation is based on the iterator. */
 		JsIterable<T> iterable();

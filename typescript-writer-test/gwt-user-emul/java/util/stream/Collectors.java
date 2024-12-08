@@ -425,9 +425,9 @@ public final class Collectors {
 
   private Collectors() { }
 
-	// ################################################
-	// ## . . . . . . . TFJS Additions . . . . . . . ##
-	// ################################################
+  // #################################################
+  // ## . . . . . . Added for hiconic.js . . . . . .##
+  // #################################################
 
 	public static <T, A, R, RR> Collector<T, A, RR> collectingAndThenJs( //
 			Collector<T, A, R> downstream, //

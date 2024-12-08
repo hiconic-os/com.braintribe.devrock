@@ -61,9 +61,9 @@ public interface Iterable<T> {
     return Spliterators.spliteratorUnknownSize(iterator(), 0);
   }
 
-	// ################################################
-	// ## . . . . . . . TFJS Additions . . . . . . . ##
-	// ################################################
+  // #################################################
+  // ## . . . . . . Added for hiconic.js . . . . . .##
+  // #################################################
 
 	@JsMethod(name = "forEach")
 	default void forEachJs(JsConsumer<? super T> consumer) {

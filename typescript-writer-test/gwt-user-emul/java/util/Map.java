@@ -215,9 +215,9 @@ public interface Map<K, V> {
 
   Collection<V> values();
   
-	// ################################################
-	// ## . . . . . . . TFJS Additions . . . . . . . ##
-	// ################################################
+  // #################################################
+  // ## . . . . . . Added for hiconic.js . . . . . .##
+  // #################################################
 
   @JsMethod(name="forEach")
    default void _forEach(JsBiConsumer<? super K, ? super V> consumer) {

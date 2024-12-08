@@ -119,9 +119,9 @@ public final class Optional<T> {
 	  @Override
 	  public String toString()  { return null; }
 
-		// ################################################
-		// ## . . . . . . . TFJS Additions . . . . . . . ##
-		// ################################################
+	  // #################################################
+	  // ## . . . . . . Added for hiconic.js . . . . . .##
+	  // #################################################
 
 		public void ifPresentJs(Lambdas.JsConsumer<? super T> consumer) {
 			ifPresent(Lambdas.toJConsumer(consumer));

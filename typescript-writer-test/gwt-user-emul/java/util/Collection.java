@@ -91,9 +91,9 @@ public interface Collection<E> extends Iterable<E> {
   @JsIgnore
   <T> T[] toArray(T[] a);
 
-	// ################################################
-	// ## . . . . . . . TFJS Additions . . . . . . . ##
-	// ################################################
+  // #################################################
+  // ## . . . . . . Added for hiconic.js . . . . . .##
+  // #################################################
 
   default boolean addAllJs(E... args) {
 	  return addAll(Arrays.asList(args));
