@@ -84,7 +84,7 @@ public class ModelEnsuringJsWriter extends AbstractStringifier {
 	private void writeDependencyImports() {
 		if (context.forNpm()) {
 			for (ArtifactIdentification d : context.dependencies())
-				println("import '" + TypeScriptWriterHelper.npmPackageFullName(d) + "';");
+				println("import '" + TypeScriptWriterHelper.npmPackageFullName(d).fullName() + "';");
 
 		} else {
 			for (VersionedArtifactIdentification d : context.dependencies())

@@ -76,7 +76,8 @@ public class TypeScriptWriterHelper {
 	/**
 	 * <tt>jsName</tt> is a value read from a js-interop annotation,
 	 * <p>
-	 * This method returns given jsName as long as it is not {@code <auto>}, in which case it returns the value from <tt>defaultValueSupplier</tt>
+	 * This method returns given jsName as long as it is not {@code <auto>}, in which case it returns the value from
+	 * <tt>defaultValueSupplier</tt>
 	 */
 	public static String jsNameOrDefault(String jsName, Supplier<String> defaultValueSupplier) {
 		return jsName.equals(JS_INTEROP_AUTO) ? defaultValueSupplier.get() : jsName;
@@ -100,9 +101,9 @@ public class TypeScriptWriterHelper {
 		Class<?> enm = findBaseClass(EnumBase.class.getName(), classLoader);
 		Class<? extends Annotation> gsi = findBaseClass(GmSystemInterface.class.getName(), classLoader);
 
-		/* We actually expect either none of them to be null or all of them, as the findBaseClass method returns null iff it cannot find the class
-		 * with given class-loader. As all these classes come from "gm-core-api", they will either all be there or none. But just to be sure, we check
-		 * if either of them was not found. */
+		/* We actually expect either none of them to be null or all of them, as the findBaseClass method returns null iff it
+		 * cannot find the class with given class-loader. As all these classes come from "gm-core-api", they will either all be
+		 * there or none. But just to be sure, we check if either of them was not found. */
 		if (ge == null || enm == null || gsi == null)
 			return c -> Boolean.FALSE;
 		else
@@ -156,7 +157,13 @@ public class TypeScriptWriterHelper {
 		return "ensure-" + artifactId;
 	}
 
-	public static String npmPackageFullName(ArtifactIdentification aa) {
+	public static record NpmPackageScopedName(String scope, String name) {
+		public String fullName() {
+			return "@" + scope + "/" + name;
+		}
+	}
+
+	public static NpmPackageScopedName npmPackageFullName(ArtifactIdentification aa) {
 		return npmPackageFullName(aa.getGroupId(), aa.getArtifactId());
 	}
 
@@ -168,22 +175,22 @@ public class TypeScriptWriterHelper {
 	 * 
 	 * The rest of the groupId and the artifactId is used as a package name.
 	 * 
-	 * However, in some cases we don't use the artifactId, but configure a different value (e.g. for the pretty version of hc.js we use hc-js-dev).
-	 * Hence the parameter is called "packageSuffix".
+	 * However, in some cases we don't use the artifactId, but configure a different value (e.g. for the pretty version of
+	 * hc.js we use hc-js-dev). Hence the parameter is called "packageSuffix".
 	 */
-	public static String npmPackageFullName(String groupId, String packageSuffix) {
+	public static NpmPackageScopedName npmPackageFullName(String groupId, String packageSuffix) {
 		String[] scopeAndPrefix = deriveScopeNameAndPackagePrefixFromGroupId(groupId);
 
 		String scope = scopeAndPrefix[0];
 		String prefix = scopeAndPrefix[1] == null ? "" : scopeAndPrefix[1] + "_";
 
-		return "@" + scope + "/" + prefix + packageSuffix;
+		return new NpmPackageScopedName(scope, prefix + packageSuffix);
 	}
 
 	private static String[] deriveScopeNameAndPackagePrefixFromGroupId(String groupId) {
-		groupId = replacePrefixIfNeeded(groupId, "com.braintribe", "dev.hiconic");
-		groupId = replacePrefixIfNeeded(groupId, "tribefire", "dev.hiconic.tf");
-		groupId = replacePrefixIfNeeded(groupId, "hiconic", "dev.hiconic");
+		groupId = replacePrefixIfNeeded(groupId, "com.braintribe.", "dev.hiconic.");
+		groupId = replacePrefixIfNeeded(groupId, "tribefire.", "dev.hiconic.tf.");
+		groupId = replacePrefixIfNeeded(groupId, "hiconic.", "dev.hiconic.");
 
 		String[] parts = groupId.split("\\.");
 		if (parts.length == 0)
@@ -196,9 +203,6 @@ public class TypeScriptWriterHelper {
 
 		int n = parts.length > 2 ? 1 : 0;
 		String prefix = groupId.substring(scope.length() + n);
-
-		if (scope.equals("com.braintribe") || scope.startsWith("tribefire"))
-			scope = "dev.hiconic";
 
 		return new String[] { scope, prefix };
 	}

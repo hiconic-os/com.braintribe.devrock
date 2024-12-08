@@ -33,10 +33,11 @@ public class TypeScriptWriterHelperTest {
 		assertFullName("tribefire.extension.js", "js-model", "@dev.hiconic/tf.extension.js_js-model");
 		assertFullName("hiconic.core.js", "js-model", "@dev.hiconic/core.js_js-model");
 		assertFullName("dev.hicocnic.js", "js-model", "@dev.hicocnic/js_js-model");
+		assertFullName("hiconic-os", "my-model", "@hiconic-os/my-model");
 	}
 
 	private void assertFullName(String groupId, String packageSuffix, String expected) {
-		String actual = npmPackageFullName(groupId, packageSuffix);
+		String actual = npmPackageFullName(groupId, packageSuffix).fullName();
 		assertThat(actual).isEqualTo(expected);
 	}
 
