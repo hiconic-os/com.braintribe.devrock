@@ -9,6 +9,16 @@ declare module "@dev.hiconic/hc-js-base" {
     type set<T> = T.Set<T>;
     type map<K, V> = T.Map<K, V>;
 
+	// Shortcuts
+	type GenericEntity = T.com.braintribe.model.generic.GenericEntity;
+	type Enum = hc.Enum<any>;
+
+	// Useful types
+	type Simple = boolean | string | integer | long | float | double | decimal | date;
+	type Scalar = Simple | Enum;
+	type CollectionElement = Scalar | GenericEntity;
+	type Base = CollectionElement | T.Map<CollectionElement, CollectionElement> | T.Set<CollectionElement> | T.Array<CollectionElement>;
+
     namespace T {
 
         class Double extends Number {
@@ -22,7 +32,6 @@ declare module "@dev.hiconic/hc-js-base" {
         }
 
         interface Array<T> {
-
             // ###################
             //        es5
             // ###################
@@ -93,7 +102,6 @@ declare module "@dev.hiconic/hc-js-base" {
        }
 
        interface Set<T> {
-
             // ###################
             // es2015.collections
             // ###################
@@ -113,11 +121,9 @@ declare module "@dev.hiconic/hc-js-base" {
             entries(): IterableIterator<[T, T]>;
             keys(): IterableIterator<T>;
             values(): IterableIterator<T>;
-
        }
 
        interface Map<K, V> {
-
             // ###################
             // es2015.collections
             // ###################
@@ -138,7 +144,6 @@ declare module "@dev.hiconic/hc-js-base" {
             entries(): IterableIterator<[K, V]>;
             keys(): IterableIterator<K>;
             values(): IterableIterator<V>;
-
         }
 
     }
