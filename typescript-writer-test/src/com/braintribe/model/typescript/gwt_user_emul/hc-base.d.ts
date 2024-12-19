@@ -1,25 +1,40 @@
 import '@dev.hiconic/runtime';
 
 declare module "@dev.hiconic/hc-js-base" {
-    type integer = number;
-    type long = bigint;
-    type double = T.Double;
-    type float = T.Float;
-    type decimal = T.Decimal;
-    type date = globalThis.Date;
-    type list<T> = T.Array<T>;
-    type set<T> = T.Set<T>;
-    type map<K, V> = T.Map<K, V>;
+    namespace hc {
+        // Actual Types
+        type integer = number;
+        type long = bigint;
+        type double = T.Double;
+        type float = T.Float;
+        type decimal = T.Decimal;
+        type date = globalThis.Date;
+        type list<T> = T.Array<T>;
+        type set<T> = T.Set<T>;
+        type map<K, V> = T.Map<K, V>;
 
-    // Shortcuts
-    type GenericEntity = T.com.braintribe.model.generic.GenericEntity;
-    type Enum = hc.Enum<any>;
+        type GenericEntity = T.com.braintribe.model.generic.GenericEntity;
 
-    // Useful types
-    type Simple = boolean | string | integer | long | float | double | decimal | date;
-    type Scalar = Simple | Enum;
-    type CollectionElement = Scalar | GenericEntity;
-    type Base = CollectionElement | T.Map<CollectionElement, CollectionElement> | T.Set<CollectionElement> | T.Array<CollectionElement>;
+        // Aggregate Types
+        type Simple = boolean | string | integer | long | float | double | decimal | date;
+        type Scalar = Simple | Enum<any>;
+        type CollectionElement = Scalar | GenericEntity;
+        type CollectionType = T.Map<CollectionElement, CollectionElement> | T.Set<CollectionElement> | T.Array<CollectionElement>;
+        type Base = CollectionElement | CollectionType;
+    }
+
+    // Local declaration within this module for types used for property declarations 
+    type integer = hc.integer;
+    type long = hc.long;
+    type float = hc.float;
+    type double = hc.double;
+    type decimal = hc.decimal;
+    type date = hc.date;
+    type list<T> = hc.list<T>;
+    type set<T> = hc.set<T>;
+    type map<K, V> = hc.map<K, V>;
+    type CollectionElement = hc.CollectionElement; // used for declaring collections of any possible value
+    type Base = hc.Base;
 
     // ************************************
     // Model Type Declaration Utility Types
@@ -44,9 +59,11 @@ declare module "@dev.hiconic/hc-js-base" {
 
     /** Ensures properties are nullable by default, but can be made non-nullable with P<type, { nullable: false }> */
     type Entity<T extends Record<string, PropertyDeclarationType>> = {
-        [K in keyof T]: T[K] extends P<infer U, { nullable: false }>
-        ? U
-        : ActualPropertyType<T[K]> | null
+        [K in keyof T]:
+        T[K] extends P<infer U, { nullable: false }> ? U :
+        // our collections are never nullable
+        ActualPropertyType<T[K]> extends hc.CollectionType ? ActualPropertyType<T[K]> :
+        ActualPropertyType<T[K]> | null
     };
 
     type Evaluable<RESULT extends Base> = {
@@ -193,4 +210,17 @@ declare module "@dev.hiconic/hc-js-base" {
             readonly enumType: unique symbol
         }
     }
+
+    type PropsOnly<T> = Pick<T, { [K in keyof T]: T[K] extends Function ? never : K }[keyof T]>
+
+    namespace hc.reflection {
+        interface EntityBase {
+            Properties(): readonly hc.reflection.Property[]
+            // This is very tricky and really needs to be a generic function
+            // If return type was simply string[], then accessing entity[propertyName] would be an error due to imlicity any
+            // If return type was (keyof this)[], then sub-types would not be assinable to their supertypes due to incompatible PropertyNames()
+            PropertyNames<T extends this>(): readonly (keyof PropsOnly<T>)[]
+        }
+    }
+
 }
