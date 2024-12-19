@@ -1,3 +1,5 @@
+import '@dev.hiconic/runtime';
+
 declare module "@dev.hiconic/hc-js-base" {
     type integer = number;
     type long = bigint;
