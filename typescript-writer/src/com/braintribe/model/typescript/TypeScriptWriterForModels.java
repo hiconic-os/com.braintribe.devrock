@@ -26,17 +26,15 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.function.Function;
 
+import com.braintribe.common.lcd.UnknownEnumException;
 import com.braintribe.common.lcd.UnsupportedEnumException;
 import com.braintribe.exception.Exceptions;
-import com.braintribe.gm.model.reason.Maybe;
 import com.braintribe.model.generic.GenericEntity;
 import com.braintribe.model.generic.GmCoreApiInteropNamespaces;
 import com.braintribe.model.generic.annotation.meta.api.synthesis.AnnotationDescriptor;
 import com.braintribe.model.generic.annotation.meta.synthesis.MdaSynthesis;
 import com.braintribe.model.generic.base.EntityBase;
 import com.braintribe.model.generic.base.EnumBase;
-import com.braintribe.model.generic.eval.Evaluator;
-import com.braintribe.model.generic.eval.JsEvalContext;
 import com.braintribe.model.generic.reflection.EntityType;
 import com.braintribe.model.generic.reflection.EnumType;
 import com.braintribe.model.generic.reflection.SimpleType;
@@ -55,7 +53,6 @@ import com.braintribe.model.meta.GmSimpleType;
 import com.braintribe.model.meta.GmType;
 import com.braintribe.model.meta.GmTypeKind;
 import com.braintribe.model.meta.data.HasMetaData;
-import com.braintribe.model.service.api.ServiceRequest;
 import com.braintribe.utils.lcd.StringTools;
 
 import jsinterop.context.JsKeywords;
@@ -104,10 +101,6 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 	private final String enumBaseJsName;
 	private final String enumName;
 
-	private final String evalContextJsName;
-	private final String evaluatorJsName;
-	private final String maybeJsName;
-
 	private TypeScriptWriterForModels(Collection<GmType> gmTypes, Function<Class<?>, String> jsNameResolver, Appendable writer) {
 		super(writer, "", "\t");
 		this.gmTypes = gmTypes;
@@ -117,10 +110,6 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 		this.enumTypeJsName = jsNameResolver.apply(EnumType.class);
 		this.enumBaseJsName = jsNameResolver.apply(EnumBase.class);
 		this.enumName = KnownJsType.java2Ts.get(Enum.class).fullName;
-
-		this.evalContextJsName = jsNameResolver.apply(JsEvalContext.class);
-		this.evaluatorJsName = jsNameResolver.apply(Evaluator.class);
-		this.maybeJsName = jsNameResolver.apply(Maybe.class);
 
 		indexTypes();
 	}
@@ -265,33 +254,54 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 		print(ctd.simpleName);
 		println(">;");
 
-		print("interface ");
+		print("type ");
 		print(ctd.simpleName);
+		print(" = ");
 
-		if (!gmEntityType.getSuperTypes().isEmpty()) {
-			print(" extends ");
+		EvalInfo evalInfo = resolveEvaluatesTo(gmEntityType);
+		boolean shouldWriteEval = evalInfo != null && evalInfo.needsDeclarationInTs;
+		if (shouldWriteEval) {
+			print("Evaluable<");
+			printType(evalInfo.gmType, true);
+			println("> &");
+		}
+
+		List<GmEntityType> superTypes = gmEntityType.getSuperTypes();
+		if (!superTypes.isEmpty()) {
+			if (shouldWriteEval)
+				print("  ");
 			int i = 0;
-			for (GmEntityType superType : gmEntityType.getSuperTypes()) {
+			for (GmEntityType superType : superTypes) {
 				if (i++ > 0) {
-					print(", ");
+					print(" & ");
 				}
 				printNullableType(superType);
 			}
 
 		} else if (gmEntityType.getTypeSignature().equals(GenericEntity.class.getName())) {
-			print(" extends ");
 			print(jsNameResolver.apply(EntityBase.class));
 		}
 
-		println(" {");
+		List<GmProperty> properties = gmEntityType.getProperties();
 
-		levelUp();
-		gmEntityType.getProperties().forEach(this::writeProperty);
+		if (!properties.isEmpty()) {
+			if (shouldWriteEval) {
+				println(" &");
+				println("  Entity<{");
+			} else {
+				println(" & Entity<{");
+			}
 
-		writeEvalIfNeeded(gmEntityType);
-		levelDown();
+			levelUp();
+			properties.forEach(this::writeProperty);
 
-		println("}\n");
+			levelDown();
+
+			print("}>");
+		}
+
+		println(";");
+		println();
 	}
 
 	private void writeProperty(GmProperty p) {
@@ -300,36 +310,6 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 		print(": ");
 		printType(p.getType(), p.getNullable());
 		println(";");
-	}
-
-	private void writeEvalIfNeeded(GmEntityType gmEntityType) {
-		EvalInfo evalInfo = resolveEvaluatesTo(gmEntityType);
-		if (evalInfo == null || !evalInfo.needsDeclarationInTs) {
-			return;
-		}
-
-		String evaluatorParam = "(evaluator: " + evaluatorJsName + "<" + KnownJsType.NS_TYPE + "." + ServiceRequest.T.getTypeSignature() + ">): ";
-
-		print("Eval");
-		print(evaluatorParam);
-		print(evalContextJsName);
-		print("<");
-		printType(evalInfo.gmType, true);
-		println(">;");
-
-		print("EvalAndGet");
-		print(evaluatorParam);
-		print("globalThis.Promise<");
-		printType(evalInfo.gmType, true);
-		println(">;");
-
-		print("EvalAndGetReasoned");
-		print(evaluatorParam);
-		print("globalThis.Promise<");
-		print(maybeJsName);
-		print("<");
-		printType(evalInfo.gmType, true);
-		println(">>;");// maybe + promise
 	}
 
 	private final Map<GmEntityType, EvalInfo> evaluatesTo = newMap();
@@ -451,7 +431,7 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 
 		switch (gmType.typeKind()) {
 			case BASE:
-				printAny();
+				printBase();
 				return;
 
 			case ENUM:
@@ -478,31 +458,40 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 	private void printSimpleType(GmSimpleType gmType, boolean nullable) {
 		SimpleType st = gmType.<SimpleType> reflectionType();
 
+		if (!nullable)
+			print("P<");
+
 		switch (st.getTypeCode()) {
 			case dateType:
 				print("date");
-				return;
+				break;
 			case decimalType:
 				print("decimal");
-				return;
+				break;
 			case doubleType:
 				print("double");
-				return;
+				break;
 			case floatType:
 				print("float");
-				return;
+				break;
 			case integerType:
 				print("integer");
-				return;
+				break;
 			case longType:
 				print("long");
-				return;
+				break;
 			case booleanType:
+				print("boolean");
+				break;
 			case stringType:
+				print("string");
+				break;
 			default:
-				printKnownType(nullable ? st.getJavaType() : st.getPrimitiveJavaType());
-				return;
+				throw new UnknownEnumException(st.getTypeCode());
 		}
+
+		if (!nullable)
+			print(", { nullable: false }>");
 	}
 
 	private void printCustomType(GmCustomType gmType) {
@@ -516,12 +505,16 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 		print(ctd.simpleName);
 	}
 
+	private boolean insideCollection;
+
 	private void printMapType(GmMapType gmType) {
+		insideCollection = true;
 		print("map<");
 		printNullableType(gmType.getKeyType());
 		print(", ");
 		printNullableType(gmType.getValueType());
 		print(">");
+		insideCollection = false;
 	}
 
 	private void printListType(GmListType gmType) {
@@ -535,22 +528,15 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 	}
 
 	private void printCollectionTypeParameters(GmLinearCollectionType gmType) {
+		insideCollection = true;
 		print("<");
 		printType(gmType.getElementType(), true);
 		print(">");
+		insideCollection = false;
 	}
 
-	private void printKnownType(Class<?> javaType) {
-		KnownJsType knownType = KnownJsType.java2Ts.computeIfAbsent(javaType, this::throwUnexpectedKnownType);
-		print(knownType.fullName);
-	}
-
-	private KnownJsType throwUnexpectedKnownType(Class<?> javaType) {
-		throw new RuntimeException("Unexpected known JS type: " + javaType.getName());
-	}
-
-	private void printAny() {
-		print("any");
+	private void printBase() {
+		print(insideCollection ? "CollectionElement" : "Base");
 	}
 
 	private CustomTypeDescriptor acquireCustomTypeDescriptor(GmCustomType gmType) {

@@ -46,7 +46,6 @@ import com.braintribe.model.typescript.model.keyword.TsKeywordEnumOwner;
 import com.braintribe.model.typescript.model.keyword.with.TsKeywordPackageEntity;
 import com.braintribe.model.typescript.model.sub.TsSub;
 import com.braintribe.model.util.meta.NewMetaModelGeneration;
-import com.braintribe.utils.lcd.StringTools;
 
 import jsinterop.annotations.JsType;
 import jsinterop.context.JsKeywords;
@@ -72,13 +71,23 @@ public class TypeScriptWriterForModelsTest extends AbstractWriterTest {
 		write(GenericEntity.T.getModel().getMetaModel());
 
 		mustContain("namespace T.com.braintribe.model.generic {");
-		mustContain("interface GenericEntity extends hc.reflection.EntityBase {");
+		mustContain("const GenericEntity: hc.reflection.EntityType<GenericEntity>;");
+		mustContain("type GenericEntity = hc.reflection.EntityBase & Entity<{");
 		mustContain("globalId: string;");
-		mustContain("id: any;");
+		mustContain("id: Base;");
 		mustContain("partition: string;");
-		mustContain("interface StandardIdentifiable extends GenericEntity {");
-		mustContain("interface StandardIntegerIdentifiable extends GenericEntity {");
-		mustContain("interface StandardStringIdentifiable extends GenericEntity {");
+		mustContain("}>;");
+
+		mustContain("const StandardIdentifiable: hc.reflection.EntityType<StandardIdentifiable>;");
+		mustContain("type StandardIdentifiable = GenericEntity");
+
+		mustContain("const StandardIntegerIdentifiable: hc.reflection.EntityType<StandardIntegerIdentifiable>;");
+		mustContain("type StandardIntegerIdentifiable = GenericEntity");
+
+		mustContain("const StandardStringIdentifiable: hc.reflection.EntityType<StandardStringIdentifiable>;");
+		mustContain("type StandardStringIdentifiable = GenericEntity");
+
+		notContains("GenericEntity &");
 	}
 
 	@Test
@@ -87,27 +96,28 @@ public class TypeScriptWriterForModelsTest extends AbstractWriterTest {
 
 		mustContain("/// <reference path=\"../com.braintribe.gm.absence-information-model-1.420~/absence-information-model.d.ts\" />");
 		mustContain("const TsJoat: hc.reflection.EntityType<TsJoat>;");
-		mustContain(
-				"interface TsJoat extends T.com.braintribe.model.typescript.model.sub.TsSub, T.com.braintribe.model.generic.pr.AbsenceInformation {");
+		mustContain("type TsJoat = Evaluable<list<string>> &\n");
+		mustContain("T.com.braintribe.model.typescript.model.sub.TsSub & T.com.braintribe.model.generic.pr.AbsenceInformation &\n");
+		mustContain("Entity<{\n");
 
-		mustContain("primitiveBoolean: boolean");
-		mustContain("wrapperBoolean: boolean");
+		mustContain("primitiveBoolean: P<boolean, { nullable: false }>;");
+		mustContain("wrapperBoolean: boolean;");
 
-		mustContain("primitiveDouble: double");
+		mustContain("primitiveDouble: P<double, { nullable: false }>;");
 		mustContain("wrapperDouble: double");
 
-		mustContain("primitiveFloat: float");
+		mustContain("primitiveFloat: P<float, { nullable: false }>;");
 		mustContain("wrapperFloat: float");
 
-		mustContain("primitiveInteger: integer");
+		mustContain("primitiveInteger: P<integer, { nullable: false }>;");
 		mustContain("wrapperInteger: integer");
 
-		mustContain("primitiveLong: long");
+		mustContain("primitiveLong: P<long, { nullable: false }>;");
 		mustContain("wrapperLong: long");
 
 		mustContain("date: date;");
 		mustContain("decimal: decimal;");
-		mustContain("object: any;");
+		mustContain("object: Base;");
 		mustContain("string: string;");
 
 		mustContain("entity: TsJoat;");
@@ -117,6 +127,9 @@ public class TypeScriptWriterForModelsTest extends AbstractWriterTest {
 		mustContain("listOfStrings: list<string>;");
 		mustContain("mapOfStrings: map<string, string>;");
 		mustContain("setOfStrings: set<string>;");
+
+		mustContain("listOfObjects: list<CollectionElement>;");
+		mustContain("mapOfObjects: map<CollectionElement, CollectionElement>;");
 
 		mustContain("interface TsEnum extends hc.reflection.EnumBase<TsEnum>, hc.Enum<TsEnum> {}");
 		mustContain("const TsEnum: {");
@@ -128,23 +141,19 @@ public class TypeScriptWriterForModelsTest extends AbstractWriterTest {
 		mustContain("// Unique");
 		mustContain("// Color(value=\"#ff0000\")");
 
-		mustContain(
-				"Eval(evaluator: hc.eval.Evaluator<T.com.braintribe.model.service.api.ServiceRequest>): hc.eval.JsEvalContext<list<string>>;");
-		mustContain("EvalAndGet(evaluator: hc.eval.Evaluator<T.com.braintribe.model.service.api.ServiceRequest>): globalThis.Promise<list<string>>;");
-		mustContain(
-				"EvalAndGetReasoned(evaluator: hc.eval.Evaluator<T.com.braintribe.model.service.api.ServiceRequest>): globalThis.Promise<hc.reason.Maybe<list<string>>>;");
+		notContains("Eval(");
+		notContains("EvalAndGet");
+		notContains("EvalAndGetReasoned");
 	}
 
 	@Test
 	public void tsWriter_EvalMultiInheritance() throws Exception {
 		write(buildTsMultiInheritanceModel());
 
-		cutTypeFromOutput(TsEvalABB.T);
-
-		mustContain("Eval(evaluator: hc.eval.Evaluator<T.com.braintribe.model.service.api.ServiceRequest>): hc.eval.JsEvalContext<TsEvalB>;");
-		mustContain("EvalAndGet(evaluator: hc.eval.Evaluator<T.com.braintribe.model.service.api.ServiceRequest>): globalThis.Promise<TsEvalB>;");
-		mustContain(
-				"EvalAndGetReasoned(evaluator: hc.eval.Evaluator<T.com.braintribe.model.service.api.ServiceRequest>): globalThis.Promise<hc.reason.Maybe<TsEvalB>>;");
+		mustContain("type TsEvalA = Evaluable<T.com.braintribe.model.generic.GenericEntity> &");
+		mustContain("type TsEvalABB = Evaluable<TsEvalB> &");
+		mustContain("type TsEvalB = Evaluable<TsEvalB> &");
+		mustContain("type TsEvalBB = TsEvalB");
 	}
 
 	private static final Set<String> jsKeywords = jsKeywordsWithout_Class();
@@ -182,9 +191,16 @@ public class TypeScriptWriterForModelsTest extends AbstractWriterTest {
 		}
 	}
 
-	private void cutTypeFromOutput(EntityType<?> et) {
-		output = StringTools.findSuffixWithBoundary(output, "const " + et.getShortName());
-		output = StringTools.findPrefixWithBoundary(output, "}");
+	@Test
+	public void tsWriter_NonNullableProperties() throws Exception {
+		write(TsKeywordEnumOwner.T);
+
+		mustContain("interface TsKeywordEnum extends hc.reflection.EnumBase<TsKeywordEnum>, hc.Enum<TsKeywordEnum> {}");
+		mustContain("const TsKeywordEnum: {");
+		mustContain("readonly [hc.Symbol.enumType]: hc.reflection.EnumType<TsKeywordEnum>,");
+		for (TsKeywordEnum e : TsKeywordEnum.class.getEnumConstants()) {
+			mustContain("readonly " + e.name() + "_: TsKeywordEnum,");
+		}
 	}
 
 	private void write(EntityType<?>... types) {

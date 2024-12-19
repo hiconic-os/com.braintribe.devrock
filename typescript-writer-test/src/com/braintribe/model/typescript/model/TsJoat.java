@@ -118,6 +118,12 @@ public interface TsJoat extends TsSub, AbsenceInformation {
 	Map<String, String> getMapOfStrings();
 	void setMapOfStrings(Map<String, String> mapOfStrings);
 
+	List<Object> getListOfObjects();
+	void setListOfObjects(List<Object> listOfObject);
+
+	Map<Object, Object> getMapOfObjects();
+	void setMapOfObjects(Map<Object, Object> mapOfObjects);
+
 	// ################################################
 	// ## . . . . . . . . . MetaData . . . . . . . . ##
 	// ################################################
