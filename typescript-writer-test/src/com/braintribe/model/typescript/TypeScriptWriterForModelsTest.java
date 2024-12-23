@@ -26,6 +26,9 @@ import java.util.Set;
 import org.junit.Test;
 
 import com.braintribe.model.generic.GenericEntity;
+import com.braintribe.model.generic.StandardIdentifiable;
+import com.braintribe.model.generic.StandardIntegerIdentifiable;
+import com.braintribe.model.generic.StandardStringIdentifiable;
 import com.braintribe.model.generic.pr.AbsenceInformation;
 import com.braintribe.model.generic.reflection.EntityType;
 import com.braintribe.model.generic.reflection.Model;
@@ -72,22 +75,24 @@ public class TypeScriptWriterForModelsTest extends AbstractWriterTest {
 
 		mustContain("namespace T.com.braintribe.model.generic {");
 		mustContain("const GenericEntity: hc.reflection.EntityType<GenericEntity>;");
-		mustContain("type GenericEntity = hc.reflection.EntityBase & Entity<{");
+		mustContain("type GenericEntity = hc.reflection.EntityBase &");
+		mustContain("  Entity<\"" + GenericEntity.class.getName() + "\", {");
 		mustContain("globalId: string;");
 		mustContain("id: Base;");
 		mustContain("partition: string;");
 		mustContain("}>;");
 
 		mustContain("const StandardIdentifiable: hc.reflection.EntityType<StandardIdentifiable>;");
-		mustContain("type StandardIdentifiable = GenericEntity");
+		mustContain("type StandardIdentifiable = GenericEntity &");
+		mustContain("  Entity<\"" + StandardIdentifiable.class.getName() + "\">;");
 
 		mustContain("const StandardIntegerIdentifiable: hc.reflection.EntityType<StandardIntegerIdentifiable>;");
-		mustContain("type StandardIntegerIdentifiable = GenericEntity");
+		mustContain("type StandardIntegerIdentifiable = GenericEntity &");
+		mustContain("  Entity<\"" + StandardIntegerIdentifiable.class.getName() + "\">;");
 
 		mustContain("const StandardStringIdentifiable: hc.reflection.EntityType<StandardStringIdentifiable>;");
-		mustContain("type StandardStringIdentifiable = GenericEntity");
-
-		notContains("GenericEntity &");
+		mustContain("type StandardStringIdentifiable = GenericEntity &");
+		mustContain("  Entity<\"" + StandardStringIdentifiable.class.getName() + "\">;");
 	}
 
 	@Test
@@ -98,7 +103,7 @@ public class TypeScriptWriterForModelsTest extends AbstractWriterTest {
 		mustContain("const TsJoat: hc.reflection.EntityType<TsJoat>;");
 		mustContain("type TsJoat = Evaluable<list<string>> &\n");
 		mustContain("T.com.braintribe.model.typescript.model.sub.TsSub & T.com.braintribe.model.generic.pr.AbsenceInformation &\n");
-		mustContain("Entity<{\n");
+		mustContain("Entity<\"" + TsJoat.class.getName() + "\", {\n");
 
 		mustContain("primitiveBoolean: P<boolean, { nullable: false }>;");
 		mustContain("wrapperBoolean: boolean;");

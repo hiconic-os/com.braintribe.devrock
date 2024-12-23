@@ -58,7 +58,7 @@ declare module "@dev.hiconic/hc-js-base" {
     type ActualPropertyType<T extends PropertyDeclarationType> = T extends P<infer U, any> ? U : T;
 
     /** Ensures properties are nullable by default, but can be made non-nullable with P<type, { nullable: false }> */
-    type Entity<T extends Record<string, PropertyDeclarationType>> = {
+    type Entity<TS extends string, T extends Record<string, PropertyDeclarationType> = {}> = { TypeSignature(): TS } & {
         [K in keyof T]:
         T[K] extends P<infer U, { nullable: false }> ? U :
         // our collections are never nullable
@@ -220,6 +220,7 @@ declare module "@dev.hiconic/hc-js-base" {
             // If return type was simply string[], then accessing entity[propertyName] would be an error due to imlicity any
             // If return type was (keyof this)[], then sub-types would not be assinable to their supertypes due to incompatible PropertyNames()
             PropertyNames<T extends this>(): readonly (keyof PropsOnly<T>)[]
+            TypeSignature(): string
         }
     }
 

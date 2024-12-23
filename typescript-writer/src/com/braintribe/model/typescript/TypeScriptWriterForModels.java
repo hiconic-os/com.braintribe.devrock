@@ -284,23 +284,24 @@ public class TypeScriptWriterForModels extends AbstractStringifier {
 
 		List<GmProperty> properties = gmEntityType.getProperties();
 
+		println(" &");
+		print("  ");
+
+		print("Entity<\"");
+		print(ctd.typeSignature);
+		print("\"");
+
 		if (!properties.isEmpty()) {
-			if (shouldWriteEval) {
-				println(" &");
-				println("  Entity<{");
-			} else {
-				println(" & Entity<{");
-			}
+			println(", {");
 
 			levelUp();
 			properties.forEach(this::writeProperty);
 
 			levelDown();
-
-			print("}>");
+			print("}");
 		}
 
-		println(";");
+		println(">;");
 		println();
 	}
 
