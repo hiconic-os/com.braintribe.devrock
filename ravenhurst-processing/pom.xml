@@ -68,9 +68,9 @@ limitations under the License.
             <version>2.14.1</version>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>${V.javax.servlet}</version>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>${V.jakarta.servlet}</version>
             <scope>provided</scope>
         </dependency>
 	</dependencies>

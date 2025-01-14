@@ -34,6 +34,7 @@ limitations under the License.
         <V.com.braintribe.wire>[2.0,2.1)</V.com.braintribe.wire>
         <V.com.braintribe.xml>[2.0,2.1)</V.com.braintribe.xml>
         <V.com.zaxxer>2.6.2</V.com.zaxxer>
+        <V.jakarta.servlet>5.0.0</V.jakarta.servlet>
         <V.javax.servlet>3.1.0</V.javax.servlet>
         <V.junit>4.11</V.junit>
         <V.joda-time>2.3</V.joda-time>

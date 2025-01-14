@@ -3,11 +3,12 @@ package com.braintribe.build.artifacts.ravenhurst.test;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Collection;
 import java.util.Locale;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 
 @SuppressWarnings("deprecation")
 public class TestHttpServletResponse implements HttpServletResponse {
@@ -180,4 +181,32 @@ public class TestHttpServletResponse implements HttpServletResponse {
 		// intentionally left empty
 	}
 
+	@Override
+	public void setContentLengthLong(long len) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public int getStatus() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public String getHeader(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<String> getHeaders(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<String> getHeaderNames() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
