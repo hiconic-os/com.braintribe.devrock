@@ -508,13 +508,13 @@ public class MavenSettingsCompiler implements Supplier<RepositoryConfiguration>,
 			MavenHttpRepository centralRelease = MavenHttpRepository.T.create();
 			centralRelease.setName( "central");
 			centralRelease.setUrl(MAVEN_ORG_URL);
-			centralRelease.setCheckSumPolicy(ChecksumPolicy.ignore);
+			centralRelease.setCheckSumPolicy(ChecksumPolicy.fail);
 			repositoryConfiguration.getRepositories().add( centralRelease);
 			
 			MavenHttpRepository centralSnapshot = MavenHttpRepository.T.create();
 			centralSnapshot.setName( "central");
 			centralSnapshot.setUrl(MAVEN_ORG_URL);			
-			centralSnapshot.setCheckSumPolicy(ChecksumPolicy.ignore);
+			centralSnapshot.setCheckSumPolicy(ChecksumPolicy.fail);
 			centralSnapshot.setSnapshotRepo(true);			
 			repositoryConfiguration.getRepositories().add( centralSnapshot);
 		}

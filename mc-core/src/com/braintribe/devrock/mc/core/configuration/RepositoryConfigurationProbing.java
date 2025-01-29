@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -39,7 +40,6 @@ import com.braintribe.devrock.mc.api.repository.RepositoryProbingSupport;
 import com.braintribe.devrock.mc.api.repository.configuration.ArtifactChangesSynchronization;
 import com.braintribe.devrock.mc.api.repository.configuration.HasConnectivityTokens;
 import com.braintribe.devrock.model.mc.reason.configuration.ProbingFailed;
-import com.braintribe.devrock.model.repository.ChangesIndexType;
 import com.braintribe.devrock.model.repository.CodebaseRepository;
 import com.braintribe.devrock.model.repository.MavenHttpRepository;
 import com.braintribe.devrock.model.repository.Repository;
@@ -47,6 +47,7 @@ import com.braintribe.devrock.model.repository.RepositoryConfiguration;
 import com.braintribe.devrock.model.repository.WorkspaceRepository;
 import com.braintribe.devrock.model.repository.filters.ArtifactFilter;
 import com.braintribe.devrock.model.repository.filters.ConjunctionArtifactFilter;
+import com.braintribe.gm.model.reason.Maybe;
 import com.braintribe.gm.model.reason.Reason;
 import com.braintribe.gm.model.reason.Reasons;
 import com.braintribe.gm.model.reason.essential.Canceled;
@@ -129,7 +130,7 @@ public class RepositoryConfigurationProbing implements Supplier<RepositoryConfig
 		Map<Repository, List<VersionedArtifactIdentification>> repositoryToChangedArtifactIdentificatons = new HashMap<>();
 		ExecutorService executorService = Executors.newFixedThreadPool( Math.min(probedRepositoryConfiguration.getRepositories().size(), 10));
 		try {
-			Map<Repository,Future<List<VersionedArtifactIdentification>>> futures = new LinkedHashMap<>(probedRepositoryConfiguration.getRepositories().size());
+			Map<Repository,Future<Maybe<List<VersionedArtifactIdentification>>>> futures = new LinkedHashMap<>(probedRepositoryConfiguration.getRepositories().size());
 			for (Repository repository : probedRepositoryConfiguration.getRepositories()) {
 				
 				// declared offline, hence can be skipped
@@ -151,10 +152,16 @@ public class RepositoryConfigurationProbing implements Supplier<RepositoryConfig
 			}
 			// collect the values and 'contextualize' all thrown exceptions
 			List<Throwable> throwables = new ArrayList<>();
-			for (Map.Entry<Repository,Future<List<VersionedArtifactIdentification>>> entry : futures.entrySet()) {
+			for (Map.Entry<Repository,Future<Maybe<List<VersionedArtifactIdentification>>>> entry : futures.entrySet()) {
 				try {
-					Future<List<VersionedArtifactIdentification>> future = entry.getValue();
-					List<VersionedArtifactIdentification> changedArtifactIdentifications = future.get();
+					Future<Maybe<List<VersionedArtifactIdentification>>> future = entry.getValue();
+					var maybe = future.get();
+					if (maybe.isUnsatisfied()) {
+						Repository repo = entry.getKey();
+						repo.setFailure(maybe.whyUnsatisfied());
+						continue;
+					}
+					List<VersionedArtifactIdentification> changedArtifactIdentifications = maybe.get();
 					repositoryToChangedArtifactIdentificatons.put( entry.getKey(), changedArtifactIdentifications);
 				} catch (InterruptedException e) {
 					Repository repository = entry.getKey();
@@ -166,25 +173,18 @@ public class RepositoryConfigurationProbing implements Supplier<RepositoryConfig
 					
 				} catch (ExecutionException e) {
 					Repository repository = entry.getKey();
-					Throwable cause = e.getCause();
 					
 					IllegalStateException ilsException = new IllegalStateException( "error while probing [" + repository.getName() + "]", e.getCause());				
 					throwables.add( ilsException);
 					
-					Reason reason = InternalError.from(ilsException, "probing error");
+					String tracebackId = UUID.randomUUID().toString();
+					String msg = "Exception while probing (tracebackId=" + tracebackId + ")";
+					log.error(msg, ilsException);
+					
+					Reason reason = InternalError.from(ilsException, msg);
 					repository.setFailure(reason);					
 				}
 			}
-			/*
-			if (throwables.size() > 0) {
-				RuntimeException re = new RuntimeException("probing failed");
-				for (Throwable throwable : throwables) {
-					re.addSuppressed(throwable);
-				}
-				throw re;
-			}
-			*/
-					
 		}
 		finally {
 			executorService.shutdown();
@@ -209,11 +209,11 @@ public class RepositoryConfigurationProbing implements Supplier<RepositoryConfig
 	 * @param probedRepositoryConfiguration - the {@link RepositoryConfiguration} to probe (actually only its local repo data is used)
 	 * @param repository - the {@link Repository} to probe
 	 */
-	private List<VersionedArtifactIdentification> probe(RepositoryConfiguration probedRepositoryConfiguration, Repository repository) {
+	private Maybe<List<VersionedArtifactIdentification>> probe(RepositoryConfiguration probedRepositoryConfiguration, Repository repository) {
 		long before = System.currentTimeMillis();
 		boolean isOffline = repository.getOffline();
 		if (isOffline) {
-			return new ArrayList<>();
+			return Maybe.complete(new ArrayList<>());
 		}
 		RepositoryProbingSupport probingSupport = repositoryProbingSupportSupplier.apply(repository);
 		RepositoryProbingResult probingResult = probingSupport.probe();
@@ -246,7 +246,12 @@ public class RepositoryConfigurationProbing implements Supplier<RepositoryConfig
 		List<VersionedArtifactIdentification> changedVersionedArtifactIdentifications = null;
 		
 		File localRepo = new File( probedRepositoryConfiguration.cachePath());
-		changedVersionedArtifactIdentifications = changesSynchronization.queryChanges(localRepo, repository);
+		Maybe<List<VersionedArtifactIdentification>> queryChangesMaybe = changesSynchronization.queryChanges(localRepo, repository);
+		
+		if (queryChangesMaybe.isUnsatisfied())
+			return queryChangesMaybe;
+		
+		changedVersionedArtifactIdentifications = queryChangesMaybe.get();
 		if (changedVersionedArtifactIdentifications != null && changedVersionedArtifactIdentifications.size() != 0) {
 		 
 			 // let the consumer of the changes artifacts know what has changed 
@@ -276,7 +281,7 @@ public class RepositoryConfigurationProbing implements Supplier<RepositoryConfig
 			long dif = after - before;
 			log.debug("probing [" + repository.getName() + "] took [" + dif + "] ms");
 		}
-		return changedVersionedArtifactIdentifications;
+		return Maybe.complete(changedVersionedArtifactIdentifications);
 	}
 
 	

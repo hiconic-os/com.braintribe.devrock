@@ -83,7 +83,7 @@ public class Transposer {
 	private static ChecksumPolicy transposeCheckSumPolicy( RepositoryPolicy policy) {
 		String checksumPolicy = policy.getChecksumPolicy();
 		if (checksumPolicy == null) {
-			return  ChecksumPolicy.ignore;
+			return  ChecksumPolicy.fail;
 		}
 		else {
 			return ChecksumPolicy.valueOf(checksumPolicy);

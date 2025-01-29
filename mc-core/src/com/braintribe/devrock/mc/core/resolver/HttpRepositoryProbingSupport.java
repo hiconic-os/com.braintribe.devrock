@@ -29,6 +29,7 @@ import com.braintribe.cfg.Configurable;
 import com.braintribe.devrock.mc.api.repository.RepositoryProbingSupport;
 import com.braintribe.devrock.model.mc.reason.configuration.HasRepository;
 import com.braintribe.devrock.model.mc.reason.configuration.RepositoryAccessError;
+import com.braintribe.devrock.model.mc.reason.configuration.RepositoryDoesNotSupportHttpMethod;
 import com.braintribe.devrock.model.mc.reason.configuration.RepositoryErroneous;
 import com.braintribe.devrock.model.mc.reason.configuration.RepositoryUnauthenticated;
 import com.braintribe.devrock.model.mc.reason.configuration.RepositoryUnauthorized;
@@ -41,6 +42,7 @@ import com.braintribe.gm.model.reason.essential.CommunicationError;
 import com.braintribe.gm.model.reason.essential.InternalError;
 import com.braintribe.gm.model.reason.essential.InvalidArgument;
 import com.braintribe.gm.model.reason.essential.IoError;
+import com.braintribe.gm.reason.TemplateReasonBuilder;
 import com.braintribe.gm.reason.TemplateReasons;
 import com.braintribe.logging.Logger;
 import com.braintribe.model.artifact.changes.RepositoryProbeStatus;
@@ -111,8 +113,7 @@ public class HttpRepositoryProbingSupport extends HttpRepositoryBase implements 
 					default:
 						status = failureStatus(statusCode);
 						String reasonPhrase = statusLine.getReasonPhrase();
-						failure = TemplateReasons.build(failureType(statusCode)) //
-								.assign(HasRepository::setRepository, repositoryId) //
+						failure = failureBuilder(statusCode, repositoryId, probingMethod) //
 								.cause(IoError
 										.create(root + " responded with HTTP status " + statusCode + (reasonPhrase == null ? "" : ": " + reasonPhrase)))
 								.toReason();
@@ -174,16 +175,20 @@ public class HttpRepositoryProbingSupport extends HttpRepositoryBase implements 
 		}
 	}
 
-	private EntityType<? extends RepositoryAccessError> failureType(int statusCode) {
+	private TemplateReasonBuilder<? extends RepositoryAccessError> failureBuilder(int statusCode, String repository, RepositoryProbingMethod method) {
 		switch (statusCode) {
-			case 401:
-				return RepositoryUnauthenticated.T;
-			case 403:
-				return RepositoryUnauthorized.T;
-			case 404:
-				return RepositoryUnavailable.T;
-			default:
-				return RepositoryErroneous.T;
+		case 401:
+			return TemplateReasons.build(RepositoryUnauthenticated.T).assign(HasRepository::setRepository, repository);
+		case 403:
+			return TemplateReasons.build(RepositoryUnauthorized.T).assign(HasRepository::setRepository, repository);
+		case 404:
+			return TemplateReasons.build(RepositoryUnavailable.T).assign(HasRepository::setRepository, repository);
+		case 405:
+			return TemplateReasons.build(RepositoryDoesNotSupportHttpMethod.T) //
+					.assign(HasRepository::setRepository, repository) //
+					.assign(RepositoryDoesNotSupportHttpMethod::setMethod, method.name().toUpperCase()); 
+		default:
+			return TemplateReasons.build(RepositoryErroneous.T).assign(HasRepository::setRepository, repository);
 		}
 	}
 

@@ -42,9 +42,9 @@ public interface ArtifactChangesSynchronization {
 	 * query RH for changes 
 	 * @param localRepo - the root folder of the local repository 
 	 * @param repository - the {@link Repository} to query about 
-	 * @return - a {@link List} of {@link VersionedArtifactIdentification} : the changes artifacts
+	 * @return - a {@link Maybe} of the changed artifacts
 	 */
-	List<VersionedArtifactIdentification> queryChanges( File localRepo, Repository repository);
+	Maybe<List<VersionedArtifactIdentification>> queryChanges( File localRepo, Repository repository);
 	
 	/**
 	 * reflect the RH changes on the index files in the local repository (maven-metadata, part-availability)

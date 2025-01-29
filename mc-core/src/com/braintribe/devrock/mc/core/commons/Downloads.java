@@ -243,12 +243,15 @@ public class Downloads {
 					}
 					catch (ReasonException e) {
 						communicationError = e.getReason();
+						logger.debug("Error in download try " + (tries + 1) + " to " + file.getAbsolutePath() + " failed: " + communicationError.stringify());
 					}
 					catch (IOException e) {
+						logger.debug("IOException in download try " + (tries + 1) + " to " + file.getAbsolutePath() + " failed.", e);
 						communicationError = Reasons.build(IoError.T).text("Download try " + (tries + 1) + " failed") //
 								.cause(InternalError.from(e)).toReason(); 
 					}
 					catch (Exception e) {
+						logger.debug("Exception in download try " + (tries + 1) + " to " + file.getAbsolutePath() + " failed.", e);
 						return InternalError.from(e);
 					}
 				}

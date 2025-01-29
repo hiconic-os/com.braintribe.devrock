@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -31,6 +32,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -92,7 +94,7 @@ import com.fasterxml.jackson.core.JsonToken;
 public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase implements ArtifactVersionsResolverTrait, ArtifactDataResolver {
 	private static Logger log = Logger.getLogger(HttpRepositoryArtifactDataResolver.class);
 
-	private ChecksumPolicy checksumPolicy = ChecksumPolicy.ignore;
+	private ChecksumPolicy checksumPolicy = ChecksumPolicy.fail;
 	private boolean ignoreHashHeaders;
 
 	private boolean activateGithubHandling = false;
@@ -261,9 +263,18 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 		public Maybe<InputStream> openStream() {
 			try {
 				return tryOpenInputStream();
-			} catch (Exception e) {
-				return Reasons.build(CommunicationError.T).text("Could not open input stream for: " + url) //
-						.cause(InternalError.from(e)).toMaybe();
+			} 
+			catch (UnknownHostException e) {
+				log.debug("Unknown host: " + url);
+				return Reasons.build(NotFound.T).text("Unknown host: " + url) //
+					.toMaybe();
+			}
+			catch (Exception e) {
+				String tracebackId = UUID.randomUUID().toString();
+				String msg = "Could not open input stream for: " + url + " (tracebackId=" + tracebackId + ")";
+				log.error(msg, e);
+				
+				return Reasons.build(CommunicationError.T).text(msg).toMaybe();
 			}
 		}
 
@@ -380,6 +391,13 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 			CloseableHttpResponse response = getResponse(url);
 
 			int statusCode = response.getStatusLine().getStatusCode();
+			
+			if (log.isDebugEnabled()) {
+				String phrase = response.getStatusLine().getReasonPhrase();
+				phrase = phrase != null? " (" + phrase + ")": "";
+				log.debug("received status " + statusCode + phrase + " from url " + url);
+			}
+			
 			if (statusCode >= 200 && statusCode < 300) {
 				HttpEntity entity = response.getEntity();
 

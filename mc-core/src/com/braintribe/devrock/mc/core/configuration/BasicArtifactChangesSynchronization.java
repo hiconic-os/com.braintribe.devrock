@@ -68,6 +68,7 @@ import com.braintribe.devrock.model.repository.filters.AllMatchingArtifactFilter
 import com.braintribe.devrock.model.repository.filters.ArtifactFilter;
 import com.braintribe.gm.model.reason.Maybe;
 import com.braintribe.gm.model.reason.Reasons;
+import com.braintribe.gm.model.reason.essential.AlreadyExists;
 import com.braintribe.gm.model.reason.essential.CommunicationError;
 import com.braintribe.gm.model.reason.essential.InternalError;
 import com.braintribe.gm.model.reason.essential.IoError;
@@ -205,9 +206,9 @@ public class BasicArtifactChangesSynchronization implements ArtifactChangesSynch
 	}
 
 	@Override
-	public List<VersionedArtifactIdentification> queryChanges(File localRepo, Repository repository) {
+	public Maybe<List<VersionedArtifactIdentification>> queryChanges(File localRepo, Repository repository) {
 		if (!(repository instanceof MavenHttpRepository))
-			return Collections.emptyList();
+			return Maybe.complete(Collections.emptyList());
 		
 		MavenHttpRepository mavenHttpRepository = (MavenHttpRepository) repository;
 		// read last access date
@@ -254,7 +255,7 @@ public class BasicArtifactChangesSynchronization implements ArtifactChangesSynch
 			switch (changesIndexType) {
 				case incremental:
 					if (basicUrl == null) { 
-						return null;
+						return Maybe.complete(null);
 					}
 					touchedArtifactsMaybe = retrieveChangesIncrementally(basicUrl, date);
 					break;
@@ -276,17 +277,21 @@ public class BasicArtifactChangesSynchronization implements ArtifactChangesSynch
 				changes.setLastSynchronization( lastAccess);
 				try (OutputStream out = new FileOutputStream(lastAccessFile)) {
 					marshaller.marshall( out, changes);
-					return touchedArtifacts;			
+					return Maybe.complete(touchedArtifacts);			
 				}
 				catch (IOException e) {
 					throw new UncheckedIOException("cannot write to file [" + lastAccessFile.getAbsolutePath() + "]", e);
 				}
-			}		
+			}
+
+			if (!touchedArtifactsMaybe.isUnsatisfiedBy(AlreadyExists.T)) {
+				return touchedArtifactsMaybe.whyUnsatisfied().asMaybe();
+			}
 		}
 		finally {
 			writeLock.unlock();
 		}		
-		return Collections.emptyList();
+		return Maybe.complete(Collections.emptyList());
 		
 	}
 	
@@ -309,7 +314,7 @@ public class BasicArtifactChangesSynchronization implements ArtifactChangesSynch
 		CompiledArtifactIdentification cai = caiMaybe.get();
 		
 		if (onlyReadIfNewVersionAvailable && !isHigherVersion(artifactChanges, cai)) {
-			return Maybe.empty(Reasons.build(NotFound.T).text("no higher version found of :" + cai.asString()).toReason());
+			return Maybe.empty(Reasons.build(AlreadyExists.T).text("no higher version found of :" + cai.asString()).toReason());
 		}
 							
 		Maybe<ArtifactDataResolution> dataResMaybe = artifactDataResolver.resolvePart(cai, PartIdentification.create("gz"));

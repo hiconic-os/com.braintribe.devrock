@@ -39,14 +39,8 @@ import com.braintribe.model.version.Version;
  * @author pit / dirk
  *
  */
-public abstract class AbstractArtifactDataResolver implements ArtifactDataResolver {
+public abstract class AbstractArtifactDataResolver implements ArtifactVersionsResolverTrait, ArtifactDataResolver {
 	private static DeclaredMavenMetaDataMarshaller marshaller = new DeclaredMavenMetaDataMarshaller();
-	
-	@Override
-	public Maybe<List<VersionInfo>> getVersionsReasoned(ArtifactIdentification artifactIdentification) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
 	@Override
 	public List<VersionInfo> getVersions(ArtifactIdentification artifactIdentification) {

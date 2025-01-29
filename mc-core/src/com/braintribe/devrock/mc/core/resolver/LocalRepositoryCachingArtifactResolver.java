@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -62,8 +61,6 @@ import com.braintribe.devrock.mc.api.repository.local.ArtifactPartResolverPersis
 import com.braintribe.devrock.mc.api.repository.local.PartAvailability;
 import com.braintribe.devrock.mc.api.repository.local.PartAvailabilityAccess;
 import com.braintribe.devrock.mc.api.resolver.ArtifactDataResolution;
-import com.braintribe.devrock.mc.api.resolver.ArtifactResolver;
-import com.braintribe.devrock.mc.api.resolver.PartAvailabilityReflection;
 import com.braintribe.devrock.mc.core.commons.Downloads;
 import com.braintribe.devrock.mc.core.commons.FileCommons;
 import com.braintribe.devrock.mc.core.commons.PartReflectionCommons;
@@ -72,6 +69,7 @@ import com.braintribe.devrock.model.mc.core.event.OnPartDownloaded;
 import com.braintribe.devrock.model.mc.core.event.OnPartDownloading;
 import com.braintribe.devrock.model.mc.reason.InaccessiblePart;
 import com.braintribe.devrock.model.mc.reason.MetaDataDownloadFailed;
+import com.braintribe.devrock.model.mc.reason.UnaccessibleArtifactVersions;
 import com.braintribe.devrock.model.mc.reason.UnresolvedPart;
 import com.braintribe.exception.Exceptions;
 import com.braintribe.gm.model.reason.Maybe;
@@ -110,7 +108,7 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 	private static final Logger logger = Logger.getLogger(LocalRepositoryCachingArtifactResolver.class);
 	private static final int MAX_THREADS = 20;
 	private final List<ArtifactPartResolverPersistenceDelegate> delegates = new ArrayList<>();
-	private final LoadingCache<EqProxy<ArtifactIdentification>, List<VersionInfo>> versionsCache;
+	private final LoadingCache<EqProxy<ArtifactIdentification>, Maybe<List<VersionInfo>>> versionsCache;
 	
 	private final LoadingCache<EqProxy<CompiledPartIdentification>, Maybe<ArtifactDataResolution>> resolutionCache;
 	private final LoadingCache<EqProxy<CompiledArtifactIdentification>, List<PartAvailabilityAccess>> partAvailabilityAccessCache;
@@ -196,39 +194,10 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 	}
 	
 	/**
-	 * structure to be used during of parallel resolving of 'recessive repositories' versions
-	 * @author pit/dirk
-	 *
-	 */
-	private class RecessiveVersionInfoRetrieval {
-		private final ArtifactIdentification artifactIdentification;
-		private final ArtifactPartResolverPersistenceDelegate delegate;
-		private Future<List<VersionInfo>> future;
-		private List<VersionInfo> versionInfos;
-		
-		RecessiveVersionInfoRetrieval(ArtifactIdentification artifactIdentification,
-				ArtifactPartResolverPersistenceDelegate delegate) {
-			super();
-			this.artifactIdentification = artifactIdentification;
-			this.delegate = delegate;
-		}
-
-		void start() {
-			future = es.submit(() -> acquireVersionInfo(artifactIdentification, delegate)); 
-		}
-		
-		List<VersionInfo> retrieve() {
-			versionInfos = get(future);
-			return versionInfos;
-		}
-	}
-
-	
-	/**
 	 * loader function for Caffeine cache  of the VersionInfo
 	 * @param eqProxy - the {@link EqProxy} that wraps the {@link ArtifactIdentification}
 	 */
-	private List<VersionInfo> loadVersions( EqProxy<ArtifactIdentification> eqProxy) {
+	private Maybe<List<VersionInfo>> loadVersions( EqProxy<ArtifactIdentification> eqProxy) {
 				
 		// basic idea is that only the maven-metadata (source of the versions) of the dominant repository are really instantly resolved
 		// and recessive repositories (any non-dominant repository) are only resolved if no dominant repository was able to answer
@@ -237,7 +206,7 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 	
 		int pos = 0;
 		
-		List<Pair<Future<List<VersionInfo>>, Integer>> futures = new ArrayList<>(delegates.size());
+		List<Pair<Future<Maybe<List<VersionInfo>>>, Integer>> futures = new ArrayList<>(delegates.size());
 		
 		for (ArtifactPartResolverPersistenceDelegate delegate: delegates) {
 			// the delegate's not relevant for this artifact, skip it
@@ -251,20 +220,33 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 				dominancePos = pos++;
 			}
 			
-			Future<List<VersionInfo>> future = es.submit(() -> acquireVersionInfo(artifactIdentification, delegate));
+			Future<Maybe<List<VersionInfo>>> future = es.submit(() -> acquireVersionInfo(artifactIdentification, delegate));
 			futures.add(Pair.of(future, dominancePos));
 		}
 		
 		ExceptionCollector exceptionCollector = new ExceptionCollector("Error while resolving maven-metadata for: " + artifactIdentification.asString());
 		
+		var lazyReason = new LazyInitialized<UnaccessibleArtifactVersions>(() -> {
+			return TemplateReasons.build(UnaccessibleArtifactVersions.T) //
+					.assign(UnaccessibleArtifactVersions::setArtifact, artifactIdentification) //
+					.toReason();
+		}); 
+		
 		// create a merged view on the avaiable versions of the recessive repos
 		Map<EqProxy<Version>, BasicVersionInfo> map = new HashMap<>();
 		
-		for (Pair<Future<List<VersionInfo>>, Integer> futureAndDominance: futures) {
+		for (Pair<Future<Maybe<List<VersionInfo>>>, Integer> futureAndDominance: futures) {
 			try {
-				Future<List<VersionInfo>> future = futureAndDominance.first();
+				Future<Maybe<List<VersionInfo>>> future = futureAndDominance.first();
 				Integer dominancePos = futureAndDominance.second();
-				List<VersionInfo> versionInfos = future.get(); // get and eventually wait for retrieval
+				Maybe<List<VersionInfo>> versionInfosMaybe = future.get(); // get and eventually wait for retrieval
+				
+				if (versionInfosMaybe.isUnsatisfied()) {
+					lazyReason.get().getReasons().add(versionInfosMaybe.whyUnsatisfied());
+					continue;
+				}
+				
+				List<VersionInfo> versionInfos = versionInfosMaybe.get();
 				
 				if (versionInfos.isEmpty())
 					continue;
@@ -287,95 +269,16 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 
 		exceptionCollector.throwIfNotEmpty();
 		
+		if (lazyReason.isInitialized())
+			return lazyReason.get().asMaybe();
+		
 		// return a ascending sorted list
 		List<VersionInfo> infos = new ArrayList<>( map.values());
 		Collections.sort(infos);
 
-		return infos;
+		return Maybe.complete(infos);
 	}
 	
-	/**
-	 * loader function for Caffeine cache  of the VersionInfo
-	 * @param eqProxy - the {@link EqProxy} that wraps the {@link ArtifactIdentification}
-	 */
-	private List<VersionInfo> loadVersions_old( EqProxy<ArtifactIdentification> eqProxy) {
-		
-		// basic idea is that only the maven-metadata (source of the versions) of the dominant repository are really instantly resolved
-		// and recessive repositories (any non-dominant repository) are only resolved if no dominant repository was able to answer
-		// 
-		ArtifactIdentification artifactIdentification = eqProxy.get();	
-		
-		List<RecessiveVersionInfoRetrieval> recessiveRetrievals = new ArrayList<>(delegates.size());
-		
-		int pos = 0;
-		
-		for (ArtifactPartResolverPersistenceDelegate delegate: delegates) {
-			// the delegate's not relevant for this artifact, skip it
-			if (!delegate.artifactFilter().matches(artifactIdentification)) { 
-				continue;
-			}		
-			
-			// split by dominance
-			if (!delegate.repositoryDominanceFilter().matches(artifactIdentification)) {
-				RecessiveVersionInfoRetrieval recessiveRetrieval = new RecessiveVersionInfoRetrieval(artifactIdentification, delegate);
-				recessiveRetrievals.add(recessiveRetrieval);
-				
-				continue;
-			}
-			
-			List<VersionInfo> dominantVersionInfos = acquireVersionInfo(artifactIdentification, delegate);
-			// if any dominant can answer, it wins, and so we return the data of the first dominant repo that has versions 
-			if (!dominantVersionInfos.isEmpty())
-				return dominantVersionInfos;
-		}
-		
-		// dominants couldn't answer, so now start the resolving
-		recessiveRetrievals.forEach(RecessiveVersionInfoRetrieval::start);
-		
-		ExceptionCollector exceptionCollector = new ExceptionCollector("Error while resolving maven-metadata for: " + artifactIdentification.asString());
-		
-		int matchCount = 0;
-		List<VersionInfo> versionInfos = new ArrayList<>();
-		
-		for (RecessiveVersionInfoRetrieval recessiveRetrieval: recessiveRetrievals) {
-			try {
-				List<VersionInfo> recessiveVersionInfos = recessiveRetrieval.retrieve(); // get and eventually wait for retrieval
-				
-				if (recessiveVersionInfos.isEmpty())
-					continue;
-				
-				matchCount++;
-				
-				versionInfos.addAll(recessiveVersionInfos);
-				
-			} catch (Exception e) {
-				exceptionCollector.collect(e);
-			}
-		}
-		
-		exceptionCollector.throwIfNotEmpty();
-		
-		if (matchCount < 2)
-			return versionInfos;
-		
-		// create a merged view on the avaiable versions of the recessive repos
-		Map<EqProxy<Version>, BasicVersionInfo> map = new HashMap<>();
-		
-		for (VersionInfo versionInfo: versionInfos) {
-			Version version = versionInfo.version();
-			BasicVersionInfo mergedVersionInfo = map.computeIfAbsent( HashComparators.version.eqProxy(version), k -> new BasicVersionInfo(version));
-			
-			for (String repositoryId: versionInfo.repositoryIds())
-				mergedVersionInfo.add(repositoryId);							
-		}
-		
-		
-		// return a ascending sorted list
-		List<VersionInfo> infos = new ArrayList<>( map.values());
-		Collections.sort(infos);
-		
-		return infos;
-	}
 
 	/**
 	 * simple class to collect exceptions during a process 
@@ -414,28 +317,17 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 		}
 	}
 	
-	/**
-	 * simple get 
-	 * @param <X> - what should be returned
-	 * @param future - the future that can return X 
-	 * @return - X 
-	 */
-	private static <X> X get(Future<X> future) {
-		try {
-			return future.get();
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		} catch (ExecutionException e) {
-			throw Exceptions.unchecked(e.getCause(), "Error in future");
-		}
-	}
-
-	private List<VersionInfo> acquireVersionInfo(ArtifactIdentification artifactIdentification, ArtifactPartResolverPersistenceDelegate delegate) {
-		List<VersionInfo> unfilteredResult = acquireUnfilteredVersionInfo(artifactIdentification, delegate);
+	private Maybe<List<VersionInfo>> acquireVersionInfo(ArtifactIdentification artifactIdentification, ArtifactPartResolverPersistenceDelegate delegate) {
+		Maybe<List<VersionInfo>> unfilteredResultMaybe = acquireUnfilteredVersionInfo(artifactIdentification, delegate);
 		
-		return unfilteredResult.stream() //
+		if (unfilteredResultMaybe.isUnsatisfied())
+			return unfilteredResultMaybe.whyUnsatisfied().asMaybe();
+		
+		List<VersionInfo> unfilteredResult = unfilteredResultMaybe.get();
+		
+		return Maybe.complete(unfilteredResult.stream() //
 				.filter(version -> isVersionReallyAvailable(version, artifactIdentification, delegate)) //
-				.collect(Collectors.toList());
+				.collect(Collectors.toList()));
 	}
 
 	// TODO this logic (filtering versions available for given delegate based on the delegate's filtere) is only tested by jinni tests, but not MC tests
@@ -443,7 +335,7 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 		return delegate.artifactFilter().matches(CompiledArtifactIdentification.from(artId, version.version()));
 	}
 
-	private List<VersionInfo> acquireUnfilteredVersionInfo(ArtifactIdentification artifactIdentification, ArtifactPartResolverPersistenceDelegate delegate) {
+	private Maybe<List<VersionInfo>> acquireUnfilteredVersionInfo(ArtifactIdentification artifactIdentification, ArtifactPartResolverPersistenceDelegate delegate) {
 		if (delegate.isCachable()) {
 			LocalDateTime now = LocalDateTime.now();
 			Duration duration = delegate.updateInterval();
@@ -462,14 +354,14 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 					}
 				}
 				
-				return versionInfos;
+				return Maybe.complete(versionInfos);
 			}
 		}
 		else {
-			return delegate.resolver().getVersions(artifactIdentification);
+			return delegate.resolver().getVersionsReasoned(artifactIdentification);
 		}
 		
-		return Collections.emptyList();
+		return Maybe.complete(Collections.emptyList());
 	}
 	
 	/**
@@ -831,12 +723,12 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 	
 	@Override
 	public Maybe<List<VersionInfo>> getVersionsReasoned(ArtifactIdentification artifactIdentification) {
-		return Maybe.complete(getVersions(artifactIdentification));
+		return versionsCache.get( HashComparators.artifactIdentification.eqProxy(artifactIdentification));
 	}
 
 	@Override
 	public List<VersionInfo> getVersions(ArtifactIdentification artifactIdentification) {	
-		return versionsCache.get( HashComparators.artifactIdentification.eqProxy(artifactIdentification));
+		return getVersionsReasoned(artifactIdentification).get();
 	}
 	
 	@Override

@@ -56,7 +56,12 @@ public interface ArtifactVersionsResolverTrait extends ArtifactVersionsResolver,
 		}
 		
 		ArtifactDataResolution resolution = resolveMetadata.get();
-		try (InputStream in = resolution.getResource().openStream() ) {
+		Maybe<InputStream> inMaybe = resolution.openStream();
+		
+		if (inMaybe.isUnsatisfied())
+			return inMaybe.whyUnsatisfied().asMaybe();
+		
+		try (InputStream in = inMaybe.get()) {
 			Maybe<MavenMetaData> mdMaybe = (Maybe<MavenMetaData>)(Maybe<?>) DeclaredMavenMetaDataMarshaller.INSTANCE.unmarshallReasoned(in);
 			if (mdMaybe.isUnsatisfied())
 				return TemplateReasons.build(MalformedMavenMetadata.T).assign(MalformedMavenMetadata::setMetadata, artifactIdentification.asString()).cause(mdMaybe.whyUnsatisfied()).toMaybe();

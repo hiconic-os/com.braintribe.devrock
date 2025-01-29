@@ -16,6 +16,7 @@
 package com.braintribe.devrock.mc.core.resolver;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -100,7 +101,11 @@ public class HttpRepositoryBase {
 		while (true) {
 			try {
 				return getResponse(url, false);
-			} catch (IOException e) {
+			}
+			catch (UnknownHostException e) {
+				throw e;
+			}
+			catch (IOException e) {
 				if ((retry++) > maxRetries)
 					throw e;
 

@@ -17,6 +17,7 @@ package com.braintribe.devrock.model.repository;
 
 import java.net.URL;
 
+import com.braintribe.model.generic.annotation.Initializer;
 import com.braintribe.model.generic.annotation.meta.Mandatory;
 import com.braintribe.model.generic.reflection.EntityType;
 import com.braintribe.model.generic.reflection.EntityTypes;
@@ -63,8 +64,9 @@ public interface MavenHttpRepository extends MavenRepository, HasCredentials {
 	void setProbingPath(String probingPath);
 
 	/**
-	 * @return - the {@link ChecksumPolicy} set (may be null, defaulting to 'ignore')
+	 * @return - the {@link ChecksumPolicy} set (may be null, defaulting to 'fail')
 	 */
+	@Initializer("fail")
 	ChecksumPolicy getCheckSumPolicy();
 	void setCheckSumPolicy(ChecksumPolicy checkSumPolicy);
 }

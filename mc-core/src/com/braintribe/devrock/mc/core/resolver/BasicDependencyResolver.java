@@ -63,7 +63,13 @@ public class BasicDependencyResolver implements DependencyResolver {
 		}
 		
 		// retrieve the available versions for the dependency
-		List<VersionInfo> versionInfos = versionsResolver.getVersions(dependencyIdentification);
+		Maybe<List<VersionInfo>> versionsInfoMaybe = versionsResolver.getVersionsReasoned(dependencyIdentification);
+		
+		if (versionsInfoMaybe.isUnsatisfied()) {
+			return versionsInfoMaybe.whyUnsatisfied().asMaybe();
+		}
+		
+		List<VersionInfo> versionInfos =  versionsInfoMaybe.get();
 
 		// if there is no version at all we can return eagerly with an adequate reason
 		if (versionInfos.isEmpty())
