@@ -53,6 +53,7 @@ import com.braintribe.devrock.mc.api.resolver.ChecksumPolicy;
 import com.braintribe.devrock.mc.core.commons.HtmlContentParser;
 import com.braintribe.devrock.mc.core.commons.PartReflectionCommons;
 import com.braintribe.devrock.model.mc.reason.MismatchingHash;
+import com.braintribe.devrock.model.mc.reason.UnknownRepositoryHost;
 import com.braintribe.exception.CommunicationException;
 import com.braintribe.gm.model.reason.Maybe;
 import com.braintribe.gm.model.reason.Reason;
@@ -266,7 +267,7 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 			} 
 			catch (UnknownHostException e) {
 				log.debug("Unknown host: " + url);
-				return Reasons.build(NotFound.T).text("Unknown host: " + url) //
+				return Reasons.build(UnknownRepositoryHost.T).text("Unknown host: " + url) //
 					.toMaybe();
 			}
 			catch (Exception e) {
