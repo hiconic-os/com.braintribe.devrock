@@ -45,7 +45,6 @@ public interface ArtifactDataResolver extends ArtifactResolver, ArtifactMetaData
 	 * HTML produced on accessing the artifact's remote location, in case of Artifactory for instance, it's their JSON
 	 * data... so what's in the resolution depends on the implementation
 	 * @param compiledArtifactIdentification - the {@link CompiledArtifactIdentification}
-	 * @return - {@link Optional} of {@link ArtifactDataResolution}
 	 */
 	Maybe<ArtifactDataResolution> getPartOverview( CompiledArtifactIdentification compiledArtifactIdentification);
 }

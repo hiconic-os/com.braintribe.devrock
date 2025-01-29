@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 import com.braintribe.cc.lcd.EqProxy;
 import com.braintribe.devrock.mc.api.commons.ArtifactAddressBuilder;
@@ -74,10 +73,7 @@ public class SnapshotPartAvailabilityAccess extends AbstractPartAvailabilityAcce
 	/**
 	 * @param compiledArtifactIdentification - the full monty artifact
 	 * @param lockSupplier - a {@link Function} that returns the {@link ReadWriteLock} for a specified file 
-	 * @param relevancyFilter - a {@link Predicate} that filters whether the repository reflected is relevant
 	 * @param localRepository - the path to the local repostory's root 
-	 * @param repositoryId - the id of the repository 
-	 * @param artifactMetaDataResolver - a fully qualified resolver for the metadata (configured reflected repository)
 	 */
 	public SnapshotPartAvailabilityAccess(CompiledArtifactIdentification compiledArtifactIdentification,
 			Function<File, ReadWriteLock> lockSupplier, ArtifactFilterExpert artifactFilter,

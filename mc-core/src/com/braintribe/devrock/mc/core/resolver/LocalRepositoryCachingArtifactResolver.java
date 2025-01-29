@@ -337,9 +337,8 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 
 	private Maybe<List<VersionInfo>> acquireUnfilteredVersionInfo(ArtifactIdentification artifactIdentification, ArtifactPartResolverPersistenceDelegate delegate) {
 		if (delegate.isCachable()) {
-			LocalDateTime now = LocalDateTime.now();
 			Duration duration = delegate.updateInterval();
-			MavenMetaData metadata = ensureMetaData(artifactIdentification, metadataMarshaller, now, delegate, duration);
+			MavenMetaData metadata = ensureMetaData(artifactIdentification, metadataMarshaller, delegate, duration);
 			// construct the overview entry
 			if (metadata != null) {
 				List<VersionInfo> versionInfos = new ArrayList<>();
@@ -367,7 +366,8 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 	/**
 	 * make sure that a maven metadata file is correctly present, updated et al 
 	 */
-	private MavenMetaData ensureMetaData(ArtifactIdentification artifactIdentification, DeclaredMavenMetaDataMarshaller metadataMarshaller, LocalDateTime now, ArtifactPartResolverPersistenceDelegate delegate, Duration duration) {
+	private MavenMetaData ensureMetaData(ArtifactIdentification artifactIdentification, DeclaredMavenMetaDataMarshaller metadataMarshaller,
+			ArtifactPartResolverPersistenceDelegate delegate, Duration duration) {
 		logger.trace("ensuring metadata for " + ArtifactIdentification.asString(artifactIdentification) + " for " + delegate.repositoryId());
 
 		File metadataFile = ArtifactAddressBuilder.build().root( localRepository.getAbsolutePath()).artifact(artifactIdentification).metaData( delegate.repositoryId()).toPath().toFile();

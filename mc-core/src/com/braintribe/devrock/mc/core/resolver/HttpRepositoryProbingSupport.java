@@ -47,7 +47,6 @@ import com.braintribe.gm.reason.TemplateReasons;
 import com.braintribe.logging.Logger;
 import com.braintribe.model.artifact.changes.RepositoryProbeStatus;
 import com.braintribe.model.artifact.changes.RepositoryProbingResult;
-import com.braintribe.model.generic.reflection.EntityType;
 
 /**
  * a {@link RepositoryProbingSupport} for http/https based repositories

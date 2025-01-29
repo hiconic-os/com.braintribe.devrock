@@ -213,8 +213,6 @@ public class BasicArtifactPartResolverPersistenceDelegate implements ArtifactPar
 	/**
 	 * reads the last probing result of the repository and returns the {@link RepositoryRestSupport} 
 	 * @param localRepository - {@link File} pointing to the local repository 
-	 * @param compiledArtifactIdentification - the 
-	 * @return
 	 */
 	private RepositoryRestSupport determineRestSupportFromPersistedLastProbingResult(File localRepository) {
 		RepositoryProbingResult probingResult = probingResultPersistenceExpert.readProbingResult(repository, localRepository);

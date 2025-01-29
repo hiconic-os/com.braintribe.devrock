@@ -40,7 +40,7 @@ import com.braintribe.logging.Logger;
  *
  */
 public class HttpRepositoryBase {
-	private Logger logger = Logger.getLogger(HttpRepositoryBase.class);
+	private final Logger logger = Logger.getLogger(HttpRepositoryBase.class);
 	protected String root;
 	protected String userName;
 	protected String password;
@@ -75,12 +75,6 @@ public class HttpRepositoryBase {
 		return getResponse(headOnly ? new HttpHead(url) : new HttpGet(url));
 	}
 
-	/**
-	 * @param url
-	 *            - the URL to use for the HttpGet
-	 * @return - a fresh {@link CloseableHttpResponse}
-	 * @throws IOException
-	 */
 	protected CloseableHttpResponse getResponse(HttpRequestBase requestBase) throws IOException {
 
 		HttpClientContext context = HttpClientContext.create();

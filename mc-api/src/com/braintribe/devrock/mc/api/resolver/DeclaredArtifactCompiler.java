@@ -41,22 +41,20 @@ public interface DeclaredArtifactCompiler {
 		return compileReasoned(in).get();
 	}
 
-	@Deprecated
 	/**
 	 * compiles a pom while reading the contents from the file
-	 * @param in - the {@link File}
 	 * @return - the {@link CompiledArtifact}, which may be invalid, check resulting {@link CompiledArtifact}
 	 */
+	@Deprecated
 	default CompiledArtifact compile(File file) {
 		return compileReasoned(file).get();
 	}
 	
-	@Deprecated
 	/**
 	 * compiles a pom from its modelled representation 
-	 * @param in - the {@link DeclaredArtifact}
 	 * @return - the {@link CompiledArtifact}, which may be invalid, check resulting {@link CompiledArtifact}
 	 */
+	@Deprecated
 	default CompiledArtifact compile(DeclaredArtifact declaredArtifact) {
 		return compileReasoned(declaredArtifact).get();
 	}
@@ -69,13 +67,13 @@ public interface DeclaredArtifactCompiler {
 	Maybe<CompiledArtifact> compileReasoned(InputStream in);
 	/**
 	 * compiles a pom while reading the contents from the file
-	 * @param in - the {@link File}
+	 * @param file - the {@link File}
 	 * @return - the {@link CompiledArtifact}, which may be invalid, check resulting {@link CompiledArtifact}
 	 */
 	Maybe<CompiledArtifact> compileReasoned(File file);
 	/**
 	 * compiles a pom from its modelled representation 
-	 * @param in - the {@link DeclaredArtifact}
+	 * @param declaredArtifact - the {@link DeclaredArtifact}
 	 * @return - the {@link CompiledArtifact}, which may be invalid, check resulting {@link CompiledArtifact}
 	 */
 	Maybe<CompiledArtifact> compileReasoned(DeclaredArtifact declaredArtifact);

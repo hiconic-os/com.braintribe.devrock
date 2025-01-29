@@ -32,9 +32,7 @@ public interface DeclaredArtifactCompilingNode {
 
 	/**
 	 * resolves a variable, via env-, pom-internal-, pom-, system-properties plus delegating it to parent chain if required 
-	 * @param variable - the variable (only name, without ${..})
 	 */
-	
 	Maybe<String> getPropertyReasoned(String name);
 	
 //	/**
@@ -49,20 +47,20 @@ public interface DeclaredArtifactCompilingNode {
 	
 	
 	/**
-	 * @param a resolution context that is null at the entry point
+	 * @param context a resolution context that is null at the entry point
 	 * @return the {@link DeclaredArtifact} that holds all merged information of this node and of all transitive parents/imports
 	 */
 	DeclaredArtifact getAggregatedDeclaredArtifact(CompiledArtifactResolutionContext context);
 	
 	/**
-	 * @param a resolution context that is null at the entry point
+	 * @param context resolution context that is null at the entry point
 	 * @return the {@link AggregatedDeclaredArtifactNode} that holds all merged information of this node and of all transitive parents/imports
 	 */
 	AggregatedDeclaredArtifactNode getAggregatedDeclaredArtifactNode(CompiledArtifactResolutionContext context);
 	
 	
 	/**
-	 * @param a resolution context that is null at the entry point
+	 * @param context a resolution context that is null at the entry point
 	 * @return the {@link DeclaredArtifact} that holds all merged and resolved information of this node and of all transitive parents/imports
 	 */
 	DeclaredArtifact getEffectiveDeclaredArtifact(CompiledArtifactResolutionContext context); 

@@ -34,7 +34,6 @@ import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 import com.braintribe.cc.lcd.EqProxy;
 import com.braintribe.common.lcd.Pair;
@@ -61,7 +60,7 @@ import com.braintribe.utils.lcd.LazyInitialized;
  *
  */
 public class ReleasePartAvailabilityAccess extends AbstractPartAvailabilityAccess {
-	private LazyInitialized<ReleaseInfo> releaseInfo = new LazyInitialized<>( this::initializePartAvailability);
+	private final LazyInitialized<ReleaseInfo> releaseInfo = new LazyInitialized<>( this::initializePartAvailability);
 	
 	/**
 	 * struct to hold the collated information 
@@ -76,9 +75,7 @@ public class ReleasePartAvailabilityAccess extends AbstractPartAvailabilityAcces
 	/**
 	 * @param compiledArtifactIdentification - the full monty artifact
 	 * @param lockSupplier - a {@link Function} that returns the {@link ReadWriteLock} for a specified file 
-	 * @param relevancyFilter - a {@link Predicate} that filters whether the repository reflected is relevant
 	 * @param localRepository - the path to the local repostory's root 
-	 * @param repositoryId - the id of the repository  
 	 */
 	public ReleasePartAvailabilityAccess(CompiledArtifactIdentification compiledArtifactIdentification,
 			Function<File, ReadWriteLock> lockSupplier, ArtifactFilterExpert artifactFilter,
@@ -120,9 +117,6 @@ public class ReleasePartAvailabilityAccess extends AbstractPartAvailabilityAcces
 			if (cachedInfo.uuid.equals( freshInfo.uuid)) {
 				freshInfo.partToAvailabilityMap.put( eqProxy, availablity);
 				storePartAvailability(  partAvailablilityFile, freshInfo);
-			}
-			else {
-				;
 			}
 		}
 		finally {

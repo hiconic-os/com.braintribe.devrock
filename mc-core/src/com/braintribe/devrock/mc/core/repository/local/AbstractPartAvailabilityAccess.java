@@ -18,7 +18,6 @@ package com.braintribe.devrock.mc.core.repository.local;
 import java.io.File;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 import com.braintribe.devrock.mc.api.repository.local.ArtifactPartResolverPersistenceDelegate;
 import com.braintribe.devrock.mc.api.repository.local.PartAvailability;
@@ -47,9 +46,7 @@ public abstract class AbstractPartAvailabilityAccess implements PartAvailability
 	/**
 	 * @param compiledArtifactIdentification - the full monty artifact
 	 * @param lockSupplier - a {@link Function} that returns the {@link ReadWriteLock} for a specified file 
-	 * @param relevancyFilter - a {@link Predicate} that filters whether the repository reflected is relevant
 	 * @param localRepository - the path to the local repostory's root 
-	 * @param repositoryId - the id of the repository  
 	 */
 	public AbstractPartAvailabilityAccess(CompiledArtifactIdentification compiledArtifactIdentification,
 			Function<File, ReadWriteLock> lockSupplier, ArtifactFilterExpert artifactFilter,

@@ -41,7 +41,7 @@ import com.braintribe.model.version.VersionExpression;
  */
 public class BasicDependencyResolver implements DependencyResolver {
 
-	private ArtifactVersionsResolver versionsResolver;
+	private final ArtifactVersionsResolver versionsResolver;
 	
 	
 	
@@ -135,28 +135,6 @@ public class BasicDependencyResolver implements DependencyResolver {
 		Comparator<VersionInfo> c2 = VersionInfo::compareTo;
 		
 		versionInfoComparator = c1.thenComparing(c2.reversed());
-	}
-
-	private String formatAvailableVersions(Map<String, List<Version>> versionsPerRepo) {
-		StringBuilder builder = new StringBuilder();
-		
-		boolean first = true;
-		for (Map.Entry<String, List<Version>> entry: versionsPerRepo.entrySet()) {
-			if (first)
-				first = false;
-			else 
-				builder.append(" | ");
-			
-			String repoId = entry.getKey();
-			builder.append(repoId);
-			builder.append(": ");
-			
-			builder.append(entry.getValue().stream().map(Version::asString).collect(Collectors.joining(", ")));
-		}
-		
-		
-		String availableVersionsStr = builder.toString();
-		return availableVersionsStr;
 	}
 
 }

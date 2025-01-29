@@ -21,28 +21,28 @@ import com.braintribe.model.generic.reflection.EntityType;
 import com.braintribe.model.generic.reflection.EntityTypes;
 
 /**
- * represents the credentials - only user & password 
+ * represents the credentials - only user and password
  * @author pit
  *
  */
 public interface HasCredentials extends GenericEntity {
-	
+
 	EntityType<HasCredentials> T = EntityTypes.T(HasCredentials.class);
-	
+
 	String user = "user";
 	String password = "password";
 
 	/**
-	 * @return - the name of the user as {@link String}. May contain variables like ${env.*}
+	 * @return - the name of the user. May contain variables like ${env.*}
 	 */
 	String getUser();
 	void setUser( String user);
-	
+
 	/**
-	 * @return - the password of the user as {@link String}. May contain variables like ${env.*}
+	 * @return - the password of the user. May contain variables like ${env.*}
 	 */
 	@Confidential
 	String getPassword();
 	void setPassword( String password);
-	
+
 }
