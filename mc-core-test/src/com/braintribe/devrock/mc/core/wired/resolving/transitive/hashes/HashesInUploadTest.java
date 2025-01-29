@@ -59,6 +59,8 @@ public class HashesInUploadTest extends AbstractHashTest {
 		
 		numParts += 4; // first level maven metadata
 		
+		numParts ++; // publish.complete
+		
 		
 		runUpload(artifactA);
 		
@@ -69,8 +71,14 @@ public class HashesInUploadTest extends AbstractHashTest {
 			UploadData uploadData = entry.getValue();
 			
 			String target = uploadData.target;
+			
+			
 			int p = target.lastIndexOf( '.');
 			String extension = target.substring( p+1);
+			
+			if (extension.equals("publish-complete"))
+				continue;
+			
 			if (knownHashExtensions.contains( extension)) {
 				continue;
 			}

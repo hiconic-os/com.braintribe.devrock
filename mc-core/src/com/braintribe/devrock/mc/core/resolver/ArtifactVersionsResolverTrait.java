@@ -58,6 +58,9 @@ public interface ArtifactVersionsResolverTrait extends ArtifactVersionsResolver,
 		ArtifactDataResolution resolution = resolveMetadata.get();
 		Maybe<InputStream> inMaybe = resolution.openStream();
 		
+		if (inMaybe.isUnsatisfiedBy(NotFound.T))
+			return Maybe.complete(Collections.emptyList());
+		
 		if (inMaybe.isUnsatisfied())
 			return inMaybe.whyUnsatisfied().asMaybe();
 		

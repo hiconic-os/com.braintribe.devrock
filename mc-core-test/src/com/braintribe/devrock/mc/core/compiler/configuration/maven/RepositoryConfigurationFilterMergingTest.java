@@ -78,7 +78,7 @@ public class RepositoryConfigurationFilterMergingTest implements HasCommonFilesy
 		iDeclaredRelease.setSnapshotRepo(false);		
 		iDeclaredRelease.setUser("declared_user");
 		iDeclaredRelease.setPassword("declared_password");
-		iDeclaredRelease.setCheckSumPolicy( ChecksumPolicy.ignore);
+		iDeclaredRelease.setCheckSumPolicy( ChecksumPolicy.fail);
 		basicConfiguration.getRepositories().add(iDeclaredRelease);
 		
 		MavenHttpRepository iDeclaredSnapshot = MavenHttpRepository.T.create();
@@ -88,7 +88,7 @@ public class RepositoryConfigurationFilterMergingTest implements HasCommonFilesy
 		iDeclaredSnapshot.setPassword("declared_password");
 		iDeclaredSnapshot.setUpdateTimeSpan( always);
 		iDeclaredSnapshot.setSnapshotRepo(true);		
-		iDeclaredSnapshot.setCheckSumPolicy( ChecksumPolicy.ignore);
+		iDeclaredSnapshot.setCheckSumPolicy( ChecksumPolicy.fail);
 		basicConfiguration.getRepositories().add(iDeclaredSnapshot);
 				
 	}
@@ -105,7 +105,7 @@ public class RepositoryConfigurationFilterMergingTest implements HasCommonFilesy
 		iDeclaredRelease2.setSnapshotRepo(false);		
 		iDeclaredRelease2.setUser("declared_user");
 		iDeclaredRelease2.setPassword("declared_password");
-		iDeclaredRelease2.setCheckSumPolicy( ChecksumPolicy.ignore);
+		iDeclaredRelease2.setCheckSumPolicy(ChecksumPolicy.fail);
 		
 		// add filter
 		QualifiedArtifactFilter declaredFilter = QualifiedArtifactFilter.T.create();
@@ -122,7 +122,7 @@ public class RepositoryConfigurationFilterMergingTest implements HasCommonFilesy
 		iDeclaredSnapshot2.setPassword("declared_password");
 		iDeclaredSnapshot2.setUpdateTimeSpan( always);
 		iDeclaredSnapshot2.setSnapshotRepo(true);		
-		iDeclaredSnapshot2.setCheckSumPolicy( ChecksumPolicy.ignore);
+		iDeclaredSnapshot2.setCheckSumPolicy( ChecksumPolicy.fail);
 		// add filter
 		iDeclaredSnapshot2.setArtifactFilter(declaredFilter);
 		
@@ -158,7 +158,7 @@ public class RepositoryConfigurationFilterMergingTest implements HasCommonFilesy
 		iDeclaredRelease_3.setSnapshotRepo(false);		
 		iDeclaredRelease_3.setUser("declared_user");
 		iDeclaredRelease_3.setPassword("declared_password");
-		iDeclaredRelease_3.setCheckSumPolicy( ChecksumPolicy.ignore);
+		iDeclaredRelease_3.setCheckSumPolicy( ChecksumPolicy.fail);
 		// add filter 
 		QualifiedArtifactFilter declaredFilter = QualifiedArtifactFilter.T.create();
 		declaredFilter.setGroupId("com.braintribe.devrock.test");
@@ -174,7 +174,7 @@ public class RepositoryConfigurationFilterMergingTest implements HasCommonFilesy
 		iDeclaredSnapshot_3.setPassword("declared_password");
 		iDeclaredSnapshot_3.setUpdateTimeSpan( always);
 		iDeclaredSnapshot_3.setSnapshotRepo(true);		
-		iDeclaredSnapshot_3.setCheckSumPolicy( ChecksumPolicy.ignore);
+		iDeclaredSnapshot_3.setCheckSumPolicy( ChecksumPolicy.fail);
 		// add filter
 		iDeclaredSnapshot_3.setArtifactFilter(declaredFilter);
 		externalConfiguration.getRepositories().add(iDeclaredSnapshot_3);

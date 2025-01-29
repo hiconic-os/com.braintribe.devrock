@@ -92,7 +92,7 @@ public class RepositoryConfigurationMavenProfileActivationTest extends AbstractC
 			repo.setUrl( pair.second);
 			repo.setSnapshotRepo( false);
 			repo.setUpdateTimeSpan(daily);
-			repo.setCheckSumPolicy(ChecksumPolicy.ignore);
+			repo.setCheckSumPolicy(ChecksumPolicy.fail);
 			
 			rc.getRepositories().add(repo);
 		}

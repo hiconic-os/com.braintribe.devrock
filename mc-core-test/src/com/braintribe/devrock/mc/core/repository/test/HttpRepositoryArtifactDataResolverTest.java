@@ -208,7 +208,7 @@ public class HttpRepositoryArtifactDataResolverTest extends AbstractRepoletBased
 		
 		/*
 		// currently deactivated as the validator cannot know what was sent by the repolet (no access to headers)
-		if (context.getChecksumPolicy() != ChecksumPolicy.ignore) {
+		if (context.getChecksumPolicy() != ChecksumPolicy.fail) {
 			String org = ArtifactAddressBuilder.build().root( hashes.getAbsolutePath()).compiledArtifact(context.getCi()).part( context.getPart()).toPath().toFilePath();
 			File blk = new File(org + ".blk");
 			File md5 = new File(org + ".md5");
@@ -256,7 +256,7 @@ public class HttpRepositoryArtifactDataResolverTest extends AbstractRepoletBased
 	public void testIgnoreCrc() {
 		CompiledArtifactIdentification ci = CompiledArtifactIdentification.parse( GRP + ":terminal#1.0");
 		PartIdentification pom = PartIdentifications.pom;
-		ResolvingContext rc = new ResolvingContext( getRoot(), ci, pom, ChecksumPolicy.ignore);
+		ResolvingContext rc = new ResolvingContext( getRoot(), ci, pom, ChecksumPolicy.fail);
 		File resolved = resolve(rc);
 				
 		// validate

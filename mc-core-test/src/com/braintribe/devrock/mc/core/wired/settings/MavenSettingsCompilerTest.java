@@ -80,25 +80,25 @@ public class MavenSettingsCompilerTest implements LauncherTrait, HasCommonFilesy
 		archiveA.setName("archiveA");
 		archiveA.setUpdateTimeSpan(null);
 		archiveA.setUrl("https://localhost:8080/archiveA/");
-		archiveA.setCheckSumPolicy(ChecksumPolicy.ignore);
+		archiveA.setCheckSumPolicy(ChecksumPolicy.fail);
 		
 		MavenHttpRepository archiveB = MavenHttpRepository.T.create();
 		archiveB.setName("archiveB");
 		archiveB.setUpdateTimeSpan(null);
 		archiveB.setUrl("https://localhost:8080/archiveB/");
-		archiveB.setCheckSumPolicy(ChecksumPolicy.ignore);
+		archiveB.setCheckSumPolicy(ChecksumPolicy.fail);
 		
 		MavenHttpRepository archiveC = MavenHttpRepository.T.create();
 		archiveC.setName("archiveC");
 		archiveC.setUpdateTimeSpan(null);
 		archiveC.setUrl("https://localhost:8080/archiveC/");
-		archiveC.setCheckSumPolicy(ChecksumPolicy.ignore);
+		archiveC.setCheckSumPolicy(ChecksumPolicy.fail);
 		
 		MavenHttpRepository archiveD = MavenHttpRepository.T.create();
 		archiveD.setName("archiveD");
 		archiveD.setUpdateTimeSpan(null);
 		archiveD.setUrl("https://localhost:8080/archiveD/");
-		archiveD.setCheckSumPolicy(ChecksumPolicy.ignore);
+		archiveD.setCheckSumPolicy(ChecksumPolicy.fail);
 		
 
 		MavenHttpRepository centralRelease = MavenHttpRepository.T.create();
@@ -106,7 +106,7 @@ public class MavenSettingsCompilerTest implements LauncherTrait, HasCommonFilesy
 		centralRelease.setUrl( MAVEN_ORG_URL);
 		centralRelease.setProbingMethod(RepositoryProbingMethod.get);
 		centralRelease.setProbingPath( MAVEN_ORG_PROBING_PATH);
-		centralRelease.setCheckSumPolicy(ChecksumPolicy.ignore);
+		centralRelease.setCheckSumPolicy(ChecksumPolicy.fail);
 				
 		MavenHttpRepository centralSnapshot = MavenHttpRepository.T.create();
 		centralSnapshot.setName( "central");
@@ -114,18 +114,18 @@ public class MavenSettingsCompilerTest implements LauncherTrait, HasCommonFilesy
 		centralSnapshot.setUrl( MAVEN_ORG_URL);
 		centralSnapshot.setProbingMethod(RepositoryProbingMethod.get);
 		centralSnapshot.setProbingPath( MAVEN_ORG_PROBING_PATH);
-		centralSnapshot.setCheckSumPolicy(ChecksumPolicy.ignore);
+		centralSnapshot.setCheckSumPolicy(ChecksumPolicy.fail);
 		
 		MavenHttpRepository mirroredCentralRelease = MavenHttpRepository.T.create();
 		mirroredCentralRelease.setName( "central");
 		mirroredCentralRelease.setUrl("https://localhost:8080/archiveA/");
-		mirroredCentralRelease.setCheckSumPolicy(ChecksumPolicy.ignore);
+		mirroredCentralRelease.setCheckSumPolicy(ChecksumPolicy.fail);
 				
 		MavenHttpRepository mirroredCentralSnapshot = MavenHttpRepository.T.create();
 		mirroredCentralSnapshot.setName( "central");
 		mirroredCentralSnapshot.setSnapshotRepo(true);
 		mirroredCentralSnapshot.setUrl("https://localhost:8080/archiveA/");
-		mirroredCentralSnapshot.setCheckSumPolicy(ChecksumPolicy.ignore);
+		mirroredCentralSnapshot.setCheckSumPolicy(ChecksumPolicy.fail);
 		
 			
 		overloadedSingleRepositoryConfiguration = RepositoryConfiguration.T.create();

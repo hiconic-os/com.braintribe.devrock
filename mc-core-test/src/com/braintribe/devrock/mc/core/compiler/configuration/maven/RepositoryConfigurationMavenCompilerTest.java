@@ -73,7 +73,7 @@ public class RepositoryConfigurationMavenCompilerTest extends AbstractCompilerTe
 		coreDev.setName( "core-dev");
 		coreDev.setUrl( "https://declared_url/core-dev/");
 		coreDev.setUpdateTimeSpan(never);
-		coreDev.setCheckSumPolicy( ChecksumPolicy.ignore);
+		coreDev.setCheckSumPolicy( ChecksumPolicy.fail);
 		coreDev.setSnapshotRepo(false);		
 		coreDev.setUser("devrock-tests-dummy");
 		coreDev.setPassword("nonewhatsoever");
@@ -84,7 +84,7 @@ public class RepositoryConfigurationMavenCompilerTest extends AbstractCompilerTe
 		thirdParty.setName( "third-party");
 		thirdParty.setUrl( "https://declared_url/third-party/");
 		thirdParty.setUpdateTimeSpan(never);
-		thirdParty.setCheckSumPolicy( ChecksumPolicy.ignore);
+		thirdParty.setCheckSumPolicy( ChecksumPolicy.fail);
 		thirdParty.setSnapshotRepo(false);	
 		thirdParty.setUser("devrock-tests-dummy");
 		thirdParty.setPassword("nonewhatsoever");
@@ -95,7 +95,7 @@ public class RepositoryConfigurationMavenCompilerTest extends AbstractCompilerTe
 		devRock.setName( "devrock");
 		devRock.setUrl( "https://declared_url/devrock/");
 		devRock.setUpdateTimeSpan(never);
-		devRock.setCheckSumPolicy( ChecksumPolicy.ignore);
+		devRock.setCheckSumPolicy( ChecksumPolicy.fail);
 		devRock.setSnapshotRepo(false);	
 		devRock.setUser("devrock-tests-dummy");
 		devRock.setPassword("nonewhatsoever");
@@ -118,7 +118,7 @@ public class RepositoryConfigurationMavenCompilerTest extends AbstractCompilerTe
 		coreDevAlternative.setName( "core-dev-alternative");
 		coreDevAlternative.setUrl( "https://declared_url/core-dev-alternative/");
 		coreDevAlternative.setUpdateTimeSpan(never);
-		coreDevAlternative.setCheckSumPolicy( ChecksumPolicy.ignore);
+		coreDevAlternative.setCheckSumPolicy( ChecksumPolicy.fail);
 		coreDevAlternative.setSnapshotRepo(false);	
 		coreDevAlternative.setUser("devrock-tests-dummy");
 		coreDevAlternative.setPassword("nonewhatsoever");
@@ -133,7 +133,7 @@ public class RepositoryConfigurationMavenCompilerTest extends AbstractCompilerTe
 		MavenHttpRepository uCoreDevRelease = MavenHttpRepository.T.create();
 		uCoreDevRelease.setName( "core-dev");
 		uCoreDevRelease.setUrl( "https://declared_url/third-party/");
-		uCoreDevRelease.setCheckSumPolicy( ChecksumPolicy.ignore);
+		uCoreDevRelease.setCheckSumPolicy( ChecksumPolicy.fail);
 		uCoreDevRelease.setUpdateTimeSpan(never);		
 		uCoreDevRelease.setUser("devrock-tests-dummy");
 		uCoreDevRelease.setPassword("nonewhatsoever");
@@ -144,7 +144,7 @@ public class RepositoryConfigurationMavenCompilerTest extends AbstractCompilerTe
 		uCoreDevSnapshot.setName( "core-dev");
 		uCoreDevSnapshot.setUrl( "https://declared_url/third-party/");
 		uCoreDevSnapshot.setSnapshotRepo(true);
-		uCoreDevSnapshot.setCheckSumPolicy( ChecksumPolicy.ignore);
+		uCoreDevSnapshot.setCheckSumPolicy( ChecksumPolicy.fail);
 		uCoreDevSnapshot.setUpdateTimeSpan(always);		
 		uCoreDevSnapshot.setUser("devrock-tests-dummy");
 		uCoreDevSnapshot.setPassword("nonewhatsoever");
@@ -164,7 +164,7 @@ public class RepositoryConfigurationMavenCompilerTest extends AbstractCompilerTe
 		uCoreDevAlternativeSnapshot.setUpdateTimeSpan( interval10);
 		uCoreDevAlternativeSnapshot.setSnapshotRepo(true);
 		uCoreDevAlternativeSnapshot.setUser("devrock-tests-dummy");
-		uCoreDevAlternativeSnapshot.setCheckSumPolicy( ChecksumPolicy.ignore);
+		uCoreDevAlternativeSnapshot.setCheckSumPolicy( ChecksumPolicy.fail);
 		uCoreDevAlternativeSnapshot.setPassword("nonewhatsoever");
 		
 		updatePoliciesConfiguration.getRepositories().add(uCoreDevAlternativeSnapshot);
@@ -173,7 +173,7 @@ public class RepositoryConfigurationMavenCompilerTest extends AbstractCompilerTe
 		uCoreDevAlternativeRelease.setName( "core-dev-alternative");
 		uCoreDevAlternativeRelease.setUrl( "https://declared_url/third-party/");
 		uCoreDevAlternativeRelease.setUpdateTimeSpan( daily);
-		uCoreDevAlternativeRelease.setCheckSumPolicy( ChecksumPolicy.ignore);
+		uCoreDevAlternativeRelease.setCheckSumPolicy( ChecksumPolicy.fail);
 		uCoreDevAlternativeRelease.setSnapshotRepo(false);
 		uCoreDevAlternativeRelease.setUser("devrock-tests-dummy");
 		uCoreDevAlternativeRelease.setPassword("nonewhatsoever");
@@ -184,7 +184,7 @@ public class RepositoryConfigurationMavenCompilerTest extends AbstractCompilerTe
 		uCoreDevAlternative2Release.setName( "core-dev-alternative-two");
 		uCoreDevAlternative2Release.setUrl( "https://declared_url/third-party/");		
 		uCoreDevAlternative2Release.setUpdateTimeSpan(daily);		
-		uCoreDevAlternative2Release.setCheckSumPolicy( ChecksumPolicy.ignore);
+		uCoreDevAlternative2Release.setCheckSumPolicy( ChecksumPolicy.fail);
 		uCoreDevAlternative2Release.setUser("devrock-tests-dummy");
 		uCoreDevAlternative2Release.setPassword("nonewhatsoever");
 		
@@ -202,7 +202,7 @@ public class RepositoryConfigurationMavenCompilerTest extends AbstractCompilerTe
 		iDeclaredRelease.setSnapshotRepo(false);		
 		iDeclaredRelease.setUser("declared_user");
 		iDeclaredRelease.setPassword("declared_password");
-		iDeclaredRelease.setCheckSumPolicy( ChecksumPolicy.ignore);
+		iDeclaredRelease.setCheckSumPolicy( ChecksumPolicy.fail);
 		injectedConfiguration.getRepositories().add(iDeclaredRelease);
 		
 		MavenHttpRepository iDeclaredSnapshot = MavenHttpRepository.T.create();
@@ -212,7 +212,7 @@ public class RepositoryConfigurationMavenCompilerTest extends AbstractCompilerTe
 		iDeclaredSnapshot.setPassword("declared_password");
 		iDeclaredSnapshot.setUpdateTimeSpan( always);
 		iDeclaredSnapshot.setSnapshotRepo(true);		
-		iDeclaredSnapshot.setCheckSumPolicy( ChecksumPolicy.ignore);
+		iDeclaredSnapshot.setCheckSumPolicy( ChecksumPolicy.fail);
 		injectedConfiguration.getRepositories().add(iDeclaredSnapshot);
 		
 		MavenHttpRepository iDeclaredReleaseToOverride = MavenHttpRepository.T.create();
@@ -222,7 +222,7 @@ public class RepositoryConfigurationMavenCompilerTest extends AbstractCompilerTe
 		iDeclaredReleaseToOverride.setSnapshotRepo(false);		
 		iDeclaredReleaseToOverride.setUser("partially_declared_repo_split_to_override_all_user");
 		iDeclaredReleaseToOverride.setPassword("partially_declared_repo_split_to_override_all_password");
-		iDeclaredReleaseToOverride.setCheckSumPolicy( ChecksumPolicy.ignore);
+		iDeclaredReleaseToOverride.setCheckSumPolicy( ChecksumPolicy.fail);
 		injectedConfiguration.getRepositories().add(iDeclaredReleaseToOverride);
 		
 		MavenHttpRepository iDeclaredSnapshotToOverride = MavenHttpRepository.T.create();
@@ -232,7 +232,7 @@ public class RepositoryConfigurationMavenCompilerTest extends AbstractCompilerTe
 		iDeclaredSnapshotToOverride.setSnapshotRepo(true);		
 		iDeclaredSnapshotToOverride.setUser("partially_declared_repo_split_to_override_all_user");
 		iDeclaredSnapshotToOverride.setPassword("partially_declared_repo_split_to_override_all_password");
-		iDeclaredSnapshotToOverride.setCheckSumPolicy( ChecksumPolicy.ignore);
+		iDeclaredSnapshotToOverride.setCheckSumPolicy( ChecksumPolicy.fail);
 		injectedConfiguration.getRepositories().add(iDeclaredSnapshotToOverride);
 		
 		MavenHttpRepository iAdded = MavenHttpRepository.T.create();
@@ -249,7 +249,7 @@ public class RepositoryConfigurationMavenCompilerTest extends AbstractCompilerTe
 		iDeclaredReleaseToOverrideRelease.setSnapshotRepo(false);		
 		iDeclaredReleaseToOverrideRelease.setUser("partially_declared_repo_split_to_override_release_user");
 		iDeclaredReleaseToOverrideRelease.setPassword("partially_declared_repo_split_to_override_release_password");
-		iDeclaredReleaseToOverrideRelease.setCheckSumPolicy( ChecksumPolicy.ignore);
+		iDeclaredReleaseToOverrideRelease.setCheckSumPolicy( ChecksumPolicy.fail);
 		injectedConfiguration.getRepositories().add(iDeclaredReleaseToOverrideRelease);
 		
 	}
