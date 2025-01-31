@@ -69,6 +69,7 @@ import com.braintribe.devrock.model.mc.core.event.OnPartDownloaded;
 import com.braintribe.devrock.model.mc.core.event.OnPartDownloading;
 import com.braintribe.devrock.model.mc.reason.InaccessiblePart;
 import com.braintribe.devrock.model.mc.reason.MetaDataDownloadFailed;
+import com.braintribe.devrock.model.mc.reason.PartReflectionFailure;
 import com.braintribe.devrock.model.mc.reason.UnaccessibleArtifactVersions;
 import com.braintribe.devrock.model.mc.reason.UnresolvedPart;
 import com.braintribe.exception.Exceptions;
@@ -730,15 +731,29 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 	public List<VersionInfo> getVersions(ArtifactIdentification artifactIdentification) {	
 		return getVersionsReasoned(artifactIdentification).get();
 	}
-	
 	@Override
-	public List<PartReflection> getAvailablePartsOf( CompiledArtifactIdentification compiledArtifactIdentification) {
-		List<PartReflection> result = new ArrayList<>();				
-		// TODO : check if locally installed ?  
+	public Maybe<List<PartReflection>> getAvailablePartsOfReasoned( CompiledArtifactIdentification compiledArtifactIdentification) {
+		List<PartReflection> result = new ArrayList<>();
+		
+		var lazyReason = new LazyInitialized<Reason>(() -> TemplateReasons.build(PartReflectionFailure.T).toReason());
+		
+		// TODO : check if locally installed ?
 		List<PartAvailabilityAccess> partAvailabilityAccesses = partAvailabilityAccessCache.get( HashComparators.compiledArtifactIdentification.eqProxy(compiledArtifactIdentification));
 		for (PartAvailabilityAccess pa : partAvailabilityAccesses) {			
+			if (!pa.repoDelegate().artifactFilter().matches(compiledArtifactIdentification))
+				continue;
+			
 			if (!pa.repoDelegate().isLocalDelegate()){ 
-				List<PartReflection> partsOf = pa.repoDelegate().resolver().getPartsOf(compiledArtifactIdentification);
+				var partsOfMaybe = pa.repoDelegate().resolver().getPartsOfReasoned(compiledArtifactIdentification);
+				
+				if (partsOfMaybe.isUnsatisfied()) {
+					if (partsOfMaybe.isUnsatisfiedBy(NotFound.T))
+						continue;
+					else
+						lazyReason.get().getReasons().add(partsOfMaybe.whyUnsatisfied());
+				}
+				
+				List<PartReflection> partsOf = partsOfMaybe.get();
 				result.addAll( partsOf);
 			}
 			else {
@@ -752,8 +767,11 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 				result.addAll( PartReflectionCommons.transpose(availableParts, "local"));
 			}					
 		}
+		
+		if (lazyReason.isInitialized())
+			return Maybe.incomplete(result, lazyReason.get());
 					
-		return result;
+		return Maybe.complete(result);
 	}
 	
 	

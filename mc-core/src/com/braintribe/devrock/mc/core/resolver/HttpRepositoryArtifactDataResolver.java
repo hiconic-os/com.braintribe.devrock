@@ -26,6 +26,7 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -566,33 +567,43 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 	}
 
 	@Override
-	public List<PartReflection> getPartsOf(CompiledArtifactIdentification compiledArtifactIdentification) {
+	public Maybe<List<PartReflection>> getPartsOfReasoned(CompiledArtifactIdentification compiledArtifactIdentification) {
 		Maybe<ArtifactDataResolution> htmlContent = getPartOverview(compiledArtifactIdentification);
+		
+		if (htmlContent.isUnsatisfiedBy(NotFound.T))
+			return Maybe.complete(Collections.emptyList());
+		
+		if (htmlContent.isUnsatisfied())
+			return htmlContent.whyUnsatisfied().asMaybe();
 
-		if (htmlContent.isSatisfied()) {
-			try {
-				String htmlData = IOTools.slurp(htmlContent.get().getResource().openStream(), "UTF-8");
-				List<String> filenamesFromHtml = null;
-				if (activateGithubHandling && this.root.startsWith("https://maven.pkg.github.com")) {
-					filenamesFromHtml = parseFilenamesFromGitHubHtml(htmlData, compiledArtifactIdentification);
-				} else {
-					filenamesFromHtml = HtmlContentParser.parseFilenamesFromHtml(htmlData);
-				}
 
-				List<PartReflection> partReflections = PartReflectionCommons.transpose(compiledArtifactIdentification, repositoryId,
-						filenamesFromHtml);
-				return partReflections;
-			} catch (IOException e) {
-				// ignored
+		try {
+			Maybe<InputStream> inMaybe = htmlContent.get().openStream();
+			
+			if (inMaybe.isUnsatisfiedBy(NotFound.T)) {
+				return Maybe.complete(Collections.emptyList());
 			}
+			
+			if (inMaybe.isUnsatisfied())
+				return inMaybe.whyUnsatisfied().asMaybe();
+			
+			String htmlData = IOTools.slurp(inMaybe.get(), "UTF-8");
+			List<String> filenamesFromHtml = null;
+			if (activateGithubHandling && this.root.startsWith("https://maven.pkg.github.com")) {
+				filenamesFromHtml = parseFilenamesFromGitHubHtml(htmlData, compiledArtifactIdentification);
+			} else {
+				filenamesFromHtml = HtmlContentParser.parseFilenamesFromHtml(htmlData);
+			}
+
+			List<PartReflection> partReflections = PartReflectionCommons.transpose(compiledArtifactIdentification, repositoryId,
+					filenamesFromHtml);
+			return Maybe.complete(partReflections);
+		} catch (Exception e) {
+			String tracebackId = UUID.randomUUID().toString();
+			String msg = "Exception while parsing repo part list reflection for " + compiledArtifactIdentification + " (tracebackId=" + tracebackId + ")";
+			log.error(msg, e);
+			return InternalError.from(e, msg).asMaybe(); 
 		}
-
-		Reason whyUnsatisfied = htmlContent.whyUnsatisfied();
-
-		if (whyUnsatisfied instanceof NotFound)
-			return null;
-
-		throw new ReasonException(whyUnsatisfied);
 	}
 
 	private List<String> parseFilenamesFromGitHubHtml(String htmlData, CompiledArtifactIdentification compiledArtifactIdentification) {

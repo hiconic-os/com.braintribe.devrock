@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.braintribe.gm.model.reason.Maybe;
 import com.braintribe.model.artifact.compiled.CompiledArtifactIdentification;
 import com.braintribe.model.artifact.compiled.CompiledPartIdentification;
 import com.braintribe.model.artifact.consumable.PartReflection;
@@ -40,5 +41,9 @@ public interface PartAvailabilityReflection {
 	 * @param compiledArtifactIdentification - the {@link CompiledArtifactIdentification} that identifies the artifact
 	 * @return - a {@link Map} of the id of the repository and a {@link Set} of {@link CompiledPartIdentification} 
 	 */
-	List<PartReflection> getAvailablePartsOf( CompiledArtifactIdentification compiledArtifactIdentification);
+	default List<PartReflection> getAvailablePartsOf( CompiledArtifactIdentification compiledArtifactIdentification) {
+		return getAvailablePartsOfReasoned(compiledArtifactIdentification).get();
+	}
+	
+	Maybe<List<PartReflection>> getAvailablePartsOfReasoned( CompiledArtifactIdentification compiledArtifactIdentification);
 }

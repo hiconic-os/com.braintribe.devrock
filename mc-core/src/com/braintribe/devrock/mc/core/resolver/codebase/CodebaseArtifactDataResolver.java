@@ -508,19 +508,19 @@ public class CodebaseArtifactDataResolver implements ArtifactDataResolver, Initi
 	}
 
 	@Override
-	public List<PartReflection> getPartsOf(CompiledArtifactIdentification compiledArtifactIdentification) {	
+	public Maybe<List<PartReflection>> getPartsOfReasoned(CompiledArtifactIdentification compiledArtifactIdentification) {	
 		// can only contain the pom 
 		File artifactDirectory = findArtifact( compiledArtifactIdentification.getGroupId(), compiledArtifactIdentification.getArtifactId(), compiledArtifactIdentification.getVersion().asString());
 		if (artifactDirectory == null || !artifactDirectory.exists()) {
-			return Collections.emptyList();
+			return Maybe.complete(Collections.emptyList());
 		}
 		File pom = new File( artifactDirectory, "pom.xml");
 		if (!pom.exists()) {
-			return Collections.emptyList();
+			return Maybe.complete(Collections.emptyList());
 		}
 		
 		PartReflection pf = PartReflection.create(null, "pom", repositoryId);
-		return Collections.singletonList( pf);
+		return Maybe.complete(Collections.singletonList( pf));
 	}
 
 	@Override

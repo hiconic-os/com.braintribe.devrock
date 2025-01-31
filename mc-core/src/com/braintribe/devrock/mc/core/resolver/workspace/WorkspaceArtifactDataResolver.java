@@ -205,13 +205,13 @@ public class WorkspaceArtifactDataResolver implements ArtifactDataResolver {
 	
 
 	@Override
-	public List<PartReflection> getPartsOf(CompiledArtifactIdentification compiledArtifactIdentification) {
+	public Maybe<List<PartReflection>> getPartsOfReasoned(CompiledArtifactIdentification compiledArtifactIdentification) {
 		Artifact codebaseArtifact = findArtifact(compiledArtifactIdentification);
 		if (codebaseArtifact == null) {
-			return Collections.emptyList();
+			return Maybe.complete(Collections.emptyList());
 		}
 		
-		return new ArrayList<PartReflection>( codebaseArtifact.getParts().values());			
+		return Maybe.complete(new ArrayList<PartReflection>( codebaseArtifact.getParts().values()));			
 		
 	}
 

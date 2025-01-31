@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 import com.braintribe.codec.marshaller.api.GmDeserializationOptions;
 import com.braintribe.codec.marshaller.json.JsonStreamMarshaller;
@@ -35,7 +36,9 @@ import com.braintribe.devrock.model.artifactory.FolderInfo;
 import com.braintribe.exception.Exceptions;
 import com.braintribe.gm.model.reason.Maybe;
 import com.braintribe.gm.model.reason.ReasonException;
+import com.braintribe.gm.model.reason.essential.InternalError;
 import com.braintribe.gm.model.reason.essential.NotFound;
+import com.braintribe.logging.Logger;
 import com.braintribe.model.artifact.compiled.CompiledArtifactIdentification;
 import com.braintribe.model.artifact.consumable.PartReflection;
 import com.braintribe.model.resource.Resource;
@@ -43,6 +46,7 @@ import com.braintribe.utils.lcd.LazyInitialized;
 import com.braintribe.utils.paths.UniversalPath;
 
 public class ArtifactoryRepositoryArtifactDataResolver extends HttpRepositoryArtifactDataResolver {
+	private static final Logger logger = Logger.getLogger(ArtifactoryRepositoryArtifactDataResolver.class);
 	private LazyInitialized<String> restUrl = new LazyInitialized<>( this::determineRestUrl);
 	private static JsonStreamMarshaller marshaller = new JsonStreamMarshaller();
 	private static GmDeserializationOptions options = GmDeserializationOptions.defaultOptions.derive().setInferredRootType( FolderInfo.T).build();
@@ -68,30 +72,37 @@ public class ArtifactoryRepositoryArtifactDataResolver extends HttpRepositoryArt
 	}
 
 	@Override
-	public List<PartReflection> getPartsOf(CompiledArtifactIdentification compiledArtifactIdentification) {
+	public Maybe<List<PartReflection>> getPartsOfReasoned(CompiledArtifactIdentification compiledArtifactIdentification) {
 		Maybe<ArtifactDataResolution> overview = getPartOverview(compiledArtifactIdentification);
-		if (overview.isSatisfied()) {
-			Resource resource = overview.get().getResource();
-			try (InputStream in = new BufferedInputStream( resource.openStream())) {
-				FolderInfo info = (FolderInfo) marshaller.unmarshall(in, options);
-				List<String> files = new ArrayList<>( info.getChildren().size());
-				for (FileItem item : info.getChildren()) {
-					files.add( item.getUri());
-				}
-				return PartReflectionCommons.transpose( compiledArtifactIdentification, repositoryId, files);
-			}
-			catch (IOException | NoSuchElementException e) {
-				return Collections.emptyList(); // no such file 
-			}
-			catch (Exception e) {
-				throw Exceptions.unchecked( e, "error while unmarshalling json result for [" +  compiledArtifactIdentification + "]");
-			}					
+		
+		if (overview.isUnsatisfiedBy(NotFound.T))
+			return Maybe.complete(Collections.emptyList());
+		
+		if (overview.isUnsatisfied())
+			return overview.whyUnsatisfied().asMaybe();
+		
+		var inMaybe = overview.get().openStream();
+		
+		if (inMaybe.isUnsatisfiedBy(NotFound.T)) {
+			return Maybe.complete(Collections.emptyList());
 		}
-		else if (overview.whyUnsatisfied() instanceof NotFound) {
-			return Collections.emptyList();	
+		
+		if (inMaybe.isUnsatisfied())
+			return inMaybe.whyUnsatisfied().asMaybe();
+
+		try (InputStream in = new BufferedInputStream(inMaybe.get())) {
+			FolderInfo info = (FolderInfo) marshaller.unmarshall(in, options);
+			List<String> files = new ArrayList<>( info.getChildren().size());
+			for (FileItem item : info.getChildren()) {
+				files.add( item.getUri());
+			}
+			return Maybe.complete(PartReflectionCommons.transpose( compiledArtifactIdentification, repositoryId, files));
 		}
-		else {
-			throw new ReasonException(overview.whyUnsatisfied());
+		catch (Exception e) {
+			String tracebackId = UUID.randomUUID().toString();
+			String msg = "Exception while parsing repo part list reflection for " + compiledArtifactIdentification + " (tracebackId=" + tracebackId + ")";
+			logger.error(msg, e);
+			return InternalError.from(e, msg).asMaybe(); 
 		}
 	}
 	

@@ -16,7 +16,6 @@
 package com.braintribe.devrock.mc.core.resolver;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +35,6 @@ import com.braintribe.model.artifact.consumable.PartReflection;
 import com.braintribe.model.artifact.essential.ArtifactIdentification;
 import com.braintribe.model.artifact.essential.PartIdentification;
 import com.braintribe.model.resource.FileResource;
-import com.braintribe.model.resource.Resource;
 import com.braintribe.model.version.Version;
 import com.braintribe.utils.paths.UniversalPath;
 
@@ -108,7 +106,7 @@ public class FilesystemRepositoryArtifactDataResolver implements ArtifactVersion
 		return Reasons.build(NotFound.T).toMaybe();
 	}
 	@Override
-	public List<PartReflection> getPartsOf(CompiledArtifactIdentification compiledArtifactIdentification) {		
+	public Maybe<List<PartReflection>> getPartsOfReasoned(CompiledArtifactIdentification compiledArtifactIdentification) {		
 		File artifactRepository = UniversalPath.empty().push( root.getAbsolutePath())
 								.pushDottedPath( compiledArtifactIdentification.getGroupId())
 								.push( compiledArtifactIdentification.getArtifactId())
@@ -116,14 +114,14 @@ public class FilesystemRepositoryArtifactDataResolver implements ArtifactVersion
 								.toFile();
 		File [] files = artifactRepository.listFiles(); 
 		if (files == null || files.length == 0) {
-			return Collections.emptyList();
+			return Maybe.complete(Collections.emptyList());
 		}
 		List<String> names = new ArrayList<>(files.length);
 		for (int i = 0; i < files.length; i++) {
 			names.add( files[i].getName());
 		}
 		
-		return PartReflectionCommons.transpose(compiledArtifactIdentification, repositoryId, names);
+		return Maybe.complete(PartReflectionCommons.transpose(compiledArtifactIdentification, repositoryId, names));
 	}
 	
 	

@@ -140,8 +140,8 @@ public class FakeArtifactPartResolverPersistenceDelegate implements ArtifactPart
 			}
 
 			@Override
-			public List<PartReflection> getPartsOf(CompiledArtifactIdentification compiledArtifactIdentification) {			
-				return Collections.emptyList();
+			public Maybe<List<PartReflection>> getPartsOfReasoned(CompiledArtifactIdentification compiledArtifactIdentification) {			
+				return Maybe.complete(Collections.emptyList());
 			}									
 		};
 	}

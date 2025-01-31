@@ -56,5 +56,11 @@ public class FailingArtifactResolver implements ReflectedArtifactResolver {
 	public List<PartReflection> getAvailablePartsOf(CompiledArtifactIdentification compiledArtifactIdentification) {
 		return Collections.emptyList();
 	}
+	
+	@Override
+	public Maybe<List<PartReflection>> getAvailablePartsOfReasoned(
+			CompiledArtifactIdentification compiledArtifactIdentification) {
+		return Maybe.complete(Collections.emptyList());
+	}
 
 }

@@ -36,8 +36,11 @@ public interface ArtifactDataResolver extends ArtifactResolver, ArtifactMetaData
 	 * @param compiledArtifactIdentification - the {@link CompiledArtifactIdentification} to get the parts of 
 	 * @return - a {@link List} of {@link PartReflection}
 	 */
-	List<PartReflection> getPartsOf( CompiledArtifactIdentification compiledArtifactIdentification);
+	default List<PartReflection> getPartsOf( CompiledArtifactIdentification compiledArtifactIdentification) {
+		return getPartsOfReasoned(compiledArtifactIdentification).get();
+	}
 	
+	Maybe<List<PartReflection>> getPartsOfReasoned( CompiledArtifactIdentification compiledArtifactIdentification);
 
 	/**
 	 * accesses the repository connected to get whatever data structure containing the data of what the repository 
