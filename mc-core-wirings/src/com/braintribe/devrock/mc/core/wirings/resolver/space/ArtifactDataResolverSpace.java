@@ -78,6 +78,7 @@ import com.braintribe.devrock.model.repository.filters.NoneMatchingArtifactFilte
 import com.braintribe.gm.model.reason.Reason;
 import com.braintribe.gm.model.reason.Reasons;
 import com.braintribe.gm.reason.TemplateReasons;
+import com.braintribe.logging.Logger;
 import com.braintribe.model.artifact.changes.RepositoryProbingResult;
 import com.braintribe.model.artifact.compiled.CompiledArtifact;
 import com.braintribe.model.artifact.declared.DeclaredArtifact;
@@ -86,6 +87,7 @@ import com.braintribe.model.time.TimeUnit;
 import com.braintribe.wire.api.annotation.Import;
 import com.braintribe.wire.api.annotation.Managed;
 import com.braintribe.wire.api.annotation.Scope;
+import com.braintribe.wire.api.context.WireContextConfiguration;
 
 /**
  * the wirespace for the {@link ArtifactDataResolverContract}
@@ -95,6 +97,7 @@ import com.braintribe.wire.api.annotation.Scope;
  */
 @Managed
 public class ArtifactDataResolverSpace implements ArtifactDataResolverContract {
+	private static final Logger logger = Logger.getLogger(ArtifactDataResolverSpace.class);
 
 	private static final String LOCAL = "local";
 
@@ -112,6 +115,15 @@ public class ArtifactDataResolverSpace implements ArtifactDataResolverContract {
 	
 	@Import
 	ArtifactDataResolverPropertiesContract properties;
+	
+	@Override
+	public void onLoaded(WireContextConfiguration configuration) {
+		if (parallelResolvingEnabled())
+			logger.info("MC parallel resolving is enabled");
+		else
+			logger.info("MC parallel resolving is disabled");
+			
+	}
 	
 	@Override
 	public boolean parallelResolvingEnabled() {
