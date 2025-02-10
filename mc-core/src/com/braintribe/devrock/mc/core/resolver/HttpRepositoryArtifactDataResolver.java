@@ -374,13 +374,6 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase
 					 */
 					private void checkChecksum() {
 						if (messageDigest != null) {
-							if (url.contains("ehcache") && url.contains(".jar"))
-								throw new ReasonException(TemplateReasons.build(MismatchingHash.T) //
-										.assign(MismatchingHash::setUrl, url) //
-										.assign(MismatchingHash::setHashAlgorithm, hashAlgAndValuePair.first)
-										.assign(MismatchingHash::setExpectedHash, hashAlgAndValuePair.getSecond())
-										.assign(MismatchingHash::setFoundHash, "fakehash").toReason());
-
 							String hash = StringTools.toHex(messageDigest.digest());
 							if (!hash.equalsIgnoreCase(hashAlgAndValuePair.getSecond())) {
 								String msg = "checksum [" + hashAlgAndValuePair.first() + "] mismatch for [" + url
