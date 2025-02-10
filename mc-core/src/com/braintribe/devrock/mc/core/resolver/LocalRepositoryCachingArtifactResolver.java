@@ -55,6 +55,7 @@ import com.braintribe.cfg.Required;
 import com.braintribe.common.lcd.Pair;
 import com.braintribe.devrock.mc.api.commons.ArtifactAddressBuilder;
 import com.braintribe.devrock.mc.api.commons.VersionInfo;
+import com.braintribe.devrock.mc.api.download.PartEnricher;
 import com.braintribe.devrock.mc.api.event.EventBroadcaster;
 import com.braintribe.devrock.mc.api.event.EventBroadcasterAttribute;
 import com.braintribe.devrock.mc.api.repository.local.ArtifactPartResolverPersistenceDelegate;
@@ -107,7 +108,7 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
  */
 public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifactResolver, LifecycleAware {
 	private static final Logger logger = Logger.getLogger(LocalRepositoryCachingArtifactResolver.class);
-	private static final int MAX_THREADS = 20;
+	public static final int MAX_THREADS = 20;
 	private final List<ArtifactPartResolverPersistenceDelegate> delegates = new ArrayList<>();
 	private final LoadingCache<EqProxy<ArtifactIdentification>, Maybe<List<VersionInfo>>> versionsCache;
 	
@@ -119,13 +120,18 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 	private File localRepository;
 	private Function<File,ReadWriteLock> lockProvider;
 	private ExecutorService es;
+	private int maxThreads = MAX_THREADS;
 	
-
 	public LocalRepositoryCachingArtifactResolver() {
 		versionsCache = Caffeine.newBuilder().build( this::loadVersions);		
 		resolutionCache = Caffeine.newBuilder().build( this::loadPartData);
 		localVersionsCache = Caffeine.newBuilder().build( this::loadLocalMetaData);
 		partAvailabilityAccessCache = Caffeine.newBuilder().build( this::loadPartAvailabilityAccesses);
+	}
+
+	@Configurable
+	public void setMaxThreads(int maxThreads) {
+		this.maxThreads = maxThreads;
 	}
 	
 	/**
@@ -151,7 +157,7 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 	
 	@Override
 	public void postConstruct() {
-		es = Executors.newFixedThreadPool( Math.max( delegates.size(), MAX_THREADS));		
+		es = Executors.newFixedThreadPool( Math.max( delegates.size(), maxThreads));		
 	}
 
 	@Override

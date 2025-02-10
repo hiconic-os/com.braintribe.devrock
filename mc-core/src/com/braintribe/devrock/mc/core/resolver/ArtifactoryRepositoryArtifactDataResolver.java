@@ -68,7 +68,7 @@ public class ArtifactoryRepositoryArtifactDataResolver extends HttpRepositoryArt
 
 	@Override
 	public Maybe<ArtifactDataResolution> getPartOverview( CompiledArtifactIdentification compiledArtifactIdentification) {
-		return resolve(ArtifactAddressBuilder.build().root( restUrl.get()).compiledArtifact(compiledArtifactIdentification));		
+		return resolve(ArtifactAddressBuilder.build().root( restUrl.get()).compiledArtifact(compiledArtifactIdentification), true);		
 	}
 
 	@Override

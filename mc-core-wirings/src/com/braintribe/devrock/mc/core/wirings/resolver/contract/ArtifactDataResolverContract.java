@@ -40,6 +40,7 @@ import com.braintribe.wire.api.space.WireSpace;
  */
 // TODO: shouldn't we rename this to ArtifactResolverContract as there is not ArtifactDataResolver available here
 public interface ArtifactDataResolverContract extends WireSpace {
+	boolean parallelResolvingEnabled();
 
 	/**
 	 * @return the repository reflection based on the effective probed {@link RepositoryConfiguration}

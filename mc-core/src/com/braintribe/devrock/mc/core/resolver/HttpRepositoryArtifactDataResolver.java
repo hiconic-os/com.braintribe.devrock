@@ -15,13 +15,11 @@
 // ============================================================================
 package com.braintribe.devrock.mc.core.resolver;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -42,8 +40,6 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.util.EntityUtils;
 
 import com.braintribe.cfg.Configurable;
 import com.braintribe.common.lcd.Pair;
@@ -63,8 +59,6 @@ import com.braintribe.gm.model.reason.Reasons;
 import com.braintribe.gm.model.reason.essential.CommunicationError;
 import com.braintribe.gm.model.reason.essential.InternalError;
 import com.braintribe.gm.model.reason.essential.NotFound;
-import com.braintribe.gm.model.security.reason.AuthenticationFailure;
-import com.braintribe.gm.model.security.reason.Forbidden;
 import com.braintribe.gm.reason.TemplateReasons;
 import com.braintribe.logging.Logger;
 import com.braintribe.model.artifact.compiled.CompiledArtifactIdentification;
@@ -88,13 +82,17 @@ import com.fasterxml.jackson.core.JsonToken;
  */
 
 /**
- * a HTTP based {@link ArtifactDataResolver}, for standard remote repos for instance
+ * a HTTP based {@link ArtifactDataResolver}, for standard remote repos for
+ * instance
  * 
  * @author pit
  *
  */
-public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase implements ArtifactVersionsResolverTrait, ArtifactDataResolver {
+public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase
+		implements ArtifactVersionsResolverTrait, ArtifactDataResolver {
 	private static Logger log = Logger.getLogger(HttpRepositoryArtifactDataResolver.class);
+	private static Pattern githubUrlPattern = Pattern
+			.compile("https:\\/\\/maven.pkg.github.com\\/([^\\/]+)\\/([^\\/]+).*");
 
 	private ChecksumPolicy checksumPolicy = ChecksumPolicy.fail;
 	private boolean ignoreHashHeaders;
@@ -125,10 +123,15 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 	}
 
 	/**
-	 * @return - either {@link Optional} with {@link BasicArtifactDataResolution} or empty {@link Optional}
+	 * @return - either {@link Optional} with {@link BasicArtifactDataResolution} or
+	 *         empty {@link Optional}
 	 */
 	protected Maybe<ArtifactDataResolution> resolve(ArtifactAddressBuilder builder) {
-		HttpArtifactDataResolution res = new HttpArtifactDataResolution(builder);
+		return resolve(builder, false);
+	}
+
+	protected Maybe<ArtifactDataResolution> resolve(ArtifactAddressBuilder builder, boolean ignoreHash) {
+		HttpArtifactDataResolution res = new HttpArtifactDataResolution(builder, ignoreHash);
 		return Maybe.complete(res);
 	}
 
@@ -143,12 +146,14 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 	}
 
 	@Override
-	public Maybe<ArtifactDataResolution> resolvePart(CompiledArtifactIdentification identification, PartIdentification partIdentification,
-			Version partVersionOverrride) {
+	public Maybe<ArtifactDataResolution> resolvePart(CompiledArtifactIdentification identification,
+			PartIdentification partIdentification, Version partVersionOverrride) {
 		if (partVersionOverrride == null)
-			return resolve(ArtifactAddressBuilder.build().root(root).compiledArtifact(identification).part(partIdentification));
+			return resolve(ArtifactAddressBuilder.build().root(root).compiledArtifact(identification)
+					.part(partIdentification));
 		else
-			return resolve(ArtifactAddressBuilder.build().root(root).compiledArtifact(identification).part(partIdentification, partVersionOverrride));
+			return resolve(ArtifactAddressBuilder.build().root(root).compiledArtifact(identification)
+					.part(partIdentification, partVersionOverrride));
 	}
 
 	/**
@@ -157,105 +162,23 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 	private class HttpArtifactDataResolution implements ArtifactDataResolution {
 		private final ArtifactAddressBuilder builder;
 		private String url;
-		private static Pattern githubPattern = Pattern.compile("https:\\/\\/maven.pkg.github.com\\/([^\\/]+)\\/([^\\/]+).*");
-		// using {0,4} instead of * to avoid potential stack overflow warning (and because there is no need to support more version levels)
+		// using {0,4} instead of * to avoid potential stack overflow warning (and
+		// because there is no need to support more version levels)
 		private static Pattern versionPattern = Pattern.compile("\\d+(\\.\\d+){0,4}");
-		
+		private final boolean ignoreHash;
+
 		public HttpArtifactDataResolution(ArtifactAddressBuilder builder) {
+			this(builder, false);
+		}
+
+		public HttpArtifactDataResolution(ArtifactAddressBuilder builder, boolean ignoreHash) {
 			this.builder = builder;
 			this.url = builder.toPath().toSlashPath();
+			this.ignoreHash = ignoreHash;
 		}
 
 		@Override
 		public Resource getResource() {
-
-			Matcher matcher = githubPattern.matcher(this.url);
-			if (activateGithubHandling && matcher.matches()) {
-				String org = matcher.group(1);
-				String repo = matcher.group(2);
-				log.debug(() -> "Identified a GitHub repository URL: " + this.url + ", Organization: " + org + ", Repository: " + repo);
-				
-				String fileName = this.builder.getFileName(); // file name could be the version, if URL ends with e.g. .../1.2.3
-				if (fileName != null && versionPattern.matcher(fileName).matches()) {
-					log.debug(() -> "URL is an artifact version URL.");
-				
-					String token = System.getenv("GITHUB_READ_PACKAGES_TOKEN");
-					if (token == null) {
-						token = System.getProperty("GITHUB_READ_PACKAGES_TOKEN");
-					}
-					if (token != null) {
-						log.debug(() -> "Found GITHUB_READ_PACKAGES_TOKEN value.");
-						// https://api.github.com/orgs/hiconic-os/packages/maven/com.braintribe.codec.dom-codecs
-						final String idUrl = "https://api.github.com/orgs/" + org + "/packages/maven/" + builder.getGroupId() + "."
-								+ builder.getArtifactId();
-						log.debug(() -> "Trying to get artifact ID via " + idUrl);
-	
-						HttpGet idGet = new HttpGet(idUrl);
-						idGet.setHeader("Accept", "application/vnd.github+json");
-						idGet.setHeader("Authorization", "Bearer " + token);
-						idGet.setHeader("X-GitHub-Api-Version", "2022-11-28");
-						try (CloseableHttpResponse idResponse = getResponseWithRetry(idGet)) {
-							int idStatusCode = idResponse.getStatusLine().getStatusCode();
-							if (idStatusCode >= 200 && idStatusCode < 300) {
-								String idJson = EntityUtils.toString(idResponse.getEntity(), "UTF-8");
-								log.debug(() -> "Received status code " + idStatusCode + ", JSON Body has length " + idJson.length());
-								JsonParser jsonParser = new JsonFactory().createParser(idJson);
-								String artifactId = null;
-								while (jsonParser.nextToken() != JsonToken.END_OBJECT) {
-									String name = jsonParser.getCurrentName();
-									if ("id".equals(name)) {
-										jsonParser.nextToken();
-										artifactId = jsonParser.getText();
-										break;
-									}
-								}
-								if (artifactId != null) {
-									log.debug("Identified artifact ID " + artifactId);
-									// https://github.com/hiconic-os/maven-repo-dev/packages/1997637?version=2.0.8
-									final String partsUrl = "https://github.com/" + org + "/" + repo + "/packages/" + artifactId + "?version="
-											+ builder.getFileName();
-									log.debug(() -> "Trying to get part information via " + partsUrl);
-	
-									HttpGet partsGet = new HttpGet(partsUrl);
-									partsGet.setHeader("Accept", "application/vnd.github+json");
-									partsGet.setHeader("Authorization", "Bearer " + token);
-									partsGet.setHeader("X-GitHub-Api-Version", "2022-11-28");
-	
-									try (CloseableHttpResponse partsResponse = getResponseWithRetry(partsGet)) {
-										int partsStatusCode = partsResponse.getStatusLine().getStatusCode();
-										if (partsStatusCode >= 200 && partsStatusCode < 300) {
-											String html = EntityUtils.toString(partsResponse.getEntity(), "UTF-8");
-											log.debug(() -> "Received status code " + partsStatusCode + ", HTML Body has length " + html.length());
-	
-											Resource resource = Resource
-													.createTransient(() -> new ByteArrayInputStream(html.getBytes(StandardCharsets.UTF_8)));
-											resource.setName(builder.getFileName());
-											this.url = partsUrl;
-											return resource;
-	
-										} else {
-											log.debug(() -> "Received status code " + partsStatusCode);
-										}
-									}
-								} else {
-									log.debug(() -> "Could not identify an artifact ID");
-								}
-							} else {
-								log.debug(() -> "Received status code " + idStatusCode);
-							}
-						} catch (IOException ioe) {
-							throw new UncheckedIOException(ioe);
-						}
-					} else {
-						log.debug(() -> "Found no GITHUB_READ_PACKAGES_TOKEN value.");
-					}
-				} else {
-					log.debug(() -> "URL is not an artifact version URL. No need for special support to look up parts.");
-				}
-			} else {
-				log.debug(() -> "Does not seem to be a GitHub repository URL: " + this.url);
-			}
-
 			Resource resource = Resource.createTransient(this::openInputStream);
 			resource.setName(builder.getFileName());
 			return resource;
@@ -265,17 +188,15 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 		public Maybe<InputStream> openStream() {
 			try {
 				return tryOpenInputStream();
-			} 
-			catch (UnknownHostException e) {
+			} catch (UnknownHostException e) {
 				log.debug("Unknown host: " + url);
 				return Reasons.build(UnknownRepositoryHost.T).text("Unknown host: " + url) //
-					.toMaybe();
-			}
-			catch (Exception e) {
+						.toMaybe();
+			} catch (Exception e) {
 				String tracebackId = UUID.randomUUID().toString();
 				String msg = "Could not open input stream for: " + url + " (tracebackId=" + tracebackId + ")";
 				log.error(msg, e);
-				
+
 				return Reasons.build(CommunicationError.T).text(msg).toMaybe();
 			}
 		}
@@ -292,8 +213,8 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 					IOTools.transferBytes(in, out, IOTools.BUFFER_SUPPLIER_64K);
 				}
 			} catch (Exception e) {
-				return Reasons.build(CommunicationError.T).text("Error while transferring data from url " + url).cause(InternalError.from(e))
-						.toReason();
+				return Reasons.build(CommunicationError.T).text("Error while transferring data from url " + url)
+						.cause(InternalError.from(e)).toReason();
 			}
 
 			return null;
@@ -315,12 +236,13 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 				IOTools.transferBytes(in, out, IOTools.BUFFER_SUPPLIER_64K);
 			}
 		}
+
 		/**
-		 * hash files seem to have this format : {@code [<file name><whitespace>]<hash>}, so if data contains whitespace characters, the part *AFTER*
-		 * the last whitespace is taken..
+		 * hash files seem to have this format :
+		 * {@code [<file name><whitespace>]<hash>}, so if data contains whitespace
+		 * characters, the part *AFTER* the last whitespace is taken..
 		 * 
-		 * @param hashOnServer
-		 *            - the values as returned from the server
+		 * @param hashOnServer - the values as returned from the server
 		 * @return - the relevant part of the hash
 		 */
 		private String extractRelevantHashpartFromServerData(String hashOnServer) {
@@ -343,8 +265,7 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 		}
 
 		/**
-		 * @param response
-		 *            - the {@link HttpResponse} as returned by the server
+		 * @param response - the {@link HttpResponse} as returned by the server
 		 * @return - a {@link Pair} consting of the hash type and hash value
 		 */
 		private Pair<String, String> determineRequiredHashMatch(HttpResponse response) throws IOException {
@@ -361,7 +282,8 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 					}
 				}
 			}
-			// search for the hashes in the hash files as stored on the server, take the first one present
+			// search for the hashes in the hash files as stored on the server, take the
+			// first one present
 			for (Entry<String, Pair<String, String>> entry : hashAlgToHeaderKeyAndExtension.entrySet()) {
 				String hashFile = url + "." + entry.getValue().second();
 				try (CloseableHttpResponse hashResponse = getResponse(hashFile)) {
@@ -374,8 +296,8 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 							return Pair.of(entry.getKey(), hashOnServer);
 						}
 					} else if (statusCode != 404) {
-						throw new CommunicationException(
-								"error while downloading hash [" + hashFile + "], Http status [" + hashResponse.getStatusLine() + "]");
+						throw new CommunicationException("error while downloading hash [" + hashFile
+								+ "], Http status [" + hashResponse.getStatusLine() + "]");
 					}
 				}
 			}
@@ -386,25 +308,26 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 		 * lenient input stream supplier, checks on CRC if configured
 		 * 
 		 * @return - an {@link InputStream} or null if not backed by data on the server
-		 * @throws IOException
-		 *             - if anything goes wrong
+		 * @throws IOException - if anything goes wrong
 		 */
 		private Maybe<InputStream> tryOpenInputStream() throws IOException {
 			CloseableHttpResponse response = getResponse(url);
 
 			int statusCode = response.getStatusLine().getStatusCode();
-			
+
 			if (log.isDebugEnabled()) {
 				String phrase = response.getStatusLine().getReasonPhrase();
-				phrase = phrase != null? " (" + phrase + ")": "";
+				phrase = phrase != null ? " (" + phrase + ")" : "";
 				log.debug("received status " + statusCode + phrase + " from url " + url);
 			}
-			
+
 			if (statusCode >= 200 && statusCode < 300) {
 				HttpEntity entity = response.getEntity();
 
-				Pair<String, String> hashAlgAndValuePair = determineRequiredHashMatch(response);
-				MessageDigest messageDigest = hashAlgAndValuePair != null ? createMessageDigest(hashAlgAndValuePair.getFirst()) : null;
+				Pair<String, String> hashAlgAndValuePair = ignoreHash ? null : determineRequiredHashMatch(response);
+				MessageDigest messageDigest = hashAlgAndValuePair != null
+						? createMessageDigest(hashAlgAndValuePair.getFirst())
+						: null;
 
 				InputStream inputStream = entity.getContent();
 
@@ -451,23 +374,30 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 					 */
 					private void checkChecksum() {
 						if (messageDigest != null) {
+							if (url.contains("ehcache") && url.contains(".jar"))
+								throw new ReasonException(TemplateReasons.build(MismatchingHash.T) //
+										.assign(MismatchingHash::setUrl, url) //
+										.assign(MismatchingHash::setHashAlgorithm, hashAlgAndValuePair.first)
+										.assign(MismatchingHash::setExpectedHash, hashAlgAndValuePair.getSecond())
+										.assign(MismatchingHash::setFoundHash, "fakehash").toReason());
+
 							String hash = StringTools.toHex(messageDigest.digest());
 							if (!hash.equalsIgnoreCase(hashAlgAndValuePair.getSecond())) {
-								String msg = "checksum [" + hashAlgAndValuePair.first() + "] mismatch for [" + url + "], expected ["
-										+ hashAlgAndValuePair.getSecond() + "], found [" + hash + "]";
+								String msg = "checksum [" + hashAlgAndValuePair.first() + "] mismatch for [" + url
+										+ "], expected [" + hashAlgAndValuePair.getSecond() + "], found [" + hash + "]";
 								switch (checksumPolicy) {
-									case fail:
-										throw new ReasonException(TemplateReasons.build(MismatchingHash.T) //
-												.assign(MismatchingHash::setUrl, url) //
-												.assign(MismatchingHash::setHashAlgorithm, hashAlgAndValuePair.first)
-												.assign(MismatchingHash::setExpectedHash, hashAlgAndValuePair.getSecond())
-												.assign(MismatchingHash::setFoundHash, hash).toReason());
-									case warn:
-										log.warn(msg);
-										break;
-									case ignore:
-									default:
-										break;
+								case fail:
+									throw new ReasonException(TemplateReasons.build(MismatchingHash.T) //
+											.assign(MismatchingHash::setUrl, url) //
+											.assign(MismatchingHash::setHashAlgorithm, hashAlgAndValuePair.first)
+											.assign(MismatchingHash::setExpectedHash, hashAlgAndValuePair.getSecond())
+											.assign(MismatchingHash::setFoundHash, hash).toReason());
+								case warn:
+									log.warn(msg);
+									break;
+								case ignore:
+								default:
+									break;
 								}
 							}
 						}
@@ -482,8 +412,7 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 		}
 
 		/**
-		 * @param hashAlg
-		 *            - name of hashing algo
+		 * @param hashAlg - name of hashing algo
 		 * @return - a matching {@link MessageDigest}
 		 */
 		private MessageDigest createMessageDigest(String hashAlg) {
@@ -498,8 +427,7 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 		 * strict supplier of a input stream to the resource.
 		 * 
 		 * @return - a valid (crc'd) input stream
-		 * @throws IOException
-		 *             - if no input stream was able to be retrieved
+		 * @throws IOException - if no input stream was able to be retrieved
 		 */
 		private InputStream openInputStream() throws IOException {
 			Maybe<InputStream> inMaybe = tryOpenInputStream();
@@ -512,19 +440,7 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 		}
 
 		private <T> Maybe<T> statusProblemMaybe(CloseableHttpResponse response) {
-			int statusCode = response.getStatusLine().getStatusCode();
-
-			switch (statusCode) {
-				case 404:
-					return Reasons.build(NotFound.T).text("Resource not found  at url " + url).toMaybe();
-				case 403:
-					return Reasons.build(Forbidden.T).text("Forbidden access to resource at url " + url).toMaybe();
-				case 401:
-					return Reasons.build(AuthenticationFailure.T).text("Unauthenticated access to resource at url " + url).toMaybe();
-				default:
-					return Reasons.build(CommunicationError.T).text("Error [" + response.getStatusLine() + "] accessing resource at url " + url)
-							.toMaybe();
-			}
+			return HttpRepositoryArtifactDataResolver.statusProblemMaybe(url, response);
 		}
 
 		@Override
@@ -542,8 +458,8 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 				return statusProblemMaybe(response);
 
 			} catch (IOException e) {
-				return Reasons.build(CommunicationError.T).text("error while testing existance of [" + url + "]").cause(InternalError.from(e))
-						.toMaybe();
+				return Reasons.build(CommunicationError.T).text("error while testing existance of [" + url + "]")
+						.cause(InternalError.from(e)).toMaybe();
 			}
 		}
 
@@ -566,47 +482,153 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 		}
 	}
 
+	record GitHubInfo(String org, String repo) {
+	}
+
+	private GitHubInfo hasGitHubInfo() {
+		if (!activateGithubHandling)
+			return null;
+
+		Matcher matcher = githubUrlPattern.matcher(this.root);
+
+		if (!matcher.matches())
+			return null;
+
+		String org = matcher.group(1);
+		String repo = matcher.group(2);
+
+		return new GitHubInfo(org, repo);
+	}
+
 	@Override
-	public Maybe<List<PartReflection>> getPartsOfReasoned(CompiledArtifactIdentification compiledArtifactIdentification) {
-		Maybe<ArtifactDataResolution> htmlContent = getPartOverview(compiledArtifactIdentification);
-		
-		if (htmlContent.isUnsatisfiedBy(NotFound.T))
+	public Maybe<List<PartReflection>> getPartsOfReasoned(
+			CompiledArtifactIdentification compiledArtifactIdentification) {
+		GitHubInfo gitHubInfo = hasGitHubInfo();
+
+		if (gitHubInfo != null)
+			return getPartsOfFromGitHub(gitHubInfo, compiledArtifactIdentification);
+
+		return getPartsOfFromStandardRepo(compiledArtifactIdentification);
+	}
+
+	private Maybe<List<PartReflection>> getPartsOfFromGitHub(GitHubInfo gitHubInfo,
+			CompiledArtifactIdentification compiledArtifactIdentification) {
+		Maybe<String> htmlDataMaybe = getGitHubPartOverviewContent(gitHubInfo, compiledArtifactIdentification);
+
+		if (htmlDataMaybe.isUnsatisfiedBy(NotFound.T))
 			return Maybe.complete(Collections.emptyList());
+
+		if (htmlDataMaybe.isUnsatisfied())
+			return htmlDataMaybe.whyUnsatisfied().asMaybe();
+
+		String htmlData = htmlDataMaybe.get();
+
+		List<String> filenamesFromHtml = parseFilenamesFromGitHubHtml(htmlData, compiledArtifactIdentification);
+		List<PartReflection> partReflections = PartReflectionCommons.transpose(compiledArtifactIdentification,
+				repositoryId, filenamesFromHtml);
+
+		return Maybe.complete(partReflections);
+	}
+
+	private Maybe<String> getGitHubPartOverviewContent(GitHubInfo gitHubInfo, CompiledArtifactIdentification compiledArtifactIdentification) {
+		final String org = gitHubInfo.org();
+		final String repo = gitHubInfo.repo();
+		final String groupId = compiledArtifactIdentification.getGroupId();
+		final String artifactId = compiledArtifactIdentification.getArtifactId();
+		final String version = compiledArtifactIdentification.getVersion().asString();
+
+		final String idUrl = "https://api.github.com/orgs/" + org + "/packages/maven/" + groupId + "." + artifactId;
+
+		log.debug(() -> "Trying to get artifact ID via GitHub API call" + idUrl);
+
+		final Maybe<String> idJsonMaybe;
 		
-		if (htmlContent.isUnsatisfied())
-			return htmlContent.whyUnsatisfied().asMaybe();
-
-
 		try {
-			Maybe<InputStream> inMaybe = htmlContent.get().openStream();
-			
-			if (inMaybe.isUnsatisfiedBy(NotFound.T)) {
-				return Maybe.complete(Collections.emptyList());
-			}
-			
-			if (inMaybe.isUnsatisfied())
-				return inMaybe.whyUnsatisfied().asMaybe();
-			
-			String htmlData = IOTools.slurp(inMaybe.get(), "UTF-8");
-			List<String> filenamesFromHtml = null;
-			if (activateGithubHandling && this.root.startsWith("https://maven.pkg.github.com")) {
-				filenamesFromHtml = parseFilenamesFromGitHubHtml(htmlData, compiledArtifactIdentification);
-			} else {
-				filenamesFromHtml = HtmlContentParser.parseFilenamesFromHtml(htmlData);
-			}
+			idJsonMaybe = readText(idUrl, "UTF-8");
+		}
+		catch (IOException e) {
+			return InternalError.from(e, "Error while reading GitHub id JSON").asMaybe();
+		}
+		
+		if (idJsonMaybe.isUnsatisfied()) {
+			log.debug(() -> "Failed to get artifact ID via GitHub API call " + idUrl + " : " + idJsonMaybe.whyUnsatisfied().stringify(true));
+			return idJsonMaybe.whyUnsatisfied().asMaybe();
+		}
 
-			List<PartReflection> partReflections = PartReflectionCommons.transpose(compiledArtifactIdentification, repositoryId,
-					filenamesFromHtml);
-			return Maybe.complete(partReflections);
-		} catch (Exception e) {
-			String tracebackId = UUID.randomUUID().toString();
-			String msg = "Exception while parsing repo part list reflection for " + compiledArtifactIdentification + " (tracebackId=" + tracebackId + ")";
-			log.error(msg, e);
-			return InternalError.from(e, msg).asMaybe(); 
+		String idJson = idJsonMaybe.get();
+		
+		String gitHubArtifactId = null;
+		try (JsonParser jsonParser = new JsonFactory().createParser(idJson)) {
+
+			while (jsonParser.nextToken() != JsonToken.END_OBJECT) {
+				String name = jsonParser.getCurrentName();
+				if ("id".equals(name)) {
+					jsonParser.nextToken();
+					gitHubArtifactId = jsonParser.getText();
+					break;
+				}
+			}
+			
+		} catch (IOException e) {
+			return InternalError.from(e, "Error while parsing GitHub id JSON").asMaybe();
+		}
+		
+		try {
+			if (gitHubArtifactId == null)
+				return Reasons.build(NotFound.T).text("GitHub package artifact id not found in JSON").toMaybe();
+			
+			log.debug("Identified artifact ID " + artifactId);
+			
+			// https://github.com/hiconic-os/maven-repo-dev/packages/1997637?version=2.0.8
+			final String partsUrl = "https://github.com/" + org + "/" + repo + "/packages/" + gitHubArtifactId + "?version="
+					+ version;
+			
+			log.debug(() -> "Trying to get part information via " + partsUrl);
+			
+			return readText(partsUrl, "UTF-8");
+		}
+		catch (IOException e) {
+			return InternalError.from(e, "Error while reading GitHub part overview").asMaybe();
 		}
 	}
 
-	private List<String> parseFilenamesFromGitHubHtml(String htmlData, CompiledArtifactIdentification compiledArtifactIdentification) {
+	private Maybe<List<PartReflection>> getPartsOfFromStandardRepo(
+			CompiledArtifactIdentification compiledArtifactIdentification) {
+		Maybe<ArtifactDataResolution> htmlContent = getPartOverview(compiledArtifactIdentification);
+
+		if (htmlContent.isUnsatisfiedBy(NotFound.T))
+			return Maybe.complete(Collections.emptyList());
+
+		if (htmlContent.isUnsatisfied())
+			return htmlContent.whyUnsatisfied().asMaybe();
+
+		try {
+			Maybe<InputStream> inMaybe = htmlContent.get().openStream();
+
+			if (inMaybe.isUnsatisfiedBy(NotFound.T)) {
+				return Maybe.complete(Collections.emptyList());
+			}
+
+			if (inMaybe.isUnsatisfied())
+				return inMaybe.whyUnsatisfied().asMaybe();
+
+			String htmlData = IOTools.slurp(inMaybe.get(), "UTF-8");
+			List<String> filenamesFromHtml = HtmlContentParser.parseFilenamesFromHtml(htmlData);
+
+			List<PartReflection> partReflections = PartReflectionCommons.transpose(compiledArtifactIdentification,
+					repositoryId, filenamesFromHtml);
+			return Maybe.complete(partReflections);
+		} catch (Exception e) {
+			String tracebackId = UUID.randomUUID().toString();
+			String msg = "Exception while parsing repo part list reflection for " + compiledArtifactIdentification
+					+ " (tracebackId=" + tracebackId + ")";
+			log.error(msg, e);
+			return InternalError.from(e, msg).asMaybe();
+		}
+	}
+
+	private List<String> parseFilenamesFromGitHubHtml(String htmlData,
+			CompiledArtifactIdentification compiledArtifactIdentification) {
 		String artifactId = compiledArtifactIdentification.getArtifactId();
 		String version = compiledArtifactIdentification.getVersion().toString();
 		String expectedStart = artifactId + "-" + version;
@@ -615,7 +637,8 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 			line = line.trim();
 			// "." -> e.g. example-artifacts-1.2.3.pom
 			// "-" -> e.g. example-artifacts-1.2.3-asset.man
-			if ((line.startsWith(expectedStart + ".") || line.startsWith(expectedStart + "-")) && !line.matches(".+\\.(md5|sha\\d+)")) {
+			if ((line.startsWith(expectedStart + ".") || line.startsWith(expectedStart + "-"))
+					&& !line.matches(".+\\.(md5|sha\\d+)")) {
 				result.add(line);
 			}
 		});
@@ -623,10 +646,11 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 	}
 
 	@Override
-	public Maybe<ArtifactDataResolution> getPartOverview(CompiledArtifactIdentification compiledArtifactIdentification) {
-		ArtifactAddressBuilder artifactAddress = ArtifactAddressBuilder.build().root(root).artifact(compiledArtifactIdentification)
-				.file(compiledArtifactIdentification.getVersion().asString());
-		return resolve(artifactAddress);
+	public Maybe<ArtifactDataResolution> getPartOverview(
+			CompiledArtifactIdentification compiledArtifactIdentification) {
+		ArtifactAddressBuilder artifactAddress = ArtifactAddressBuilder.build().root(root)
+				.artifact(compiledArtifactIdentification).file(compiledArtifactIdentification.getVersion().asString());
+		return resolve(artifactAddress, true);
 	}
 
 }

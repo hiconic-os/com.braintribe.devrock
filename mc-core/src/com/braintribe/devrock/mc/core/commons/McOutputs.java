@@ -139,7 +139,21 @@ public interface McOutputs {
 	}
 	
 	public static ConsoleOutput compiledPartIdentification(CompiledPartIdentification part) {
-		return sequence(compiledArtifactIdentification(part), text("/"), partIdentification(part));
+		return artifactPartIdentification(part, part);
+	}
+	
+	public static ConsoleOutput artifactPartIdentification(CompiledArtifactIdentification artifact, PartIdentification part) {
+		return artifactPartIdentification(
+				artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion().asString(), 
+				part);
+	}
+	
+	public static ConsoleOutput artifactPartIdentification(VersionedArtifactIdentification artifact, PartIdentification part) {
+		return sequence(versionedArtifactIdentification(artifact), text("/"), partIdentification(part));
+	}
+	
+	public static ConsoleOutput artifactPartIdentification(String groupId, String artifactId, String version, PartIdentification part) {
+		return sequence(artifact(groupId, artifactId, version), text("/"), partIdentification(part));
 	}
 
 	/** {@code groupId} and {@code version} are both optional. */

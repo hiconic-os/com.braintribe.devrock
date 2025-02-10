@@ -13,29 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ============================================================================
-package com.braintribe.devrock.mc.core.wirings.backend;
+package com.braintribe.devrock.mc.core.wirings.properties.contract;
 
-import java.util.Collections;
-import java.util.List;
+import com.braintribe.wire.api.space.WireSpace;
 
-import com.braintribe.devrock.mc.core.wirings.backend.contract.ArtifactDataBackendContract;
-import com.braintribe.devrock.mc.core.wirings.properties.PropertyLookupWireModule;
-import com.braintribe.wire.api.module.WireModule;
-import com.braintribe.wire.api.module.WireTerminalModule;
-
-/**
- * the {@link WireTerminalModule} for the {@link ArtifactDataBackendContract}
- * @author pit/dirk
- *
- */
-public enum ArtifactDataBackendModule implements WireTerminalModule<ArtifactDataBackendContract> {
-
-	INSTANCE;
-	
-	
-	@Override
-	public List<WireModule> dependencies() {
-		return Collections.singletonList(PropertyLookupWireModule.INSTANCE);
-	}
-	
+public interface PropertyLookupContract extends WireSpace {
 }

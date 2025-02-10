@@ -206,14 +206,25 @@ public class BasicPartEnricher implements PartEnricher {
 				}
 				
 				if (unresolved != null && entry.enrichment.getMandatory()) {				
+					// create a failed part equipped with a failure reason
+					Part part = Part.T.create();
+					part.setClassifier(entry.enrichment.getClassifier());
+					part.setType(entry.enrichment.getType());
+					part.setFailure(unresolved);
+					
+					String key = entry.enrichment.getKey();
+					if (key == null)
+						key = PartIdentification.asString(entry.enrichment);
+					
+					entry.artifact.getParts().put(key, part);
+
+					// enrich artifact failure
 					Reason reason = Reasons.build(UnresolvedPart.T) //
 							.enrich( r -> r.setPart(entry.enrichment))
 							.enrich( r -> r.setArtifact( CompiledArtifactIdentification.from( entry.artifact)))
 							.text("Unresolved required part [" + PartIdentification.asString(entry.enrichment) + "] for artifact [" + entry.artifact.asString() + "]") //
+							.cause(unresolved) //
 							.toReason();
-					
-					if (!(unresolved instanceof NotFound))
-						reason.getReasons().add(unresolved);
 					
 					// add reason to artifact 
 					AnalysisArtifactResolutionPreparation.acquireCollatorReason(entry.artifact).getReasons().add(reason);

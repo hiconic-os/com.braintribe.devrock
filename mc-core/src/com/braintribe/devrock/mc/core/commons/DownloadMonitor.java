@@ -64,6 +64,7 @@ public class DownloadMonitor implements AutoCloseable {
 	private boolean initialLinebreak;
 	private List<DownloadMonitorPhase> phases = new ArrayList<>();
 	private int currentPhase = -1;
+	private int lastStaticOutputPhase = -1;
 	
 	private static class DownloadInfo {
 		CompiledPartIdentification part;
@@ -133,7 +134,10 @@ public class DownloadMonitor implements AutoCloseable {
 		}
 		
 		public ConsoleOutput getOutput() {
-			return sequence(title, text(" "), text(progress)); 
+			if (dynamicOutput)
+				return sequence(title, text(" "), text(progress));
+			else
+				return title; 
 		}
 	}
 
@@ -178,6 +182,39 @@ public class DownloadMonitor implements AutoCloseable {
 	}
 	
 	private void doOutput() {
+		if (dynamicOutput)
+			doDynamicOutput();
+		else
+			doStaticOutput();
+	}
+	
+	private synchronized void doStaticOutput() {
+		if (done) {
+			ConsoleOutputs.println(sequence( //
+				text("Downloaded Objects: "), //
+				text(String.valueOf(downloadCount)) //
+			));
+			
+			ConsoleOutputs.println(sequence( //
+				text("Downloaded Data Volume: "), // 
+				text(formatBytesOptimally(downloadedVolume)) //
+			));
+
+			ConsoleOutputs.println(sequence( //
+				text("Total Download Time: "), //
+				text(formatMilliesOptimally(System.currentTimeMillis() - startTime)) //
+			));
+			return;
+		}
+		
+		if (lastStaticOutputPhase == currentPhase || currentPhase >= phases.size()) 
+			return;
+		
+		ConsoleOutputs.println(sequence(phases.get(currentPhase).getOutput(), text("...")));
+		lastStaticOutputPhase = currentPhase;
+	}
+
+	private void doDynamicOutput() {
 		if (initialLinebreak && lastConsoleReprinting == null)
 			ConsoleOutputs.println("");
 			

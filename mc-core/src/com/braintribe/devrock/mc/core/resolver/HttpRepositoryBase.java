@@ -16,8 +16,13 @@
 package com.braintribe.devrock.mc.core.resolver;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.UnknownHostException;
+import java.util.Base64;
+import java.util.UUID;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -25,13 +30,23 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.message.BasicHeader;
 
 import com.braintribe.cfg.Configurable;
 import com.braintribe.cfg.Required;
+import com.braintribe.devrock.model.mc.reason.UnknownRepositoryHost;
+import com.braintribe.gm.model.reason.Maybe;
+import com.braintribe.gm.model.reason.Reasons;
+import com.braintribe.gm.model.reason.essential.CommunicationError;
+import com.braintribe.gm.model.reason.essential.NotFound;
+import com.braintribe.gm.model.security.reason.AuthenticationFailure;
+import com.braintribe.gm.model.security.reason.Forbidden;
 import com.braintribe.logging.Logger;
+import com.braintribe.utils.IOTools;
 
 /**
  * common base for {@link HttpRepositoryArtifactDataResolver} and {@link HttpRepositoryProbingSupport}
@@ -74,19 +89,95 @@ public class HttpRepositoryBase {
 	protected CloseableHttpResponse getResponse(String url, boolean headOnly) throws IOException {
 		return getResponse(headOnly ? new HttpHead(url) : new HttpGet(url));
 	}
-
+	
 	protected CloseableHttpResponse getResponse(HttpRequestBase requestBase) throws IOException {
 
-		HttpClientContext context = HttpClientContext.create();
+	    if (userName != null && password != null) {
+	        String auth = userName + ":" + password;
+	        String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes());
+	        requestBase.setHeader(new BasicHeader("Authorization", "Basic " + encodedAuth));
+	    }
 
-		if (userName != null && password != null) {
-			String host = requestBase.getURI().getHost();
-			CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-			credentialsProvider.setCredentials(new AuthScope(host, AuthScope.ANY_PORT), new UsernamePasswordCredentials(userName, password));
-			context.setCredentialsProvider(credentialsProvider);
+	    return httpClient.execute(requestBase, HttpClientContext.create());
+	}
+
+	protected static <T> Maybe<T> statusProblemMaybe(HttpUriRequest request, CloseableHttpResponse response) {
+		return statusProblemMaybe(request.getURI().toString(), response);
+		
+	}
+	
+	protected static <T> Maybe<T> statusProblemMaybe(String url, CloseableHttpResponse response) {
+		int statusCode = response.getStatusLine().getStatusCode();
+
+		switch (statusCode) {
+			case 404:
+				return Reasons.build(NotFound.T).text("Resource not found  at url " + url).toMaybe();
+			case 403:
+				return Reasons.build(Forbidden.T).text("Forbidden access to resource at url " + url).toMaybe();
+			case 401:
+				return Reasons.build(AuthenticationFailure.T).text("Unauthenticated access to resource at url " + url).toMaybe();
+			default:
+				return Reasons.build(CommunicationError.T).text("Error [" + response.getStatusLine() + "] accessing resource at url " + url)
+						.toMaybe();
 		}
-		CloseableHttpResponse response = httpClient.execute(requestBase, context);
-		return response;
+	}
+	
+	protected Maybe<String> readText(String url, String encoding) throws IOException {
+		var maybe = openInputStream(url);
+		
+		if (maybe.isUnsatisfied())
+			return maybe.whyUnsatisfied().asMaybe();
+		
+		try (InputStream in = maybe.get()) {
+			return Maybe.complete(IOTools.slurp(in, encoding)); 
+		}
+	}
+	
+	protected Maybe<InputStream> openInputStream(String url) throws IOException {
+		var responseMaybe = getResponseReasoned(url);
+		
+		if (responseMaybe.isUnsatisfied()) {
+			return responseMaybe.whyUnsatisfied().asMaybe();
+		}
+		
+		var response = responseMaybe.get();
+		
+		if (logger.isDebugEnabled()) {
+			StatusLine statusLine = response.getStatusLine();
+			int statusCode = statusLine.getStatusCode();
+			String phrase = statusLine.getReasonPhrase();
+			phrase = phrase != null? " (" + phrase + ")": "";
+			logger.debug("received status " + statusCode + phrase + " from url " + url);
+		}
+		
+		HttpEntity entity = response.getEntity();
+		
+		return Maybe.complete(entity.getContent());
+	}
+	
+	protected Maybe<CloseableHttpResponse> getResponseReasoned(String url) {
+		try {
+			var response = getResponse(url);
+			var statusLine = response.getStatusLine();
+			var statusCode = statusLine.getStatusCode();
+			
+			if (statusCode >= 200 && statusCode < 300)
+				return Maybe.complete(response);
+			
+			return statusProblemMaybe(url, response);
+		}
+		catch (UnknownHostException e) {
+			logger.debug("Unknown host: " + url);
+			return Reasons.build(UnknownRepositoryHost.T).text("Unknown host: " + url) //
+				.toMaybe();
+		}
+		catch (Exception e) {
+			String tracebackId = UUID.randomUUID().toString();
+			String msg = "Could not open input stream for: " + url + " (tracebackId=" + tracebackId + ")";
+			logger.error(msg, e);
+			
+			return Reasons.build(CommunicationError.T).text(msg).toMaybe();
+		}
 	}
 
 	protected CloseableHttpResponse getResponse(String url) throws IOException {
@@ -100,7 +191,7 @@ public class HttpRepositoryBase {
 				throw e;
 			}
 			catch (IOException e) {
-				if ((retry++) > maxRetries)
+				if ((++retry) > maxRetries)
 					throw e;
 
 				logger.warn("failed try " + retry + " of " + maxRetries + " to open a http request to: " + url, e);
@@ -114,8 +205,12 @@ public class HttpRepositoryBase {
 		while (true) {
 			try {
 				return getResponse(get);
-			} catch (IOException e) {
-				if ((retry++) > maxRetries)
+			} 
+			catch (UnknownHostException e) {
+				throw e;
+			}
+			catch (IOException e) {
+				if ((++retry) > maxRetries)
 					throw e;
 
 				logger.warn("failed try " + retry + " of " + maxRetries + " to open a http request to: " + get.getURI(), e);

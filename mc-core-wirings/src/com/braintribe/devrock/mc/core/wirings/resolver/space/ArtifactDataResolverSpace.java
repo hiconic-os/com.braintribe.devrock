@@ -59,6 +59,7 @@ import com.braintribe.devrock.mc.core.wirings.configuration.contract.RepositoryC
 import com.braintribe.devrock.mc.core.wirings.configuration.space.RepositoryViewResolutionSpace;
 import com.braintribe.devrock.mc.core.wirings.impl.configuration.ViewRepositoryConfigurationCompiler;
 import com.braintribe.devrock.mc.core.wirings.resolver.contract.ArtifactDataResolverContract;
+import com.braintribe.devrock.mc.core.wirings.resolver.contract.ArtifactDataResolverPropertiesContract;
 import com.braintribe.devrock.mc.core.wirings.venv.contract.VirtualEnvironmentContract;
 import com.braintribe.devrock.model.mc.cfg.origination.RepositoryBiasAdded;
 import com.braintribe.devrock.model.mc.cfg.origination.RepositoryBiasLoaded;
@@ -108,6 +109,14 @@ public class ArtifactDataResolverSpace implements ArtifactDataResolverContract {
 	
 	@Import
 	RepositoryViewResolutionSpace repositoryViewResolution;
+	
+	@Import
+	ArtifactDataResolverPropertiesContract properties;
+	
+	@Override
+	public boolean parallelResolvingEnabled() {
+		return !properties.disableParallelResolving();
+	}
 
 	/**
 	 * @return - the {@link DeclaredArtifactResolver} that resolves DECLARED artifacts
@@ -440,6 +449,8 @@ public class ArtifactDataResolverSpace implements ArtifactDataResolverContract {
 		
 		bean.setDelegates(delegates);
 		bean.setLockProvider(backendContract().lockSupplier());
+		if (parallelResolvingEnabled())
+			bean.setMaxThreads(1);
 		return bean;
 	}
 
@@ -488,6 +499,8 @@ public class ArtifactDataResolverSpace implements ArtifactDataResolverContract {
 	public BasicPartDownloadManager partDownloadManager() {
 		BasicPartDownloadManager bean = new BasicPartDownloadManager();
 		bean.setPartResolver(artifactResolver());
+		if (!parallelResolvingEnabled())
+			bean.setPoolSize(1);
 		return bean;
 	}
 	
