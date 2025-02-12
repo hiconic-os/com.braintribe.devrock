@@ -44,6 +44,7 @@ import com.braintribe.devrock.mc.core.resolver.ProbingSupportFactories;
 import com.braintribe.devrock.mc.core.resolver.codebase.CodebaseArtifactDataResolver;
 import com.braintribe.devrock.mc.core.resolver.workspace.WorkspaceArtifactDataResolver;
 import com.braintribe.devrock.mc.core.wirings.backend.contract.ArtifactDataBackendContract;
+import com.braintribe.devrock.mc.core.wirings.resolver.contract.ArtifactDataResolverPropertiesContract;
 import com.braintribe.devrock.model.repository.CodebaseRepository;
 import com.braintribe.devrock.model.repository.LocalRepository;
 import com.braintribe.devrock.model.repository.MavenFileSystemRepository;
@@ -54,6 +55,7 @@ import com.braintribe.gm.model.reason.Reason;
 import com.braintribe.gm.model.reason.Reasons;
 import com.braintribe.gm.model.reason.essential.InvalidArgument;
 import com.braintribe.transport.http.DefaultHttpClientProvider;
+import com.braintribe.wire.api.annotation.Import;
 import com.braintribe.wire.api.annotation.Managed;
 
 /**
@@ -64,9 +66,12 @@ import com.braintribe.wire.api.annotation.Managed;
  */
 @Managed
 public class ArtifactDataBackendSpace implements ArtifactDataBackendContract {
+
+	@Import
+	private ArtifactDataResolverPropertiesContract properties;
+
 	/**
 	 * registers {@link RepositoryProbingSupport} producers for the currently known different {@link Repository} types 
-	 * @return
 	 */
 	@Managed
 	private ProbingSupportFactories probingSupportFactories() {
@@ -83,7 +88,6 @@ public class ArtifactDataBackendSpace implements ArtifactDataBackendContract {
 	
 	/**
 	 * registers {@link ArtifactDataResolver} producers for the currently know different {@link Repository} types
-	 * @return
 	 */
 	@Managed
 	private ArtifactDataResolverFactories artifactDataResolverFactories() {
@@ -138,7 +142,7 @@ public class ArtifactDataBackendSpace implements ArtifactDataBackendContract {
 	@Managed
 	public CloseableHttpClient httpClient() {
 		DefaultHttpClientProvider bean = new DefaultHttpClientProvider();
-		bean.setSocketTimeout(5_000);
+		bean.setSocketTimeout(properties.socketTimeout());
 		
 		try {
 			return bean.provideHttpClient();
@@ -201,7 +205,7 @@ public class ArtifactDataBackendSpace implements ArtifactDataBackendContract {
 	 * @param repository - the {@link LocalRepository}
 	 * @return - a 'empty' {@link ArtifactDataResolver} as it's not backed by a 'real' repository
 	 */
-	public ArtifactDataResolver localRepository(LocalRepository repository) {
+	public ArtifactDataResolver localRepository(@SuppressWarnings("unused") LocalRepository repository) {
 		return EmptyRepositoryArtifactDataResolver.instance;
 	}
 
@@ -237,11 +241,6 @@ public class ArtifactDataBackendSpace implements ArtifactDataBackendContract {
 		bean.setRoot(repository.normalizedRootPath().toFile());		
 		return bean;
 	}
-	
-	/**
-	 * @param repository - the {@link Repository} (a filesystem based repo)
-	 * @return - the respective {@link FileRepositoryProbingSupport}
-	 */
 	
 	@Managed
 	private FilesystemRepositoryProbingSupport localRepositoryProbingSupport(LocalRepository repository) {
@@ -305,7 +304,6 @@ public class ArtifactDataBackendSpace implements ArtifactDataBackendContract {
 
 	/**
 	 * registers {@link ArtifactDataResolver} producers for the currently know different {@link Repository} types
-	 * @return
 	 */
 	@Managed
 	private ArtifactDeployerFactories artifactDeployerFactories() {
