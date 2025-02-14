@@ -136,7 +136,8 @@ public interface ArtifactAddressBuilder extends ArtifactAddress {
 	 * @return - an {@link UniversalPath} built from the data contained
 	 */
 	UniversalPath toPath();
-			
+	
+	UniversalPath toRelativePath();
 }
 
 /**
@@ -281,18 +282,14 @@ class BasicArtifactDataPathBuilder implements ArtifactAddressBuilder {
 		this.metaExt = hashType;
 		return this;
 	}
-
-	@Override
-	public UniversalPath toPath() {
-		UniversalPath path = UniversalPath.empty();
-		if (root != null)
-			path = path.push(root);
+	
+	private UniversalPath pushRelativePath(UniversalPath path) {
 		if (groupId != null) 
 			path = path.push(groupId, ".");
 		if (artifactId != null)
-			path = path.push( artifactId);
+			path = path.push(artifactId);
 		if (version != null)
-			path = path.push( version);
+			path = path.push(version);
 		
 		if (fileName != null) {			
 			String element = fileName.get();
@@ -302,6 +299,20 @@ class BasicArtifactDataPathBuilder implements ArtifactAddressBuilder {
 			path = path.push( element);			
 		}
 		return path;
+	}
+	
+	@Override
+	public UniversalPath toRelativePath() {
+		return pushRelativePath(UniversalPath.empty());
+	}
+
+	@Override
+	public UniversalPath toPath() {
+		UniversalPath path = UniversalPath.empty();
+		if (root != null)
+			path = path.push(root);
+		
+		return pushRelativePath(path);
 	}
 
 	@Override

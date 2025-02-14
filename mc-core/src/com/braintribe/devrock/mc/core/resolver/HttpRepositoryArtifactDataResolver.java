@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.net.UnknownHostException;
-import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -29,7 +28,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -49,6 +47,7 @@ import com.braintribe.devrock.mc.api.resolver.ArtifactDataResolver;
 import com.braintribe.devrock.mc.api.resolver.ChecksumPolicy;
 import com.braintribe.devrock.mc.core.commons.HtmlContentParser;
 import com.braintribe.devrock.mc.core.commons.PartReflectionCommons;
+import com.braintribe.devrock.mc.core.download.PartDownloadInputStream;
 import com.braintribe.devrock.model.mc.reason.MismatchingHash;
 import com.braintribe.devrock.model.mc.reason.UnknownRepositoryHost;
 import com.braintribe.exception.CommunicationException;
@@ -69,7 +68,6 @@ import com.braintribe.model.resource.Resource;
 import com.braintribe.model.version.Version;
 import com.braintribe.utils.IOTools;
 import com.braintribe.utils.StringTools;
-import com.braintribe.utils.stream.BasicDelegateInputStream;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -129,31 +127,40 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase
 	protected Maybe<ArtifactDataResolution> resolve(ArtifactAddressBuilder builder) {
 		return resolve(builder, false);
 	}
-
+	
+	protected Maybe<ArtifactDataResolution> resolve(ArtifactAddressBuilder builder, ArtifactIdentification artifact, Version version, PartIdentification part) {
+		return resolve(builder, false, artifact, version, part);
+	}
+	
 	protected Maybe<ArtifactDataResolution> resolve(ArtifactAddressBuilder builder, boolean ignoreHash) {
-		HttpArtifactDataResolution res = new HttpArtifactDataResolution(builder, ignoreHash);
+		return resolve(builder, ignoreHash, null, null, null);
+	}
+	
+	protected Maybe<ArtifactDataResolution> resolve(ArtifactAddressBuilder builder, boolean ignoreHash, ArtifactIdentification artifact, Version version, PartIdentification part) {
+		HttpArtifactDataResolution res = new HttpArtifactDataResolution(builder, ignoreHash, artifact, version, part);
 		return Maybe.complete(res);
 	}
 
 	@Override
 	public Maybe<ArtifactDataResolution> resolveMetadata(ArtifactIdentification identification) {
-		return resolve(ArtifactAddressBuilder.build().root(root).artifact(identification).metaData());
+		return resolve(ArtifactAddressBuilder.build().root(root).artifact(identification).metaData(), identification, null, null);
 	}
 
 	@Override
 	public Maybe<ArtifactDataResolution> resolveMetadata(CompiledArtifactIdentification identification) {
-		return resolve(ArtifactAddressBuilder.build().root(root).compiledArtifact(identification).metaData());
+		return resolve(ArtifactAddressBuilder.build().root(root).compiledArtifact(identification).metaData(), ArtifactIdentification.from(identification), identification.getVersion(), null);
 	}
 
 	@Override
 	public Maybe<ArtifactDataResolution> resolvePart(CompiledArtifactIdentification identification,
 			PartIdentification partIdentification, Version partVersionOverrride) {
+		ArtifactIdentification ai = ArtifactIdentification.from(identification);
 		if (partVersionOverrride == null)
 			return resolve(ArtifactAddressBuilder.build().root(root).compiledArtifact(identification)
-					.part(partIdentification));
+					.part(partIdentification), ai, partVersionOverrride, partIdentification);
 		else
 			return resolve(ArtifactAddressBuilder.build().root(root).compiledArtifact(identification)
-					.part(partIdentification, partVersionOverrride));
+					.part(partIdentification, partVersionOverrride), ai, identification.getVersion(), partIdentification);
 	}
 
 	/**
@@ -166,13 +173,15 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase
 		// because there is no need to support more version levels)
 		private static Pattern versionPattern = Pattern.compile("\\d+(\\.\\d+){0,4}");
 		private final boolean ignoreHash;
+		private PartIdentification part;
+		private Version version;
+		private ArtifactIdentification artifact;
 
-		public HttpArtifactDataResolution(ArtifactAddressBuilder builder) {
-			this(builder, false);
-		}
-
-		public HttpArtifactDataResolution(ArtifactAddressBuilder builder, boolean ignoreHash) {
+		public HttpArtifactDataResolution(ArtifactAddressBuilder builder, boolean ignoreHash, ArtifactIdentification artifact, Version version, PartIdentification part) {
 			this.builder = builder;
+			this.artifact = artifact;
+			this.version = version;
+			this.part = part;
 			this.url = builder.toPath().toSlashPath();
 			this.ignoreHash = ignoreHash;
 		}
@@ -329,74 +338,30 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase
 						? createMessageDigest(hashAlgAndValuePair.getFirst())
 						: null;
 
-				InputStream inputStream = entity.getContent();
-
-				if (messageDigest != null) {
-					inputStream = new DigestInputStream(inputStream, messageDigest);
-				}
-
-				return Maybe.complete(new BasicDelegateInputStream(inputStream) {
-					@Override
-					public void close() throws IOException {
-						super.close();
-						response.close();
-					}
-
-					@Override
-					public int read() throws IOException {
-						int i = super.read();
-						if (i < 0) {
-							checkChecksum();
+				InputStream inputStream = new PartDownloadInputStream(entity.getContent(), repositoryId, artifact, version, part, builder.toRelativePath().toSlashPath(), messageDigest, digest -> {
+					String hash = StringTools.toHex(digest.digest());
+					if (!hash.equalsIgnoreCase(hashAlgAndValuePair.getSecond())) {
+						String msg = "checksum [" + hashAlgAndValuePair.first() + "] mismatch for [" + url
+								+ "], expected [" + hashAlgAndValuePair.getSecond() + "], found [" + hash + "]";
+						switch (checksumPolicy) {
+						case fail:
+							throw new ReasonException(TemplateReasons.build(MismatchingHash.T) //
+									.assign(MismatchingHash::setUrl, url) //
+									.assign(MismatchingHash::setHashAlgorithm, hashAlgAndValuePair.first)
+									.assign(MismatchingHash::setExpectedHash, hashAlgAndValuePair.getSecond())
+									.assign(MismatchingHash::setFoundHash, hash).toReason());
+						case warn:
+							log.warn(msg);
+							break;
+						case ignore:
+						default:
+							break;
 						}
-						return i;
-					}
-
-					@Override
-					public int read(byte[] b) throws IOException {
-						int i = super.read(b);
-						if (i < 0) {
-							checkChecksum();
-						}
-						return i;
-					}
-
-					@Override
-					public int read(byte[] b, int off, int len) throws IOException {
-						int i = super.read(b, off, len);
-						if (i < 0) {
-							checkChecksum();
-						}
-						return i;
-					}
-
-					/**
-					 * check the CRC of the stream right at time of closing
-					 */
-					private void checkChecksum() {
-						if (messageDigest != null) {
-							String hash = StringTools.toHex(messageDigest.digest());
-							if (!hash.equalsIgnoreCase(hashAlgAndValuePair.getSecond())) {
-								String msg = "checksum [" + hashAlgAndValuePair.first() + "] mismatch for [" + url
-										+ "], expected [" + hashAlgAndValuePair.getSecond() + "], found [" + hash + "]";
-								switch (checksumPolicy) {
-								case fail:
-									throw new ReasonException(TemplateReasons.build(MismatchingHash.T) //
-											.assign(MismatchingHash::setUrl, url) //
-											.assign(MismatchingHash::setHashAlgorithm, hashAlgAndValuePair.first)
-											.assign(MismatchingHash::setExpectedHash, hashAlgAndValuePair.getSecond())
-											.assign(MismatchingHash::setFoundHash, hash).toReason());
-								case warn:
-									log.warn(msg);
-									break;
-								case ignore:
-								default:
-									break;
-								}
-							}
-						}
-
 					}
 				});
+
+				return Maybe.complete(inputStream);
+				
 			} else {
 				response.close();
 
@@ -423,13 +388,7 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase
 		 * @throws IOException - if no input stream was able to be retrieved
 		 */
 		private InputStream openInputStream() throws IOException {
-			Maybe<InputStream> inMaybe = tryOpenInputStream();
-
-			if (inMaybe.isUnsatisfiedBy(NotFound.T)) {
-				throw new NoSuchElementException("no such file [" + url + "]");
-			}
-
-			return inMaybe.get();
+			return tryOpenInputStream().get();
 		}
 
 		private <T> Maybe<T> statusProblemMaybe(CloseableHttpResponse response) {

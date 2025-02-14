@@ -15,16 +15,9 @@
 // ============================================================================
 package com.braintribe.devrock.model.mc.core.event;
 
-import com.braintribe.model.artifact.compiled.CompiledPartIdentification;
-import com.braintribe.model.generic.GenericEntity;
 import com.braintribe.model.generic.reflection.EntityType;
 import com.braintribe.model.generic.reflection.EntityTypes;
 
-public interface OnPartDownloadProcessed extends GenericEntity {
+public interface OnPartDownloadProcessed extends PartDownloadEvent {
 	EntityType<OnPartDownloadProcessed> T = EntityTypes.T(OnPartDownloadProcessed.class);
-	
-	static String part = "part";
-
-	CompiledPartIdentification getPart();
-	void setPart(CompiledPartIdentification part);
 }

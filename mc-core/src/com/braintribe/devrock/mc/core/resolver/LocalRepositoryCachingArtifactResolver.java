@@ -23,14 +23,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -38,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -52,12 +48,10 @@ import com.braintribe.cc.lcd.EqProxy;
 import com.braintribe.cfg.Configurable;
 import com.braintribe.cfg.LifecycleAware;
 import com.braintribe.cfg.Required;
+import com.braintribe.common.attribute.AttributeContext;
 import com.braintribe.common.lcd.Pair;
 import com.braintribe.devrock.mc.api.commons.ArtifactAddressBuilder;
 import com.braintribe.devrock.mc.api.commons.VersionInfo;
-import com.braintribe.devrock.mc.api.download.PartEnricher;
-import com.braintribe.devrock.mc.api.event.EventBroadcaster;
-import com.braintribe.devrock.mc.api.event.EventBroadcasterAttribute;
 import com.braintribe.devrock.mc.api.repository.local.ArtifactPartResolverPersistenceDelegate;
 import com.braintribe.devrock.mc.api.repository.local.PartAvailability;
 import com.braintribe.devrock.mc.api.repository.local.PartAvailabilityAccess;
@@ -66,8 +60,6 @@ import com.braintribe.devrock.mc.core.commons.Downloads;
 import com.braintribe.devrock.mc.core.commons.FileCommons;
 import com.braintribe.devrock.mc.core.commons.PartReflectionCommons;
 import com.braintribe.devrock.mc.core.declared.commons.HashComparators;
-import com.braintribe.devrock.model.mc.core.event.OnPartDownloaded;
-import com.braintribe.devrock.model.mc.core.event.OnPartDownloading;
 import com.braintribe.devrock.model.mc.reason.InaccessiblePart;
 import com.braintribe.devrock.model.mc.reason.MetaDataDownloadFailed;
 import com.braintribe.devrock.model.mc.reason.PartReflectionFailure;
@@ -91,8 +83,6 @@ import com.braintribe.model.artifact.essential.PartIdentification;
 import com.braintribe.model.artifact.maven.meta.MavenMetaData;
 import com.braintribe.model.artifact.maven.meta.Versioning;
 import com.braintribe.model.resource.FileResource;
-import com.braintribe.model.time.TimeSpan;
-import com.braintribe.model.time.TimeUnit;
 import com.braintribe.model.version.Version;
 import com.braintribe.utils.collection.impl.AttributeContexts;
 import com.braintribe.utils.lcd.IOTools;
@@ -200,6 +190,22 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 		return accesses;	
 	}
 	
+	private <T> Future<T> submit(Callable<T> callable) {
+		AttributeContext ac = AttributeContexts.peek();
+		
+		Future<T> future = es.submit(() -> {
+			AttributeContexts.push(ac);
+			try {
+				return callable.call();
+			}
+			finally {
+				AttributeContexts.pop();
+			}
+		});
+		
+		return future;
+	}
+	
 	/**
 	 * loader function for Caffeine cache  of the VersionInfo
 	 * @param eqProxy - the {@link EqProxy} that wraps the {@link ArtifactIdentification}
@@ -226,8 +232,9 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 			if (delegate.repositoryDominanceFilter().matches(artifactIdentification)) {
 				dominancePos = pos++;
 			}
+
+			Future<Maybe<List<VersionInfo>>> future = submit(() -> acquireVersionInfo(artifactIdentification, delegate));
 			
-			Future<Maybe<List<VersionInfo>>> future = es.submit(() -> acquireVersionInfo(artifactIdentification, delegate));
 			futures.add(Pair.of(future, dominancePos));
 		}
 		
@@ -661,9 +668,12 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 			}
 		
 		}
+		
 		FileResource resource = FileResource.T.create();
 		resource.setPath( part.getAbsolutePath());
 		resource.setName( part.getName());						
+		resource.setFileSize(part.length());
+		
 		BasicArtifactDataResolution basicArtifactDataResolution = new BasicArtifactDataResolution(resource);
 		basicArtifactDataResolution.setRepositoryId(pa.repository().getName());
 		return Maybe.complete(basicArtifactDataResolution);
@@ -672,51 +682,7 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 	
 	private Reason downloadPart(CompiledPartIdentification cdi, File part, ArtifactDataResolution artifactDataResolution) {
 		logger.trace("downloading " + cdi.asString() + " from " + artifactDataResolution.repositoryId());
-		Reason reason = null;
-		try {
-			EventBroadcaster eventBroadcaster = AttributeContexts.peek().findAttribute(EventBroadcasterAttribute.class).orElse(EventBroadcaster.empty);
-			
-			
-			long start = System.currentTimeMillis();
-
-			OnPartDownloading downloadingEvent = OnPartDownloading.T.create();
-			downloadingEvent.setPart(cdi);
-			downloadingEvent.setRepositoryOrigin(artifactDataResolution.repositoryId());
-			
-			eventBroadcaster.sendEvent(downloadingEvent);
-			
-			reason = Downloads.downloadNotifying(eventBroadcaster, cdi, artifactDataResolution.repositoryId(), part, artifactDataResolution::openStream, lockProvider);
-			if (reason != null) {
-				return reason;
-			}
-
-			long end = System.currentTimeMillis();
-			
-			TimeSpan elapsedTime = TimeSpan.create((end-start)/1000.0, TimeUnit.second);
-			
-			FileResource fileResource = FileResource.T.create();
-			fileResource.setPath(part.getAbsolutePath());
-			fileResource.setFileSize(part.length());
-			fileResource.setName(part.getName());
-			
-			BasicFileAttributes attr = Files.readAttributes(part.toPath(), BasicFileAttributes.class);
-		    FileTime fileTime = attr.creationTime();
-			fileResource.setCreated(Date.from(fileTime.toInstant()));
-			
-			OnPartDownloaded downloadedEvent = OnPartDownloaded.T.create();
-			downloadedEvent.setResource(fileResource);
-			downloadedEvent.setElapsedTime(elapsedTime);
-			downloadedEvent.setPart(cdi);
-			downloadedEvent.setRepositoryOrigin(artifactDataResolution.repositoryId());
-			downloadedEvent.setDownloadSize(part.length());
-			
-			eventBroadcaster.sendEvent(downloadedEvent);
-			
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-		
-		return reason;
+		return Downloads.downloadLocked(cdi, artifactDataResolution.repositoryId(), part, artifactDataResolution::openStream, lockProvider);
 	}
 
 	@Override

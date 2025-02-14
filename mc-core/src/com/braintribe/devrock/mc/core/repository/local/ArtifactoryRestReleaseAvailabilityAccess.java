@@ -44,6 +44,7 @@ import com.braintribe.gm.model.reason.Maybe;
 import com.braintribe.gm.model.reason.Reason;
 import com.braintribe.gm.model.reason.ReasonException;
 import com.braintribe.gm.model.reason.essential.NotFound;
+import com.braintribe.logging.Logger;
 import com.braintribe.model.artifact.compiled.CompiledArtifactIdentification;
 import com.braintribe.model.artifact.compiled.CompiledPartIdentification;
 import com.braintribe.model.artifact.essential.PartIdentification;
@@ -56,6 +57,7 @@ import com.braintribe.utils.lcd.LazyInitialized;
  *
  */
 public class ArtifactoryRestReleaseAvailabilityAccess extends AbstractPartAvailabilityAccess {
+	private static Logger logger = Logger.getLogger(ArtifactoryRestReleaseAvailabilityAccess.class);
 	private static JsonStreamMarshaller marshaller = new JsonStreamMarshaller();
 	private static GmDeserializationOptions options = GmDeserializationOptions.defaultOptions.derive().setInferredRootType( FolderInfo.T).build();
 	private final LazyInitialized<FolderInfo> folderInfo = new LazyInitialized<>( this::loadPartOverview);
@@ -145,6 +147,7 @@ public class ArtifactoryRestReleaseAvailabilityAccess extends AbstractPartAvaila
 			
 			if (reason != null) {
 				if (reason instanceof NotFound) {
+					logger.debug("Artifactory REST API did not return a FolderInfo for [" + compiledArtifactIdentification + "]. An empty FolderInfo will be implied.");
 					//create an empty part-availability-file so that it will not be tried again, and return a folderinfo 
 					FolderInfo folderInfo = FolderInfo.T.create();
 					folderInfo.setRepo(repository.getName());

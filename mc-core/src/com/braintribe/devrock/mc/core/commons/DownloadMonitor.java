@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.braintribe.cc.lcd.EqProxy;
 import com.braintribe.cfg.Configurable;
 import com.braintribe.console.ConsoleOutputs;
 import com.braintribe.console.output.ConfigurableConsoleOutputContainer;
@@ -38,19 +37,19 @@ import com.braintribe.console.output.ConsoleText;
 import com.braintribe.devrock.mc.api.event.EntityEventListener;
 import com.braintribe.devrock.mc.api.event.EventContext;
 import com.braintribe.devrock.mc.api.event.EventEmitter;
-import com.braintribe.devrock.mc.core.declared.commons.HashComparators;
 import com.braintribe.devrock.model.mc.core.event.OnPartDownloaded;
 import com.braintribe.devrock.model.mc.core.event.OnPartDownloading;
-import com.braintribe.model.artifact.compiled.CompiledPartIdentification;
 
 public class DownloadMonitor implements AutoCloseable {
 	private boolean dynamicOutput = true;
 	private final EventEmitter emitter;
 	private final EntityEventListener<OnPartDownloading> downloadingListener = this::onDownloading;
 	private final EntityEventListener<OnPartDownloaded> downloadedListener = this::onDownloaded;
-	private final Map<EqProxy<CompiledPartIdentification>, DownloadInfo> downloadInfos = new HashMap<>();
+	private final Map<String, DownloadInfo> downloadInfos = new HashMap<>();
 	private int downloadCount;
-	private int objectCount;
+	private int totalCount;
+	private int artifactPartCount;
+	private int metaDataXmlCount;
 	private int downloadedVolume;
 	private int downloadedVolumeInSlice;
 	private int downloadRate;
@@ -67,7 +66,7 @@ public class DownloadMonitor implements AutoCloseable {
 	private int lastStaticOutputPhase = -1;
 	
 	private static class DownloadInfo {
-		CompiledPartIdentification part;
+		String path;
 	}
 	
 	public DownloadMonitor(EventEmitter emitter) {
@@ -240,13 +239,13 @@ public class DownloadMonitor implements AutoCloseable {
 		
 		if (!done) {
 			lastConsoleReprinting.appendLine(sequence( //
-				text("Counting Objects to be downloaded: "), //
-				text(String.valueOf(objectCount)) //
+				text("Counting Files to be downloaded: "), //
+				text(String.valueOf(totalCount)) //
 			));
 		}
 		
 		lastConsoleReprinting.appendLine(sequence( //
-			text("Downloaded Objects: "), //
+			text("Downloaded Files Total: "), //
 			text(String.valueOf(downloadCount)) //
 		));
 		
@@ -276,16 +275,16 @@ public class DownloadMonitor implements AutoCloseable {
 	
 	private void onDownloading(EventContext eventContext, OnPartDownloading event) {
 		synchronized (sync) {
-			DownloadInfo downloadInfo = downloadInfos.computeIfAbsent(HashComparators.compiledPartIdentification.eqProxy(event.getPart()), k -> new DownloadInfo());
+			DownloadInfo downloadInfo = downloadInfos.computeIfAbsent(event.getPath(), k -> new DownloadInfo());
 
 			int dataAmound = event.getDataAmount();
 			
 			downloadedVolumeInSlice += dataAmound;
 			downloadedVolume += dataAmound;
 			
-			if (downloadInfo.part == null) {
-				objectCount++;
-				downloadInfo.part = event.getPart();
+			if (downloadInfo.path == null) {
+				totalCount++;
+				downloadInfo.path = event.getPath();
 				doOutput();
 			}
 			else {
