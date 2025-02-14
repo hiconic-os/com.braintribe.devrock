@@ -20,7 +20,7 @@ limitations under the License.
         <version>[2.0,2.1)</version>
     </parent>
     <artifactId>declared-artifact-marshaller</artifactId>
-    <version>2.0.26</version>
+    <version>2.0.27</version>
     <properties>
         <archetype>library</archetype>
     </properties>

@@ -20,7 +20,7 @@ limitations under the License.
         <version>[2.0,2.1)</version>
     </parent>
     <artifactId>mc-core</artifactId>
-    <version>2.0.95</version>
+    <version>2.0.96</version>
     <properties>
 
     </properties>
