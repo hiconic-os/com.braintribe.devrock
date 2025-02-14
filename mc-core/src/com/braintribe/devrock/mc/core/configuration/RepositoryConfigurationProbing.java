@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,7 +36,9 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.braintribe.cfg.Configurable;
+import com.braintribe.cfg.LifecycleAware;
 import com.braintribe.cfg.Required;
+import com.braintribe.common.attribute.AttributeContext;
 import com.braintribe.devrock.mc.api.repository.RepositoryProbingSupport;
 import com.braintribe.devrock.mc.api.repository.configuration.ArtifactChangesSynchronization;
 import com.braintribe.devrock.mc.api.repository.configuration.HasConnectivityTokens;
@@ -57,6 +60,7 @@ import com.braintribe.logging.Logger;
 import com.braintribe.model.artifact.changes.RepositoryProbingResult;
 import com.braintribe.model.artifact.essential.VersionedArtifactIdentification;
 import com.braintribe.model.generic.reflection.ConfigurableCloningContext;
+import com.braintribe.utils.collection.impl.AttributeContexts;
 import com.braintribe.utils.lcd.LazyInitialized;
 
 
@@ -66,7 +70,7 @@ import com.braintribe.utils.lcd.LazyInitialized;
  * @author pit / dirk
  *
  */
-public class RepositoryConfigurationProbing implements Supplier<RepositoryConfiguration>, HasConnectivityTokens {
+public class RepositoryConfigurationProbing implements Supplier<RepositoryConfiguration>, HasConnectivityTokens, LifecycleAware {
 	private static Logger log = Logger.getLogger(RepositoryConfigurationProbing.class);
 	private final LazyInitialized<RepositoryConfiguration> effective = new LazyInitialized<RepositoryConfiguration>( this::probe); 
 	private Supplier<RepositoryConfiguration> repositoryConfigurationSupplier;
@@ -74,6 +78,8 @@ public class RepositoryConfigurationProbing implements Supplier<RepositoryConfig
 	private ArtifactChangesSynchronization changesSynchronization;
 	private BiFunction<File, Repository,ArtifactFilter> artifactFilterSupplier;
 	private ProbingResultPersistenceExpert probingResultPersistenceExpert;
+	private int poolSize = 5;
+	private ExecutorService executorService;
 
 	/**
 	 * @param probingResultPersistenceExpert - the expert that handles the persistence of the {@link RepositoryProbingResult}
@@ -107,6 +113,30 @@ public class RepositoryConfigurationProbing implements Supplier<RepositoryConfig
 		this.artifactFilterSupplier = artifactFilterSupplier;
 	}
 	
+	@Override
+	public void postConstruct() {
+		this.executorService = Executors.newFixedThreadPool(poolSize);
+	}
+	
+	@Override
+	public void preDestroy() {
+		executorService.shutdown();
+	}
+	
+	private <T> Future<T> submit(Callable<T> callable) {
+		AttributeContext ac = AttributeContexts.peek();
+		
+		return executorService.submit(() -> {
+			AttributeContexts.push(ac);
+			try {
+				return callable.call();
+			}
+			finally {
+				AttributeContexts.peek();
+			}
+		});
+	}
+	
 	/**
 	 * @return - the 'probed' or 'enriched' or 'fully qualified' {@link RepositoryConfiguration}
 	 */
@@ -128,7 +158,7 @@ public class RepositoryConfigurationProbing implements Supplier<RepositoryConfig
 				
 		// probe all repositories of the configuration in parallel	
 		Map<Repository, List<VersionedArtifactIdentification>> repositoryToChangedArtifactIdentificatons = new HashMap<>();
-		ExecutorService executorService = Executors.newFixedThreadPool( Math.min(probedRepositoryConfiguration.getRepositories().size(), 10));
+		
 		try {
 			Map<Repository,Future<Maybe<List<VersionedArtifactIdentification>>>> futures = new LinkedHashMap<>(probedRepositoryConfiguration.getRepositories().size());
 			for (Repository repository : probedRepositoryConfiguration.getRepositories()) {
@@ -148,7 +178,7 @@ public class RepositoryConfigurationProbing implements Supplier<RepositoryConfig
 				if (repository instanceof WorkspaceRepository) {
 					continue;
 				}
-				futures.put( repository, executorService.submit( () -> probe(probedRepositoryConfiguration, repository)));
+				futures.put(repository, submit(() -> probe(probedRepositoryConfiguration, repository)));
 			}
 			// collect the values and 'contextualize' all thrown exceptions
 			List<Throwable> throwables = new ArrayList<>();
@@ -289,8 +319,9 @@ public class RepositoryConfigurationProbing implements Supplier<RepositoryConfig
 	@Override
 	public RepositoryConfiguration get() {	
 		return effective.get();
-	} 
-	
-	
+	}
 
+	public void setPoolSize(int poolSize) {
+		this.poolSize = poolSize;
+	} 
 }

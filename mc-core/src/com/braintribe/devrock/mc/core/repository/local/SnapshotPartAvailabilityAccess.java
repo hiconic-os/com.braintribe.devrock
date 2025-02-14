@@ -17,12 +17,9 @@ package com.braintribe.devrock.mc.core.repository.local;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
 import java.time.Duration;
 import java.util.HashSet;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -41,6 +38,8 @@ import com.braintribe.devrock.mc.core.filters.ArtifactFilterExpert;
 import com.braintribe.devrock.model.repository.Repository;
 import com.braintribe.exception.Exceptions;
 import com.braintribe.gm.model.reason.Maybe;
+import com.braintribe.gm.model.reason.Reason;
+import com.braintribe.gm.model.reason.ReasonException;
 import com.braintribe.gm.model.reason.essential.NotFound;
 import com.braintribe.marshaller.artifact.maven.metadata.DeclaredMavenMetaDataMarshaller;
 import com.braintribe.model.artifact.compiled.CompiledArtifactIdentification;
@@ -158,16 +157,15 @@ public class SnapshotPartAvailabilityAccess extends AbstractPartAvailabilityAcce
 			
 			ArtifactDataResolution resolveMetadata = resolutionMaybe.get();
 			
-			try {
-				Downloads.download( metadataFile, resolveMetadata.getResource()::openStream);
-				return load( metadataFile);
-			}
-			catch (NoSuchElementException e) {
+			Reason reason = Downloads.downloadReasoned( metadataFile, resolveMetadata.getResource());
+			
+			if (reason == null)
+				return load(metadataFile);
+			
+			if (reason instanceof NotFound)
 				return null;
-			}
-			catch (IOException e) {
-				throw new UncheckedIOException( e);
-			}				
+			
+			throw new ReasonException(reason);
 		}
 		finally {
 			writeLock.unlock();

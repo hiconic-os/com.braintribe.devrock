@@ -15,30 +15,15 @@
 // ============================================================================
 package com.braintribe.devrock.model.mc.core.event;
 
-import com.braintribe.model.artifact.compiled.CompiledPartIdentification;
-import com.braintribe.model.generic.GenericEntity;
 import com.braintribe.model.generic.reflection.EntityType;
 import com.braintribe.model.generic.reflection.EntityTypes;
-import com.braintribe.model.resource.Resource;
 import com.braintribe.model.time.TimeSpan;
 
-public interface OnPartDownloaded extends GenericEntity {
+public interface OnPartDownloaded extends PartDownloadEvent {
 	EntityType<OnPartDownloaded> T = EntityTypes.T(OnPartDownloaded.class);
 	
-	static String part = "part";
-	static String repositoryOrigin = "repositoryOrigin";
-	static String resource = "resource";
 	static String elapsedTime = "elapsedTime";
-	
 	static String downloadSize = "downloadSize";
-	CompiledPartIdentification getPart();
-	void setPart(CompiledPartIdentification part);
-	
-	String getRepositoryOrigin();
-	void setRepositoryOrigin(String repositoryOrigin);
-	
-	Resource getResource();
-	void setResource(Resource resource);
 	
 	TimeSpan getElapsedTime();
 	void setElapsedTime(TimeSpan elapsedTime);

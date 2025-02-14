@@ -298,6 +298,8 @@ public class ArtifactDataResolverSpace implements ArtifactDataResolverContract {
 		bean.setArtifactFilterSupplier( changesSynchronization()::getFilterForRepository);
 		bean.setChangesSynchronization(changesSynchronization());
 		bean.setProbingResultPersistenceExpert(probingResultPersistenceExpert());
+		if (!parallelResolvingEnabled())
+			bean.setPoolSize(1);
 		return bean;
 	}
 	

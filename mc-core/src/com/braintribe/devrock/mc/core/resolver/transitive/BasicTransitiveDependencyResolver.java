@@ -38,6 +38,7 @@ import com.braintribe.cc.lcd.EqProxy;
 import com.braintribe.cfg.Configurable;
 import com.braintribe.cfg.LifecycleAware;
 import com.braintribe.cfg.Required;
+import com.braintribe.common.attribute.AttributeContext;
 import com.braintribe.common.lcd.Pair;
 import com.braintribe.devrock.mc.api.commons.Functions;
 import com.braintribe.devrock.mc.api.commons.PartIdentifications;
@@ -82,6 +83,7 @@ import com.braintribe.model.artifact.essential.VersionedArtifactIdentification;
 import com.braintribe.processing.async.api.AsyncCallback;
 import com.braintribe.processing.async.api.Promise;
 import com.braintribe.processing.async.impl.HubPromise;
+import com.braintribe.utils.collection.impl.AttributeContexts;
 import com.braintribe.utils.lcd.LazyInitialization;
 import com.braintribe.utils.lcd.LazyInitialized;
 
@@ -755,8 +757,11 @@ public class BasicTransitiveDependencyResolver implements TransitiveDependencyRe
 		
 		private <T> Promise<T> submit(Supplier<T> supplier) {
 			onAsyncStart();
+			
+			var ac = AttributeContexts.peek();
 			HubPromise<T> promise = new HubPromise<>();
 			executorService.submit(() -> {
+				AttributeContexts.push(ac);
 				try {
 					promise.accept(supplier.get());
 				}
@@ -764,6 +769,7 @@ public class BasicTransitiveDependencyResolver implements TransitiveDependencyRe
 					promise.onFailure(e);
 				}
 				finally {
+					AttributeContexts.pop();
 					onAsyncStop();
 				}
 			});

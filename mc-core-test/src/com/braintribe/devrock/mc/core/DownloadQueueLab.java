@@ -47,6 +47,7 @@ import com.braintribe.devrock.model.mc.core.event.OnPartDownloadProcessing;
 import com.braintribe.devrock.model.mc.core.event.OnPartDownloaded;
 import com.braintribe.devrock.model.mc.core.event.OnPartDownloading;
 import com.braintribe.model.artifact.analysis.AnalysisArtifactResolution;
+import com.braintribe.model.artifact.compiled.CompiledArtifactIdentification;
 import com.braintribe.model.artifact.compiled.CompiledDependencyIdentification;
 import com.braintribe.model.artifact.compiled.CompiledPartIdentification;
 import com.braintribe.model.artifact.essential.PartIdentification;
@@ -177,8 +178,14 @@ public class DownloadQueueLab {
 	public static void onDownloading(EventContext eventContext, OnPartDownloading event) {
 
 		inUiThread(() -> {
-			if (downloads.add(event.getPart())) {
-				downloadingModel.addElement(event.getPart().asString());
+			var part = event.getPart();
+			
+			if (part != null) {
+				CompiledArtifactIdentification cai = CompiledArtifactIdentification.from(event.getArtifact(), event.getVersion());
+				CompiledPartIdentification cpi = CompiledPartIdentification.from(cai, part);
+				if (downloads.add(cpi)) {
+					downloadingModel.addElement(event.getPart().asString());
+				}
 			}
 	    });
 	}

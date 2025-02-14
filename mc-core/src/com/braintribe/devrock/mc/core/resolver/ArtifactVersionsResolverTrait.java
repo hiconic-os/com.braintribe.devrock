@@ -94,13 +94,9 @@ public interface ArtifactVersionsResolverTrait extends ArtifactVersionsResolver,
 			versions.sort( (v1,v2) -> v1.version().compareTo(v2.version()));
 			return Maybe.complete(versions);
 		}
-		catch (NoSuchElementException e) {
-			return Maybe.complete(Collections.emptyList());
-		}
 		catch (Exception e) {
 			throw Exceptions.unchecked(e, "error while processing metadata for [" + artifactIdentification.asString() + "] from [" + resolution.repositoryId() + "]");
 		}
-						
 	}
 	
 	@Override
