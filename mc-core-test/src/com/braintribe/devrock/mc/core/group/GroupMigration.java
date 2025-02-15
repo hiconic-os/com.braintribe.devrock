@@ -43,10 +43,10 @@ import com.braintribe.utils.FileTools;
 public class GroupMigration {
 	private static List<String> gitIngores = Arrays.asList(".gradle");
 	private static List<String> obsoletes = Arrays.asList("Jenkinsfile", "MIGRATION.md", "build.xml");
-	private Map<String, Group> groups = new LinkedHashMap<>();
-	private File folder;
-	private List<SortedSet<Group>> bulks = new ArrayList<>();
-	private static final String[] natures = {"TribefireModule", "TribefireWebPlatform", "ModelPriming", "PrimingModule", "CoreWebContext"};
+	private final Map<String, Group> groups = new LinkedHashMap<>();
+	private final File folder;
+	private final List<SortedSet<Group>> bulks = new ArrayList<>();
+	private static final String[] natures = {"TribefireModule", "TribefireWebPlatform", "PrimingModule", "CoreWebContext"};
 	
 	public GroupMigration(File folder) {
 		this.folder = folder;
@@ -289,8 +289,8 @@ public class GroupMigration {
 	}
 
 	public static void main(String[] args) {
-		new GroupMigration(new File("C:\\devrock-sdk\\env\\migration\\git\\")).process();
-		//new GroupMigration(new File("C:\\devrock-sdk\\env\\cicd\\git\\initial\\extracted")).process();
+		//new GroupMigration(new File("C:\\devrock-sdk\\env\\migration\\git\\")).process();
+		new GroupMigration(new File("C:\\devrock-sdk\\env\\release")).process();
 	}
 
 }
