@@ -168,14 +168,11 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase
 	 */
 	private class HttpArtifactDataResolution implements ArtifactDataResolution {
 		private final ArtifactAddressBuilder builder;
-		private String url;
-		// using {0,4} instead of * to avoid potential stack overflow warning (and
-		// because there is no need to support more version levels)
-		private static Pattern versionPattern = Pattern.compile("\\d+(\\.\\d+){0,4}");
+		private final String url;
 		private final boolean ignoreHash;
-		private PartIdentification part;
-		private Version version;
-		private ArtifactIdentification artifact;
+		private final PartIdentification part;
+		private final Version version;
+		private final ArtifactIdentification artifact;
 
 		public HttpArtifactDataResolution(ArtifactAddressBuilder builder, boolean ignoreHash, ArtifactIdentification artifact, Version version, PartIdentification part) {
 			this.builder = builder;
@@ -197,10 +194,13 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase
 		public Maybe<InputStream> openStream() {
 			try {
 				return tryOpenInputStream();
+
 			} catch (UnknownHostException e) {
 				log.debug("Unknown host: " + url);
-				return Reasons.build(UnknownRepositoryHost.T).text("Unknown host: " + url) //
+				return Reasons.build(UnknownRepositoryHost.T) //
+						.text("Unknown host: " + url) //
 						.toMaybe();
+
 			} catch (Exception e) {
 				String tracebackId = UUID.randomUUID().toString();
 				String msg = "Could not open input stream for: " + url + " (tracebackId=" + tracebackId + ")";
@@ -334,31 +334,38 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase
 				HttpEntity entity = response.getEntity();
 
 				Pair<String, String> hashAlgAndValuePair = ignoreHash ? null : determineRequiredHashMatch(response);
-				MessageDigest messageDigest = hashAlgAndValuePair != null
-						? createMessageDigest(hashAlgAndValuePair.getFirst())
+				MessageDigest messageDigest = hashAlgAndValuePair != null //
+						? createMessageDigest(hashAlgAndValuePair.getFirst()) //
 						: null;
 
-				InputStream inputStream = new PartDownloadInputStream(entity.getContent(), repositoryId, artifact, version, part, builder.toRelativePath().toSlashPath(), messageDigest, digest -> {
-					String hash = StringTools.toHex(digest.digest());
-					if (!hash.equalsIgnoreCase(hashAlgAndValuePair.getSecond())) {
-						String msg = "checksum [" + hashAlgAndValuePair.first() + "] mismatch for [" + url
-								+ "], expected [" + hashAlgAndValuePair.getSecond() + "], found [" + hash + "]";
-						switch (checksumPolicy) {
-						case fail:
-							throw new ReasonException(TemplateReasons.build(MismatchingHash.T) //
-									.assign(MismatchingHash::setUrl, url) //
-									.assign(MismatchingHash::setHashAlgorithm, hashAlgAndValuePair.first)
-									.assign(MismatchingHash::setExpectedHash, hashAlgAndValuePair.getSecond())
-									.assign(MismatchingHash::setFoundHash, hash).toReason());
-						case warn:
-							log.warn(msg);
-							break;
-						case ignore:
-						default:
-							break;
-						}
-					}
-				});
+				InputStream inputStream = new PartDownloadInputStream( //
+						entity.getContent(), //
+						repositoryId, //
+						artifact, version, part, //
+						builder.toRelativePath().toSlashPath(), //
+						messageDigest, digest -> {
+
+							String hash = StringTools.toHex(digest.digest());
+							if (hash.equalsIgnoreCase(hashAlgAndValuePair.getSecond()))
+								return;
+
+							String msg = "checksum [" + hashAlgAndValuePair.first() + "] mismatch for [" + url + "], expected ["
+									+ hashAlgAndValuePair.getSecond() + "], found [" + hash + "]";
+							switch (checksumPolicy) {
+								case fail:
+									throw new ReasonException(TemplateReasons.build(MismatchingHash.T) //
+											.assign(MismatchingHash::setUrl, url) //
+											.assign(MismatchingHash::setHashAlgorithm, hashAlgAndValuePair.first)
+											.assign(MismatchingHash::setExpectedHash, hashAlgAndValuePair.getSecond())
+											.assign(MismatchingHash::setFoundHash, hash).toReason());
+								case warn:
+									log.warn(msg);
+									break;
+								case ignore:
+								default:
+									break;
+							}
+						});
 
 				return Maybe.complete(inputStream);
 				
@@ -422,6 +429,7 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase
 				int statusCode = response.getStatusLine().getStatusCode();
 				if (statusCode >= 200 && statusCode < 300)
 					return true;
+
 			} catch (IOException e) {
 				throw new UncheckedIOException("error while testing existance of [" + url + "]", e);
 			}
@@ -463,8 +471,7 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase
 		return getPartsOfFromStandardRepo(compiledArtifactIdentification);
 	}
 
-	private Maybe<List<PartReflection>> getPartsOfFromGitHub(GitHubInfo gitHubInfo,
-			CompiledArtifactIdentification compiledArtifactIdentification) {
+	private Maybe<List<PartReflection>> getPartsOfFromGitHub(GitHubInfo gitHubInfo, CompiledArtifactIdentification compiledArtifactIdentification) {
 		Maybe<String> htmlDataMaybe = getGitHubPartOverviewContent(gitHubInfo, compiledArtifactIdentification);
 
 		if (htmlDataMaybe.isUnsatisfiedBy(NotFound.T))
@@ -497,8 +504,8 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase
 		
 		try {
 			idJsonMaybe = readText(idUrl, "UTF-8");
-		}
-		catch (IOException e) {
+
+		} catch (IOException e) {
 			return InternalError.from(e, "Error while reading GitHub id JSON").asMaybe();
 		}
 		
@@ -544,8 +551,7 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase
 		}
 	}
 
-	private Maybe<List<PartReflection>> getPartsOfFromStandardRepo(
-			CompiledArtifactIdentification compiledArtifactIdentification) {
+	private Maybe<List<PartReflection>> getPartsOfFromStandardRepo(CompiledArtifactIdentification compiledArtifactIdentification) {
 		Maybe<ArtifactDataResolution> htmlContent = getPartOverview(compiledArtifactIdentification);
 
 		if (htmlContent.isUnsatisfiedBy(NotFound.T))
@@ -557,9 +563,8 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase
 		try {
 			Maybe<InputStream> inMaybe = htmlContent.get().openStream();
 
-			if (inMaybe.isUnsatisfiedBy(NotFound.T)) {
+			if (inMaybe.isUnsatisfiedBy(NotFound.T))
 				return Maybe.complete(Collections.emptyList());
-			}
 
 			if (inMaybe.isUnsatisfied())
 				return inMaybe.whyUnsatisfied().asMaybe();
@@ -570,6 +575,7 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase
 			List<PartReflection> partReflections = PartReflectionCommons.transpose(compiledArtifactIdentification,
 					repositoryId, filenamesFromHtml);
 			return Maybe.complete(partReflections);
+
 		} catch (Exception e) {
 			String tracebackId = UUID.randomUUID().toString();
 			String msg = "Exception while parsing repo part list reflection for " + compiledArtifactIdentification
@@ -598,10 +604,12 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase
 	}
 
 	@Override
-	public Maybe<ArtifactDataResolution> getPartOverview(
-			CompiledArtifactIdentification compiledArtifactIdentification) {
-		ArtifactAddressBuilder artifactAddress = ArtifactAddressBuilder.build().root(root)
-				.artifact(compiledArtifactIdentification).file(compiledArtifactIdentification.getVersion().asString());
+	public Maybe<ArtifactDataResolution> getPartOverview(CompiledArtifactIdentification compiledArtifactIdentification) {
+		ArtifactAddressBuilder artifactAddress = ArtifactAddressBuilder.build() //
+				.root(root)
+				.artifact(compiledArtifactIdentification) //
+				.file(compiledArtifactIdentification.getVersion().asString());
+
 		return resolve(artifactAddress, true);
 	}
 
