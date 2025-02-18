@@ -89,7 +89,7 @@ import com.fasterxml.jackson.core.JsonToken;
 public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase
 		implements ArtifactVersionsResolverTrait, ArtifactDataResolver {
 	private static Logger log = Logger.getLogger(HttpRepositoryArtifactDataResolver.class);
-	private static Pattern githubUrlPattern = Pattern
+	private static Pattern githubUrlPattern = Pattern // TODO support ${token}@mvn.pkg....
 			.compile("https:\\/\\/maven.pkg.github.com\\/([^\\/]+)\\/([^\\/]+).*");
 
 	private ChecksumPolicy checksumPolicy = ChecksumPolicy.fail;
