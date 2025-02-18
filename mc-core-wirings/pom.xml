@@ -52,6 +52,7 @@ limitations under the License.
             <artifactId>mc-core</artifactId>
             <version>${V.com.braintribe.devrock}</version>
         </dependency>
+        <!--TODO remove if not needed. This only brings the Apache HttpClient. Can be fully removed once it's replaced with Java's native HttpClient -->
         <dependency>
             <groupId>com.braintribe.gm</groupId>
             <artifactId>http-transport</artifactId>

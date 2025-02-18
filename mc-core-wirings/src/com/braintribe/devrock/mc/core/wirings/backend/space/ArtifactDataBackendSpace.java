@@ -21,6 +21,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.function.Function;
 
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
 
 import com.braintribe.devrock.mc.api.deploy.ArtifactDeployer;
 import com.braintribe.devrock.mc.api.repository.RepositoryProbingSupport;
@@ -54,7 +56,6 @@ import com.braintribe.devrock.model.repository.WorkspaceRepository;
 import com.braintribe.gm.model.reason.Reason;
 import com.braintribe.gm.model.reason.Reasons;
 import com.braintribe.gm.model.reason.essential.InvalidArgument;
-import com.braintribe.transport.http.DefaultHttpClientProvider;
 import com.braintribe.wire.api.annotation.Import;
 import com.braintribe.wire.api.annotation.Managed;
 
@@ -141,14 +142,11 @@ public class ArtifactDataBackendSpace implements ArtifactDataBackendContract {
 	@Override
 	@Managed
 	public CloseableHttpClient httpClient() {
-		DefaultHttpClientProvider bean = new DefaultHttpClientProvider();
-		bean.setSocketTimeout(properties.socketTimeout());
-		
-		try {
-			return bean.provideHttpClient();
-		} catch (Exception e) {
-			throw new IllegalStateException("cannot setup http client", e);
-		}				
+		CloseableHttpClient bean = HttpClients.custom() //
+				.setRoutePlanner(new SystemDefaultRoutePlanner(null)) //
+				.build();
+
+		return bean;
 	}
 	
 	@Override
