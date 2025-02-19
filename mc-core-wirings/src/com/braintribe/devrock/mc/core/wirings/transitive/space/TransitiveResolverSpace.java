@@ -42,7 +42,7 @@ public class TransitiveResolverSpace implements TransitiveResolverContract {
 		bean.setArtifactDataResolver(artifactDataResolver.artifactResolver());
 		bean.setPartEnricher(artifactDataResolver.partEnricher());
 		
-		if (artifactDataResolver.parallelResolvingEnabled())
+		if (!artifactDataResolver.parallelResolvingEnabled())
 			bean.setThreadPoolSize(1);
 		
 		return bean;

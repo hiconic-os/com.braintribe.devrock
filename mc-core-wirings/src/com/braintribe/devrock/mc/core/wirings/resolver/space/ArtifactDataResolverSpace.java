@@ -118,13 +118,9 @@ public class ArtifactDataResolverSpace implements ArtifactDataResolverContract {
 	
 	@Override
 	public void onLoaded(WireContextConfiguration configuration) {
-		if (parallelResolvingEnabled())
-			logger.info("MC parallel resolving is enabled");
-		else
-			logger.info("MC parallel resolving is disabled");
-			
+		logger.info("MC parallel resolving enabled: " + parallelResolvingEnabled());
 	}
-	
+
 	@Override
 	public boolean parallelResolvingEnabled() {
 		return !properties.disableParallelResolving();
@@ -463,7 +459,7 @@ public class ArtifactDataResolverSpace implements ArtifactDataResolverContract {
 		
 		bean.setDelegates(delegates);
 		bean.setLockProvider(backendContract().lockSupplier());
-		if (parallelResolvingEnabled())
+		if (!parallelResolvingEnabled())
 			bean.setMaxThreads(1);
 		return bean;
 	}
