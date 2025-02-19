@@ -155,11 +155,11 @@ public class ArtifactDataBackendSpace implements ArtifactDataBackendContract {
 				.build();
 
 		PoolingHttpClientConnectionManager cxMgr = new PoolingHttpClientConnectionManager();
-		cxMgr.setMaxTotal(8192);
-		cxMgr.setDefaultMaxPerRoute(8192);
+		cxMgr.setMaxTotal(1000);
+		cxMgr.setDefaultMaxPerRoute(200);
 		cxMgr.setDefaultSocketConfig(socketConfig);
-		cxMgr.setValidateAfterInactivity(10_000);
-		cxMgr.closeIdleConnections(5, TimeUnit.MINUTES);
+		cxMgr.setValidateAfterInactivity(5_000);
+		cxMgr.closeIdleConnections(1, TimeUnit.MINUTES);
 
 		CloseableHttpClient bean = HttpClients.custom() //
 				.setRoutePlanner(new SystemDefaultRoutePlanner(null)) //

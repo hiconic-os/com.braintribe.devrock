@@ -13,7 +13,7 @@ public interface ArtifactDataResolverPropertiesContract extends PropertyLookupCo
 	// This was originally 5 Seconds. But we had a problem behind a proxy that files > ~1MB would fail with a SocketTimeoutException
 	// Maven/Gradle allegedly have infinite socket timeout by default
 	@Name("MC_SOCKET_TIMEOUT")
-	@Default("300000")
+	@Default("150000")
 	int socketTimeout();
 
 }
