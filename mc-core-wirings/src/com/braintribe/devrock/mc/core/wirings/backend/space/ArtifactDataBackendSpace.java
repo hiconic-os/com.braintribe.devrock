@@ -17,11 +17,15 @@ package com.braintribe.devrock.mc.core.wirings.backend.space;
 
 import java.io.File;
 import java.net.URI;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.function.Function;
 
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
 
 import com.braintribe.devrock.mc.api.deploy.ArtifactDeployer;
@@ -72,7 +76,7 @@ public class ArtifactDataBackendSpace implements ArtifactDataBackendContract {
 	private ArtifactDataResolverPropertiesContract properties;
 
 	/**
-	 * registers {@link RepositoryProbingSupport} producers for the currently known different {@link Repository} types 
+	 * registers {@link RepositoryProbingSupport} producers for the currently known different {@link Repository} types
 	 */
 	@Managed
 	private ProbingSupportFactories probingSupportFactories() {
@@ -82,11 +86,11 @@ public class ArtifactDataBackendSpace implements ArtifactDataBackendContract {
 		bean.register(MavenFileSystemRepository.T, this::filesystemRepositoryProbingSupport);
 		bean.register(CodebaseRepository.T, this::codebaseRepositoryProbingSupport);
 		bean.register(LocalRepository.T, this::localRepositoryProbingSupport);
-		//TODO: what is the probing support of the workspace repository? 
+		// TODO: what is the probing support of the workspace repository?
 
 		return bean;
 	}
-	
+
 	/**
 	 * registers {@link ArtifactDataResolver} producers for the currently know different {@link Repository} types
 	 */
@@ -99,7 +103,7 @@ public class ArtifactDataBackendSpace implements ArtifactDataBackendContract {
 		bean.register(CodebaseRepository.T, this::codebaseRepository);
 		bean.register(LocalRepository.T, this::localRepository);
 		bean.register(WorkspaceRepository.T, this::workspaceRepository);
-		
+
 		return bean;
 	}
 
@@ -114,93 +118,112 @@ public class ArtifactDataBackendSpace implements ArtifactDataBackendContract {
 	@Managed
 	public CodebaseArtifactDataResolver codebaseRepository(CodebaseRepository repository) {
 		CodebaseArtifactDataResolver bean = new CodebaseArtifactDataResolver(repository.normalizedRootPath().toFile(), repository.getTemplate());
-		bean.setRepositoryId( repository.getName());
+		bean.setRepositoryId(repository.getName());
 		bean.setArchetypesExcludes(repository.getArchetypesExcludes());
 		bean.setArchetypesIncludes(repository.getArchetypesIncludes());
 		return bean;
 	}
-	
+
 	@Override
 	@Managed
 	public WorkspaceArtifactDataResolver workspaceRepository(WorkspaceRepository repository) {
 		WorkspaceArtifactDataResolver bean = new WorkspaceArtifactDataResolver();
-		bean.setRepositoryId( repository.getName());	
-		bean.setArtifacts( repository.getArtifacts());
+		bean.setRepositoryId(repository.getName());
+		bean.setArtifacts(repository.getArtifacts());
 		return bean;
 	}
-	
-	
+
 	@Override
 	@Managed
 	public ArtifactDataResolver fileSystemRepository(MavenFileSystemRepository repository) {
 		FilesystemRepositoryArtifactDataResolver bean = new FilesystemRepositoryArtifactDataResolver();
 		bean.setRepositoryId(repository.getName());
-		bean.setRoot(repository.normalizedRootPath().toFile());			
+		bean.setRoot(repository.normalizedRootPath().toFile());
 		return bean;
 	}
-	
+
 	@Override
 	@Managed
 	public CloseableHttpClient httpClient() {
+		SocketConfig socketConfig = SocketConfig.custom() //
+				.setSoTimeout(properties.socketTimeout()) //
+				.build();
+
+		RequestConfig requestConfig = RequestConfig.custom() //
+				.setConnectTimeout(20_000) //
+				.setSocketTimeout(properties.socketTimeout()) //
+				.build();
+
+		PoolingHttpClientConnectionManager cxMgr = new PoolingHttpClientConnectionManager();
+		cxMgr.setMaxTotal(8192);
+		cxMgr.setDefaultMaxPerRoute(8192);
+		cxMgr.setDefaultSocketConfig(socketConfig);
+		cxMgr.setValidateAfterInactivity(10_000);
+		cxMgr.closeIdleConnections(5, TimeUnit.MINUTES);
+
 		CloseableHttpClient bean = HttpClients.custom() //
 				.setRoutePlanner(new SystemDefaultRoutePlanner(null)) //
+				.setDefaultSocketConfig(socketConfig) //
+				.setDefaultRequestConfig(requestConfig) //
+				.setConnectionManager(cxMgr) //
 				.build();
 
 		return bean;
 	}
-	
+
 	@Override
 	public ArtifactDataResolver httpRepository(MavenHttpRepository repository) {
 		switch (repository.getRestSupport()) {
 			case artifactory:
-				return artifactoryRepository( repository);
+				return artifactoryRepository(repository);
 			default:
 				return standardHttpRepository(repository);
 		}
 	}
-	
+
 	@Override
 	public BasicHttpUploader httpUploader() {
 		BasicHttpUploader bean = new BasicHttpUploader();
 		bean.setHttpClient(httpClient());
 		return bean;
 	}
-	
-	private ChecksumPolicy transpose( com.braintribe.devrock.model.repository.ChecksumPolicy policy) {
-		return ChecksumPolicy.valueOf( policy.name());
+
+	private ChecksumPolicy transpose(com.braintribe.devrock.model.repository.ChecksumPolicy policy) {
+		return ChecksumPolicy.valueOf(policy.name());
 	}
-	
+
 	@Override
 	@Managed
 	public ArtifactDataResolver standardHttpRepository(MavenHttpRepository repository) {
 		HttpRepositoryArtifactDataResolver bean = new HttpRepositoryArtifactDataResolver();
-		bean.setRepositoryId( repository.getName());
-		bean.setRoot( repository.getUrl());
+		bean.setRepositoryId(repository.getName());
+		bean.setRoot(repository.getUrl());
 		bean.setHttpClient(httpClient());
-		bean.setPassword( repository.getPassword());
-		bean.setUserName( repository.getUser());
-		
+		bean.setPassword(repository.getPassword());
+		bean.setUserName(repository.getUser());
+
 		com.braintribe.devrock.model.repository.ChecksumPolicy checkSumPolicy = repository.getCheckSumPolicy();
 		if (checkSumPolicy != null) {
-			bean.setChecksumPolicy( transpose(checkSumPolicy));
+			bean.setChecksumPolicy(transpose(checkSumPolicy));
 		}
 		return bean;
 	}
-	
+
 	@Override
 	@Managed
 	public ArtifactDataResolver artifactoryRepository(MavenHttpRepository repository) {
 		ArtifactoryRepositoryArtifactDataResolver bean = new ArtifactoryRepositoryArtifactDataResolver();
-		bean.setRepositoryId( repository.getName());
-		bean.setRoot( repository.getUrl());
+		bean.setRepositoryId(repository.getName());
+		bean.setRoot(repository.getUrl());
 		bean.setHttpClient(httpClient());
-		bean.setPassword( repository.getPassword());
-		bean.setUserName( repository.getUser());
+		bean.setPassword(repository.getPassword());
+		bean.setUserName(repository.getUser());
 		return bean;
 	}
-	
+
 	/**
-	 * @param repository - the {@link LocalRepository}
+	 * @param repository
+	 *            - the {@link LocalRepository}
 	 * @return - a 'empty' {@link ArtifactDataResolver} as it's not backed by a 'real' repository
 	 */
 	public ArtifactDataResolver localRepository(@SuppressWarnings("unused") LocalRepository repository) {
@@ -208,93 +231,95 @@ public class ArtifactDataBackendSpace implements ArtifactDataBackendContract {
 	}
 
 	@Override
-	public ArtifactDataResolver repository(Repository repository) {	
+	public ArtifactDataResolver repository(Repository repository) {
 		if (repository.getOffline()) {
 			return emptyRepository(repository);
 		}
-		
+
 		return artifactDataResolverFactories().get(repository).apply(repository);
 	}
-	
+
 	/**
-	 * @param repository - the {@link Repository} (a filesystem based repo) 
+	 * @param repository
+	 *            - the {@link Repository} (a filesystem based repo)
 	 * @return - the respective {@link FilesystemRepositoryProbingSupport}
 	 */
 	@Managed
 	private FilesystemRepositoryProbingSupport filesystemRepositoryProbingSupport(MavenFileSystemRepository repository) {
 		FilesystemRepositoryProbingSupport bean = new FilesystemRepositoryProbingSupport();
-		bean.setRepositoryId( repository.getName());
-		bean.setRoot(repository.normalizedRootPath().toFile());		
+		bean.setRepositoryId(repository.getName());
+		bean.setRoot(repository.normalizedRootPath().toFile());
 		return bean;
 	}
-	
+
 	/**
-	 * @param repository - the {@link CodebaseRepository} (a special file system repo backed by sources)
+	 * @param repository
+	 *            - the {@link CodebaseRepository} (a special file system repo backed by sources)
 	 * @return - the respective {@link FilesystemRepositoryProbingSupport}
 	 */
 	@Managed
 	private FilesystemRepositoryProbingSupport codebaseRepositoryProbingSupport(CodebaseRepository repository) {
 		FilesystemRepositoryProbingSupport bean = new FilesystemRepositoryProbingSupport();
-		bean.setRepositoryId( repository.getName());
-		bean.setRoot(repository.normalizedRootPath().toFile());		
+		bean.setRepositoryId(repository.getName());
+		bean.setRoot(repository.normalizedRootPath().toFile());
 		return bean;
 	}
-	
+
 	@Managed
 	private FilesystemRepositoryProbingSupport localRepositoryProbingSupport(LocalRepository repository) {
 		FilesystemRepositoryProbingSupport bean = new FilesystemRepositoryProbingSupport();
-		bean.setRepositoryId( repository.getName());
-		bean.setRoot(repository.normalizedRootPath().toFile());		
+		bean.setRepositoryId(repository.getName());
+		bean.setRoot(repository.normalizedRootPath().toFile());
 		return bean;
 	}
-	
+
 	/**
-	 * @param repository - a {@link MavenHttpRepository} 
+	 * @param repository
+	 *            - a {@link MavenHttpRepository}
 	 * @return - the appropriate {@link HttpRepositoryProbingSupport}
 	 */
 	@Managed
 	private RepositoryProbingSupport httpRepositoryProbingSupport(MavenHttpRepository repository) {
-		
-		// probing path may be overriden  
-		
+
+		// probing path may be overriden
+
 		String probingPath = repository.getProbingPath();
-		
+
 		if (probingPath != null) {
 			URI uri;
 			try {
 				uri = URI.create(probingPath);
-				
+
 				if (!uri.isAbsolute())
 					probingPath = repository.getUrl() + probingPath;
-				
+
 			} catch (IllegalArgumentException e) {
-				Reason failure = Reasons.build(InvalidArgument.T).text("The probing path of repository " + repository.getName() + " is an invalid URI").toReason();
+				Reason failure = Reasons.build(InvalidArgument.T)
+						.text("The probing path of repository " + repository.getName() + " is an invalid URI").toReason();
 				return new FailingHttpRepositoryProbingSupport(repository.getName(), failure);
 			}
-			
-		}
-		else {
+
+		} else {
 			probingPath = repository.getUrl();
 		}
 
 		HttpRepositoryProbingSupport bean = new HttpRepositoryProbingSupport();
-		bean.setRepositoryId( repository.getName());
-		bean.setRoot( probingPath);
+		bean.setRepositoryId(repository.getName());
+		bean.setRoot(probingPath);
 		// probing method may be overriden
-		bean.setProbingMethod( repository.getProbingMethod());
-		
+		bean.setProbingMethod(repository.getProbingMethod());
+
 		bean.setHttpClient(httpClient());
-		bean.setPassword( repository.getPassword());
-		bean.setUserName( repository.getUser());
+		bean.setPassword(repository.getPassword());
+		bean.setUserName(repository.getUser());
 		return bean;
 	}
 
-	
 	@Override
 	public RepositoryProbingSupport probingSupport(Repository repository) {
 		return probingSupportFactories().get(repository).apply(repository);
 	}
-	
+
 	@Override
 	public ArtifactDeployer artifactDeployer(Repository repository) {
 		return artifactDeployerFactories().get(repository).apply(repository);
@@ -310,10 +335,10 @@ public class ArtifactDataBackendSpace implements ArtifactDataBackendContract {
 		bean.register(MavenHttpRepository.T, this::httpDeployer);
 		bean.register(MavenFileSystemRepository.T, this::fileSystemDeployer);
 		bean.register(LocalRepository.T, this::localDeployer);
-		
+
 		return bean;
 	}
-	
+
 	@Managed
 	private HttpRepositoryDeployer httpDeployer(MavenHttpRepository repository) {
 		HttpRepositoryDeployer bean = new HttpRepositoryDeployer();
@@ -321,30 +346,27 @@ public class ArtifactDataBackendSpace implements ArtifactDataBackendContract {
 		bean.setHttpClient(httpClient());
 		return bean;
 	}
-	
+
 	@Managed
 	private FileSystemRepositoryDeployer fileSystemDeployer(MavenFileSystemRepository repository) {
 		FileSystemRepositoryDeployer bean = new FileSystemRepositoryDeployer();
 		bean.setRepository(repository);
 		return bean;
 	}
-	
+
 	@Managed
 	private LocalRepositoryDeployer localDeployer(LocalRepository repository) {
 		LocalRepositoryDeployer bean = new LocalRepositoryDeployer();
 		bean.setRepository(repository);
 		return bean;
 	}
-	
 
 	@Override
 	@Managed
 	public Function<File, ReadWriteLock> lockSupplier() {
 		ManagedFilesystemLockSupplier bean = new ManagedFilesystemLockSupplier();
-		
+
 		return bean;
 	}
-
-	
 
 }
