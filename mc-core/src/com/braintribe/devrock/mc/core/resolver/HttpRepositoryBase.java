@@ -85,23 +85,42 @@ public class HttpRepositoryBase {
 	protected CloseableHttpResponse getResponse(String url, boolean headOnly) throws IOException {
 		return getResponse(headOnly ? new HttpHead(url) : new HttpGet(url));
 	}
-	
+
 	protected CloseableHttpResponse getResponse(HttpRequestBase requestBase) throws IOException {
+		if (userName != null && password != null) {
+			String auth = userName + ":" + password;
+			String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes());
+			requestBase.setHeader(new BasicHeader("Authorization", "Basic " + encodedAuth));
+		}
 
-	    if (userName != null && password != null) {
-	        String auth = userName + ":" + password;
-	        String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes());
-	        requestBase.setHeader(new BasicHeader("Authorization", "Basic " + encodedAuth));
-	    }
+		long start = System.nanoTime();
+		try {
+			CloseableHttpResponse response = httpClient.execute(requestBase, HttpClientContext.create());
+			logDuration(start, requestBase, "took");
+			return response;
 
-	    return httpClient.execute(requestBase, HttpClientContext.create());
+		} catch (Exception e) {
+			logDuration(start, requestBase, "failed after");
+			throw e;
+		}
+	}
+
+	private void logDuration(long start, HttpRequestBase requestBase, String what) {
+		if (!logger.isDebugEnabled())
+			return;
+
+		try {
+			logger.debug("Request " + what + ": " + (System.nanoTime() - start) / 1_000_000 + " ms. URL: " + requestBase.getURI().toURL().toString());
+		} catch (Exception e) {
+			// ignored
+		}
 	}
 
 	protected static <T> Maybe<T> statusProblemMaybe(HttpUriRequest request, CloseableHttpResponse response) {
 		return statusProblemMaybe(request.getURI().toString(), response);
-		
+
 	}
-	
+
 	protected static <T> Maybe<T> statusProblemMaybe(String url, CloseableHttpResponse response) {
 		int statusCode = response.getStatusLine().getStatusCode();
 
@@ -117,61 +136,59 @@ public class HttpRepositoryBase {
 						.toMaybe();
 		}
 	}
-	
+
 	protected Maybe<String> readText(String url, String encoding) throws IOException {
 		var maybe = openInputStream(url);
-		
+
 		if (maybe.isUnsatisfied())
 			return maybe.whyUnsatisfied().asMaybe();
-		
+
 		try (InputStream in = maybe.get()) {
-			return Maybe.complete(IOTools.slurp(in, encoding)); 
+			return Maybe.complete(IOTools.slurp(in, encoding));
 		}
 	}
-	
+
 	protected Maybe<InputStream> openInputStream(String url) throws IOException {
 		var responseMaybe = getResponseReasoned(url);
-		
+
 		if (responseMaybe.isUnsatisfied()) {
 			return responseMaybe.whyUnsatisfied().asMaybe();
 		}
-		
+
 		var response = responseMaybe.get();
-		
+
 		if (logger.isDebugEnabled()) {
 			StatusLine statusLine = response.getStatusLine();
 			int statusCode = statusLine.getStatusCode();
 			String phrase = statusLine.getReasonPhrase();
-			phrase = phrase != null? " (" + phrase + ")": "";
+			phrase = phrase != null ? " (" + phrase + ")" : "";
 			logger.debug("received status " + statusCode + phrase + " from url " + url);
 		}
-		
+
 		HttpEntity entity = response.getEntity();
-		
+
 		return Maybe.complete(entity.getContent());
 	}
-	
+
 	protected Maybe<CloseableHttpResponse> getResponseReasoned(String url) {
 		try {
 			var response = getResponse(url);
 			var statusLine = response.getStatusLine();
 			var statusCode = statusLine.getStatusCode();
-			
+
 			if (statusCode >= 200 && statusCode < 300)
 				return Maybe.complete(response);
-			
+
 			return statusProblemMaybe(url, response);
-		}
-		catch (UnknownHostException e) {
+		} catch (UnknownHostException e) {
 			logger.debug("Unknown host: " + url);
 			return Reasons.build(UnknownRepositoryHost.T).text("Unknown host: " + url) //
-				.toMaybe();
-		}
-		catch (Exception e) {
+					.toMaybe();
+		} catch (Exception e) {
 			String tracebackId = UUID.randomUUID().toString();
 			String msg = "Could not open input stream for: " + url + " (tracebackId=" + tracebackId + ")";
 			logger.error(msg, e);
-			
+
 			return Reasons.build(CommunicationError.T).text(msg).toMaybe();
 		}
 	}
@@ -182,11 +199,9 @@ public class HttpRepositoryBase {
 		while (true) {
 			try {
 				return getResponse(url, false);
-			}
-			catch (UnknownHostException e) {
+			} catch (UnknownHostException e) {
 				throw e;
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				if ((++retry) > maxRetries)
 					throw e;
 
@@ -201,11 +216,9 @@ public class HttpRepositoryBase {
 		while (true) {
 			try {
 				return getResponse(get);
-			} 
-			catch (UnknownHostException e) {
+			} catch (UnknownHostException e) {
 				throw e;
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				if ((++retry) > maxRetries)
 					throw e;
 

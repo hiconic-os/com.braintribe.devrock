@@ -150,7 +150,7 @@ public class ArtifactDataBackendSpace implements ArtifactDataBackendContract {
 				.build();
 
 		RequestConfig requestConfig = RequestConfig.custom() //
-				.setConnectTimeout(20_000) //
+				.setConnectTimeout(10_000) //
 				.setSocketTimeout(properties.socketTimeout()) //
 				.build();
 

@@ -727,14 +727,12 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 					else
 						lazyReason.get().getReasons().add(partsOfMaybe.whyUnsatisfied());
 				}
-				
+
 				List<PartReflection> partsOf = partsOfMaybe.get();
 				result.addAll( partsOf);
 
-				// TODO Improvement by Dirk, but it breaks test: MultiRepositoryPartReflectionTest.testActivePartReflectionOverAllKindsOfRepositories
-				// The first repo is codebase repon with AllMatching dominance filter - maybe the test is wrong?
-				// if (repoDelegate.repositoryDominanceFilter().matches(compiledArtifactIdentification))
-				// break;
+				if (repoDelegate.repositoryDominanceFilter().matches(compiledArtifactIdentification))
+					break;
 
 			} else {
 				// handle local repository here 
