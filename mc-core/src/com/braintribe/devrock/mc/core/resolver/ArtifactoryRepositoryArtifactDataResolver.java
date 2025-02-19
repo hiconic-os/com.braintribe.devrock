@@ -16,14 +16,12 @@
 package com.braintribe.devrock.mc.core.resolver;
 
 import java.io.BufferedInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import com.braintribe.codec.marshaller.api.GmDeserializationOptions;
@@ -33,21 +31,19 @@ import com.braintribe.devrock.mc.api.resolver.ArtifactDataResolution;
 import com.braintribe.devrock.mc.core.commons.PartReflectionCommons;
 import com.braintribe.devrock.model.artifactory.FileItem;
 import com.braintribe.devrock.model.artifactory.FolderInfo;
-import com.braintribe.exception.Exceptions;
 import com.braintribe.gm.model.reason.Maybe;
-import com.braintribe.gm.model.reason.ReasonException;
 import com.braintribe.gm.model.reason.essential.InternalError;
 import com.braintribe.gm.model.reason.essential.NotFound;
 import com.braintribe.logging.Logger;
 import com.braintribe.model.artifact.compiled.CompiledArtifactIdentification;
 import com.braintribe.model.artifact.consumable.PartReflection;
-import com.braintribe.model.resource.Resource;
 import com.braintribe.utils.lcd.LazyInitialized;
 import com.braintribe.utils.paths.UniversalPath;
 
 public class ArtifactoryRepositoryArtifactDataResolver extends HttpRepositoryArtifactDataResolver {
+
 	private static final Logger logger = Logger.getLogger(ArtifactoryRepositoryArtifactDataResolver.class);
-	private LazyInitialized<String> restUrl = new LazyInitialized<>( this::determineRestUrl);
+	private final LazyInitialized<String> restUrl = new LazyInitialized<>( this::determineRestUrl);
 	private static JsonStreamMarshaller marshaller = new JsonStreamMarshaller();
 	private static GmDeserializationOptions options = GmDeserializationOptions.defaultOptions.derive().setInferredRootType( FolderInfo.T).build();
 	
@@ -67,8 +63,10 @@ public class ArtifactoryRepositoryArtifactDataResolver extends HttpRepositoryArt
 	}
 
 	@Override
-	public Maybe<ArtifactDataResolution> getPartOverview( CompiledArtifactIdentification compiledArtifactIdentification) {
-		return resolve(ArtifactAddressBuilder.build().root( restUrl.get()).compiledArtifact(compiledArtifactIdentification), true);		
+	public Maybe<ArtifactDataResolution> getPartOverview(CompiledArtifactIdentification compiledArtifactIdentification) {
+		return resolve(ArtifactAddressBuilder.build() //
+				.root(restUrl.get()) //
+				.compiledArtifact(compiledArtifactIdentification), true);
 	}
 
 	@Override

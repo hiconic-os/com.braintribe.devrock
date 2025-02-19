@@ -536,6 +536,7 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 								.cause(candidate.whyUnsatisfied()) //
 								.toReason()
 						);
+						break;
 					}
 				default:
 					break;				
@@ -712,11 +713,13 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 		// TODO : check if locally installed ?
 		List<PartAvailabilityAccess> partAvailabilityAccesses = partAvailabilityAccessCache.get( HashComparators.compiledArtifactIdentification.eqProxy(compiledArtifactIdentification));
 		for (PartAvailabilityAccess pa : partAvailabilityAccesses) {			
-			if (!pa.repoDelegate().artifactFilter().matches(compiledArtifactIdentification))
+			ArtifactPartResolverPersistenceDelegate repoDelegate = pa.repoDelegate();
+
+			if (!repoDelegate.artifactFilter().matches(compiledArtifactIdentification))
 				continue;
 			
-			if (!pa.repoDelegate().isLocalDelegate()){ 
-				var partsOfMaybe = pa.repoDelegate().resolver().getPartsOfReasoned(compiledArtifactIdentification);
+			if (!repoDelegate.isLocalDelegate()){
+				var partsOfMaybe = repoDelegate.resolver().getPartsOfReasoned(compiledArtifactIdentification);
 				
 				if (partsOfMaybe.isUnsatisfied()) {
 					if (partsOfMaybe.isUnsatisfiedBy(NotFound.T))
@@ -727,8 +730,13 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 				
 				List<PartReflection> partsOf = partsOfMaybe.get();
 				result.addAll( partsOf);
-			}
-			else {
+
+				// TODO Improvement by Dirk, but it breaks test: MultiRepositoryPartReflectionTest.testActivePartReflectionOverAllKindsOfRepositories
+				// The first repo is codebase repon with AllMatching dominance filter - maybe the test is wrong?
+				// if (repoDelegate.repositoryDominanceFilter().matches(compiledArtifactIdentification))
+				// break;
+
+			} else {
 				// handle local repository here 
 				@Nullable
 				Set<EqProxy<Version>> set = localVersionsCache.get( HashComparators.artifactIdentification.eqProxy( compiledArtifactIdentification));
