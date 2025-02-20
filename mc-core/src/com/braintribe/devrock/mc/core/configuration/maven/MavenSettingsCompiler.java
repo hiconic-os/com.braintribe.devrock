@@ -75,9 +75,9 @@ public class MavenSettingsCompiler implements Supplier<RepositoryConfiguration>,
 	private static Logger log = Logger.getLogger(MavenSettingsCompiler.class);
 	private Supplier<Settings> settingsSupplier;
 	private VirtualEnvironment virtualEnvironment = StandardEnvironment.INSTANCE;
-	private YamlMarshaller marshaller = new YamlMarshaller();
-	private GmDeserializationOptions options = GmDeserializationOptions.defaultOptions.derive().setInferredRootType(com.braintribe.devrock.model.repository.RepositoryConfiguration.T).absentifyMissingProperties(true).build();	
-	private LazyInitialized<RepositoryConfiguration> repositoryConfiguration = new LazyInitialized<>(this::initializeRepositoryConfiguration);
+	private final YamlMarshaller marshaller = new YamlMarshaller();
+	private final GmDeserializationOptions options = GmDeserializationOptions.defaultOptions.derive().setInferredRootType(com.braintribe.devrock.model.repository.RepositoryConfiguration.T).absentifyMissingProperties(true).build();	
+	private final LazyInitialized<RepositoryConfiguration> repositoryConfiguration = new LazyInitialized<>(this::initializeRepositoryConfiguration);
 	private boolean ignoreExternalConfiguration = false;
 	
 	@Configurable @Required
@@ -559,12 +559,9 @@ public class MavenSettingsCompiler implements Supplier<RepositoryConfiguration>,
 				configuredRepository.setOffline(true);
 			}
 			else {
-				if (url.equals( MAVEN_ORG_URL)) {
-					// TODO is there an easier way?
-					EntityCommons.setIfNotAbsent(configuredRepository, MavenHttpRepository.probingMethod,  RepositoryProbingMethod.get);				
-					EntityCommons.setIfNotAbsent(configuredRepository, MavenHttpRepository.probingPath,  MAVEN_ORG_PROBING_PATH);									
-				}
-				
+				httpRepository.setProbingMethod(RepositoryProbingMethod.none);
+				httpRepository.setRestSupport(RepositoryRestSupport.none);
+
 				// if settings is offline in itself, mark *all* repositories as offline
 				if (repositoryConfiguration.getOffline()) {
 					configuredRepository.setOffline(true);
