@@ -206,6 +206,29 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 		return future;
 	}
 	
+	private record EffectiveDelegates(List<ArtifactPartResolverPersistenceDelegate> dominantDelegates, List<ArtifactPartResolverPersistenceDelegate> normalDelegates) {}
+	
+	private EffectiveDelegates determineEffectiveDelegates(ArtifactIdentification artifactIdentification) {
+		List<ArtifactPartResolverPersistenceDelegate> dominantDelegates = new LinkedList<>();
+		List<ArtifactPartResolverPersistenceDelegate> normalDelegates = new LinkedList<>();
+		
+		for (ArtifactPartResolverPersistenceDelegate delegate: delegates) {
+			// the delegate's not relevant for this artifact, skip it
+			if (!delegate.artifactFilter().matches(artifactIdentification)) { 
+				continue;
+			}		
+
+			if (delegate.repositoryDominanceFilter().matches(artifactIdentification)) {
+				dominantDelegates.add(delegate);
+			}
+			else {
+				normalDelegates.add(delegate);
+			}
+		}
+		
+		return new EffectiveDelegates(dominantDelegates, normalDelegates);
+	}
+	
 	/**
 	 * loader function for Caffeine cache  of the VersionInfo
 	 * @param eqProxy - the {@link EqProxy} that wraps the {@link ArtifactIdentification}
@@ -215,27 +238,30 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 		// basic idea is that only the maven-metadata (source of the versions) of the dominant repository are really instantly resolved
 		// and recessive repositories (any non-dominant repository) are only resolved if no dominant repository was able to answer
 		// 
-		ArtifactIdentification artifactIdentification = eqProxy.get();	
-	
-		int pos = 0;
+		ArtifactIdentification artifactIdentification = eqProxy.get();
+		
+		EffectiveDelegates effectiveDelegates = determineEffectiveDelegates(artifactIdentification);
+		
+		for (ArtifactPartResolverPersistenceDelegate delegate: effectiveDelegates.dominantDelegates()) {
+			Maybe<List<VersionInfo>> versionsMaybe = acquireVersionInfo(artifactIdentification, delegate);
+			
+			if (versionsMaybe.isUnsatisfied())
+				return TemplateReasons.build(UnaccessibleArtifactVersions.T) //
+					.assign(UnaccessibleArtifactVersions::setArtifact, artifactIdentification) //
+					.cause(versionsMaybe.whyUnsatisfied()) //
+					.toMaybe();
+			
+			List<VersionInfo> versions = versionsMaybe.get();
+			
+			if (!versions.isEmpty())
+				return versionsMaybe;
+		}
 		
 		List<Pair<Future<Maybe<List<VersionInfo>>>, Integer>> futures = new ArrayList<>(delegates.size());
 		
-		for (ArtifactPartResolverPersistenceDelegate delegate: delegates) {
-			// the delegate's not relevant for this artifact, skip it
-			if (!delegate.artifactFilter().matches(artifactIdentification)) { 
-				continue;
-			}		
-
-			Integer dominancePos = null;
-			
-			if (delegate.repositoryDominanceFilter().matches(artifactIdentification)) {
-				dominancePos = pos++;
-			}
-
+		for (ArtifactPartResolverPersistenceDelegate delegate: effectiveDelegates.normalDelegates()) {
 			Future<Maybe<List<VersionInfo>>> future = submit(() -> acquireVersionInfo(artifactIdentification, delegate));
-			
-			futures.add(Pair.of(future, dominancePos));
+			futures.add(Pair.of(future, null));
 		}
 		
 		ExceptionCollector exceptionCollector = new ExceptionCollector("Error while resolving maven-metadata for: " + artifactIdentification.asString());
@@ -252,7 +278,6 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 		for (Pair<Future<Maybe<List<VersionInfo>>>, Integer> futureAndDominance: futures) {
 			try {
 				Future<Maybe<List<VersionInfo>>> future = futureAndDominance.first();
-				Integer dominancePos = futureAndDominance.second();
 				Maybe<List<VersionInfo>> versionInfosMaybe = future.get(); // get and eventually wait for retrieval
 				
 				if (versionInfosMaybe.isUnsatisfied()) {
@@ -269,9 +294,6 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 					Version version = versionInfo.version();
 					BasicVersionInfo mergedVersionInfo = map.computeIfAbsent( HashComparators.version.eqProxy(version), k -> new BasicVersionInfo(version));
 
-					if (dominancePos != null && mergedVersionInfo.dominancePos() == null)
-						mergedVersionInfo.setDominancePos(dominancePos);
-					
 					for (String repositoryId: versionInfo.repositoryIds())
 						mergedVersionInfo.add(repositoryId);							
 				}
