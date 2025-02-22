@@ -18,7 +18,7 @@ declare module "@dev.hiconic/hc-js-base" {
         // Aggregate Types
         type Simple = boolean | string | integer | long | float | double | decimal | date;
         type Scalar = Simple | Enum<any>;
-        type CollectionElement = Scalar | GenericEntity;
+        type CollectionElement = Scalar | GenericEntity | null;
         type CollectionType = T.Map<CollectionElement, CollectionElement> | T.Set<CollectionElement> | T.Array<CollectionElement>;
         type Base = CollectionElement | CollectionType;
     }
