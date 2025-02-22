@@ -17,6 +17,8 @@ package com.braintribe.devrock.mc.core.configuration.maven;
 
 
 
+import static com.braintribe.utils.lcd.StringTools.isEmpty;
+
 import java.io.File;
 import java.io.Reader;
 import java.io.StringReader;
@@ -59,6 +61,7 @@ import com.braintribe.model.generic.reflection.ConfigurableCloningContext;
 import com.braintribe.model.generic.reflection.EntityType;
 import com.braintribe.model.version.Version;
 import com.braintribe.model.version.VersionRange;
+import com.braintribe.utils.StringTools;
 import com.braintribe.utils.lcd.LazyInitialized;
 import com.braintribe.ve.api.VirtualEnvironment;
 import com.braintribe.ve.impl.StandardEnvironment;
@@ -75,9 +78,9 @@ public class MavenSettingsCompiler implements Supplier<RepositoryConfiguration>,
 	private static Logger log = Logger.getLogger(MavenSettingsCompiler.class);
 	private Supplier<Settings> settingsSupplier;
 	private VirtualEnvironment virtualEnvironment = StandardEnvironment.INSTANCE;
-	private YamlMarshaller marshaller = new YamlMarshaller();
-	private GmDeserializationOptions options = GmDeserializationOptions.defaultOptions.derive().setInferredRootType(com.braintribe.devrock.model.repository.RepositoryConfiguration.T).absentifyMissingProperties(true).build();	
-	private LazyInitialized<RepositoryConfiguration> repositoryConfiguration = new LazyInitialized<>(this::initializeRepositoryConfiguration);
+	private final YamlMarshaller marshaller = new YamlMarshaller();
+	private final GmDeserializationOptions options = GmDeserializationOptions.defaultOptions.derive().setInferredRootType(com.braintribe.devrock.model.repository.RepositoryConfiguration.T).absentifyMissingProperties(true).build();	
+	private final LazyInitialized<RepositoryConfiguration> repositoryConfiguration = new LazyInitialized<>(this::initializeRepositoryConfiguration);
 	private boolean ignoreExternalConfiguration = false;
 	
 	@Configurable @Required
@@ -477,7 +480,7 @@ public class MavenSettingsCompiler implements Supplier<RepositoryConfiguration>,
 		if (!ignoreExternalConfiguration) {
 			RepositoryConfiguration externalRepositoryConfiguration = null;
 			String externalConfigurationFilePath = virtualEnvironment.getEnv( DEVROCK_REPOSITORY_CONFIGURATION);
-			if (externalConfigurationFilePath != null) {
+			if (!isEmpty(externalConfigurationFilePath)) {
 				File externalConfigurationFile = new File( externalConfigurationFilePath);
 				if (externalConfigurationFile.exists()) {
 				
