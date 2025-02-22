@@ -287,7 +287,6 @@ public class BasicPartDownloadManager implements PartDownloadManager, LifecycleA
 				
 				EventBroadcaster eventBroadcaster = job.attributeContext.findAttribute(EventBroadcasterAttribute.class).orElse(EventBroadcaster.empty);
 				
-
 				OnPartDownloadEnqueued enqueuedEvent = OnPartDownloadEnqueued.T.create();
 				
 				CompiledPartIdentification part = CompiledPartIdentification.from(job.artifactIdentification, job.partIdentification);
@@ -298,9 +297,9 @@ public class BasicPartDownloadManager implements PartDownloadManager, LifecycleA
 				
 				// We need submit to block in order not to unfairly transfer prioritize eagerly known candidate queues
 				// because candidates could occur any time but would then be processed only after the previous ones
-				AttributeContexts.with(job.attributeContext).run(() -> {
+				executor.get().submit(() -> {
+					AttributeContexts.with(job.attributeContext).run(() -> {
 
-					executor.get().submit(() -> {
 						OnPartDownloadProcessing processingEvent = OnPartDownloadProcessing.T.create();
 						processingEvent.setPart(part);
 						
