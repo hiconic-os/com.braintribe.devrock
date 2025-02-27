@@ -15,6 +15,8 @@
 // ============================================================================
 package com.braintribe.devrock.model.repositoryview;
 
+import java.util.Date;
+
 import com.braintribe.model.generic.GenericEntity;
 import com.braintribe.model.generic.reflection.EntityType;
 import com.braintribe.model.generic.reflection.EntityTypes;
@@ -32,5 +34,20 @@ public interface Release extends GenericEntity {
 
 	final EntityType<Release> T = EntityTypes.T(Release.class);
 
-	// no properties
+	String groupId = "groupId";
+	String artifactId = "artifactId";
+	String version = "version";
+	String date = "date";
+	
+	String getGroupId();
+	void setGroupId(String groupId);
+	
+	String getArtifactId();
+	void setArtifactId(String artifactId);
+	
+	String getVersion();
+	void setVersion(String version);
+	
+	Date getDate();
+	void setDate(Date date);
 }
