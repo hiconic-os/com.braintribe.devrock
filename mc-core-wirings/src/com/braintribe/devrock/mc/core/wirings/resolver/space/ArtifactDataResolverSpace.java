@@ -314,6 +314,7 @@ public class ArtifactDataResolverSpace implements ArtifactDataResolverContract {
 	@Managed
 	public ViewRepositoryConfigurationCompiler viewRepositoryConfigurationCompiler() {
 		ViewRepositoryConfigurationCompiler bean = new ViewRepositoryConfigurationCompiler(repositoryConfiguration.repositoryConfiguration(), virtualEnvironment.virtualEnvironment());
+		bean.setLockSupplier(backendContract().lockSupplier());
 		return bean;
 	}
 	
@@ -338,7 +339,7 @@ public class ArtifactDataResolverSpace implements ArtifactDataResolverContract {
 				repository.setUpdateTimeSpan( TimeSpan.create(1, TimeUnit.day));			
 			}
 		}
-					
+		
 		// load bias 
 		PcBiasCompiler biasCompiler = biasCompiler( new File(declaredRepositoryConfiguration.cachePath()));
 		boolean anyBias = biasCompiler.loadPcBias();

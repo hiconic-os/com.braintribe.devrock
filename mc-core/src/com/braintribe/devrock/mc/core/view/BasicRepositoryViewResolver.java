@@ -15,7 +15,6 @@
 // ============================================================================
 package com.braintribe.devrock.mc.core.view;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -27,8 +26,6 @@ import java.util.stream.Collectors;
 
 import com.braintribe.cfg.Configurable;
 import com.braintribe.cfg.Required;
-import com.braintribe.codec.marshaller.api.GmDeserializationOptions;
-import com.braintribe.codec.marshaller.yaml.YamlMarshaller;
 import com.braintribe.devrock.mc.api.download.PartEnrichingContext;
 import com.braintribe.devrock.mc.api.transitive.TransitiveDependencyResolver;
 import com.braintribe.devrock.mc.api.transitive.TransitiveResolutionContext;
@@ -48,7 +45,9 @@ import com.braintribe.devrock.model.repositoryview.enrichments.ArtifactFilterEnr
 import com.braintribe.devrock.model.repositoryview.enrichments.RepositoryEnrichment;
 import com.braintribe.devrock.model.repositoryview.resolution.RepositoryViewResolution;
 import com.braintribe.devrock.model.repositoryview.resolution.RepositoryViewSolution;
+import com.braintribe.gm.config.yaml.ModeledYamlConfigurationLoader;
 import com.braintribe.gm.model.reason.Maybe;
+import com.braintribe.gm.model.reason.essential.NotFound;
 import com.braintribe.logging.Logger;
 import com.braintribe.model.artifact.analysis.AnalysisArtifact;
 import com.braintribe.model.artifact.analysis.AnalysisArtifactResolution;
@@ -59,12 +58,12 @@ import com.braintribe.model.artifact.essential.PartIdentification;
 import com.braintribe.model.generic.GenericEntity;
 import com.braintribe.model.generic.reflection.EntityType;
 import com.braintribe.model.generic.reflection.Property;
-import com.braintribe.model.resource.FileResource;
 import com.braintribe.model.resource.Resource;
-import com.braintribe.utils.FileTools;
 import com.braintribe.utils.lcd.CommonTools;
 import com.braintribe.utils.lcd.NullSafe;
 import com.braintribe.utils.lcd.StringTools;
+import com.braintribe.ve.api.VirtualEnvironment;
+import com.braintribe.ve.impl.StandardEnvironment;
 
 /**
  * Transitively resolves all view artifacts, reads the
@@ -83,10 +82,16 @@ public class BasicRepositoryViewResolver implements RepositoryViewResolver {
 	private static final Logger logger = Logger.getLogger(BasicRepositoryViewResolver.class);
 	
 	private TransitiveDependencyResolver transitiveDependencyResolver;
+	private VirtualEnvironment virtualEnvironment = StandardEnvironment.INSTANCE;
 	
 	@Configurable @Required
 	public void setTransitiveDependencyResolver(TransitiveDependencyResolver transitiveDependencyResolver) {
 		this.transitiveDependencyResolver = transitiveDependencyResolver;
+	}
+	
+	@Configurable 
+	public void setVirtualEnvironment(VirtualEnvironment virtualEnvironment) {
+		this.virtualEnvironment = virtualEnvironment;
 	}
 
 	@Override
@@ -125,7 +130,12 @@ public class BasicRepositoryViewResolver implements RepositoryViewResolver {
 			terminals = resolution.getTerminals().stream().map(AnalysisTerminal::asString).collect(Collectors.toList());
 
 			for (AnalysisArtifact solution : resolution.getSolutions()) {
-				RepositoryView readRepositoryView = readRepositoryView(solution);
+				Maybe<RepositoryView> maybe = readRepositoryView(solution);
+				
+				if (maybe.isUnsatisfied())
+					return maybe.whyUnsatisfied().asMaybe();
+				
+				RepositoryView readRepositoryView = maybe.get();
 				if (readRepositoryView != null) {
 					repositoryViews.put(readRepositoryView, solution);
 				}
@@ -177,33 +187,32 @@ public class BasicRepositoryViewResolver implements RepositoryViewResolver {
 		}
 	}
 
-	private static RepositoryView readRepositoryView(AnalysisArtifact analysisArtifact) {
-		final Optional<File> partFile = findPartFile(analysisArtifact, REPOSITORY_VIEW_PART_IDENTIFICATION);
+	private Maybe<RepositoryView> readRepositoryView(AnalysisArtifact analysisArtifact) {
+		final Optional<Resource> partFile = findPartResource(analysisArtifact, REPOSITORY_VIEW_PART_IDENTIFICATION);
+		
 		if (partFile.isPresent()) {
-			return readYamlFile(partFile.get());
+			return readYaml(partFile.get());
 		}
 		// this is expected (e.g. for parents)
-		return null;
+		return Maybe.complete(null);
 	}
 	
-	private static <T extends GenericEntity> T readYamlFile(File file) {
-		GmDeserializationOptions options = GmDeserializationOptions.deriveDefaults() //
-				.absentifyMissingProperties(true) //
-				.build();
-		return (T) FileTools.read(file).fromInputStream(it -> new YamlMarshaller().unmarshall(it, options));
+	private Maybe<RepositoryView> readYaml(Resource resource) {
+		Maybe<RepositoryView> maybeConfig = new ModeledYamlConfigurationLoader() //
+				.virtualEnvironment(virtualEnvironment) //
+				.loadConfig(RepositoryView.T, resource::openStream);
+		
+		return maybeConfig;
 	}
 
-	private static Optional<File> findPartFile(AnalysisArtifact solution, PartIdentification partIdentification) {
+	private static Optional<Resource> findPartResource(AnalysisArtifact solution, PartIdentification partIdentification) {
 		Part part = solution.getParts().get(partIdentification.asString());
 		if (part == null)
 			return Optional.empty();
 
 		Resource r = part.getResource();
-		if (!(r instanceof FileResource))
-			throw new IllegalStateException("Resource for part type '" + part.getType() + "' is not a FileResource. Resource: " + r);
-
-		FileResource fr = (FileResource) r;
-		return Optional.of(new File(fr.getPath()));
+		
+		return Optional.ofNullable(r);
 	}
 
 	static RepositoryViewResolution createRepositoryViewResolution(Map<RepositoryView, AnalysisArtifact> repositoryViews, List<String> terminals) {
