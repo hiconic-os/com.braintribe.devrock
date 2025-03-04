@@ -35,21 +35,19 @@ import com.braintribe.console.output.ConsoleOutput;
 import com.braintribe.console.output.ConsoleOutputContainer;
 import com.braintribe.console.output.ConsoleText;
 import com.braintribe.devrock.mc.api.event.EntityEventListener;
-import com.braintribe.devrock.mc.api.event.EventContext;
 import com.braintribe.devrock.mc.api.event.EventEmitter;
 import com.braintribe.devrock.model.mc.core.event.OnPartDownloaded;
 import com.braintribe.devrock.model.mc.core.event.OnPartDownloading;
 
 public class DownloadMonitor implements AutoCloseable {
+
 	private boolean dynamicOutput = true;
 	private final EventEmitter emitter;
-	private final EntityEventListener<OnPartDownloading> downloadingListener = this::onDownloading;
-	private final EntityEventListener<OnPartDownloaded> downloadedListener = this::onDownloaded;
+	private final EntityEventListener<OnPartDownloading> downloadingListener = (ctx, event) -> onDownloading(event);
+	private final EntityEventListener<OnPartDownloaded> downloadedListener = (ctx, event) -> onDownloaded();
 	private final Map<String, DownloadInfo> downloadInfos = new HashMap<>();
 	private int downloadCount;
 	private int totalCount;
-	private int artifactPartCount;
-	private int metaDataXmlCount;
 	private int downloadedVolume;
 	private int downloadedVolumeInSlice;
 	private int downloadRate;
@@ -61,7 +59,7 @@ public class DownloadMonitor implements AutoCloseable {
 	private boolean done;
 	private ConsoleOutput indent;
 	private boolean initialLinebreak;
-	private List<DownloadMonitorPhase> phases = new ArrayList<>();
+	private final List<DownloadMonitorPhase> phases = new ArrayList<>();
 	private int currentPhase = -1;
 	private int lastStaticOutputPhase = -1;
 	
@@ -95,10 +93,9 @@ public class DownloadMonitor implements AutoCloseable {
 	
 
 	private class DownloadMonitorPhase {
-		private ConsoleOutput title;
+		private final ConsoleOutput title;
 		private int itemCount = -1;
 		private int itemsDone = 0;
-		private int percentage;
 		private String progress = "";
 		
 		public DownloadMonitorPhase(ConsoleOutput title) {
@@ -273,7 +270,7 @@ public class DownloadMonitor implements AutoCloseable {
 		lastOutputTime = System.currentTimeMillis();
 	}
 	
-	private void onDownloading(EventContext eventContext, OnPartDownloading event) {
+	private void onDownloading(OnPartDownloading event) {
 		synchronized (sync) {
 			DownloadInfo downloadInfo = downloadInfos.computeIfAbsent(event.getPath(), k -> new DownloadInfo());
 
@@ -293,7 +290,7 @@ public class DownloadMonitor implements AutoCloseable {
 		}
 	}
 	
-	private void onDownloaded(EventContext eventContext, OnPartDownloaded event) {
+	private void onDownloaded() {
 		synchronized (sync) {
 			downloadCount++;
 			doOutput();
@@ -438,4 +435,5 @@ class ConsoleReprinting {
 		
 		return len;
 	}
+
 }

@@ -54,7 +54,6 @@ import com.braintribe.devrock.model.mc.reason.ClasspathInvalidDependencyReferenc
 import com.braintribe.devrock.model.mc.reason.ClasspathInvalidPartReference;
 import com.braintribe.gm.model.reason.Maybe;
 import com.braintribe.gm.model.reason.Reason;
-import com.braintribe.gm.model.reason.essential.InternalError;
 import com.braintribe.gm.reason.TemplateReasons;
 import com.braintribe.model.artifact.analysis.AnalysisArtifact;
 import com.braintribe.model.artifact.analysis.AnalysisArtifactResolution;
@@ -107,11 +106,11 @@ public class BasicClasspathDependencyResolver implements ClasspathDependencyReso
 	 *
 	 */
 	private class StatefulClasspathResolver {
-		private List<Pair<AnalysisArtifact, Reason>> collectedErrors = new ArrayList<>();
-		private ClasspathResolutionContext context;
-		private Iterable<? extends CompiledTerminal> terminals;
-		private Set<EqProxy<CompiledDependency>> providedDependencies = ConcurrentHashMap.newKeySet();
-		private ClasspathResolutionScope scope;
+		private final List<Pair<AnalysisArtifact, Reason>> collectedErrors = new ArrayList<>();
+		private final ClasspathResolutionContext context;
+		private final Iterable<? extends CompiledTerminal> terminals;
+		private final Set<EqProxy<CompiledDependency>> providedDependencies = ConcurrentHashMap.newKeySet();
+		private final ClasspathResolutionScope scope;
 
 		public StatefulClasspathResolver(ClasspathResolutionContext context, Iterable<? extends CompiledTerminal> terminals) {
 			this.context = context;
@@ -394,10 +393,6 @@ public class BasicClasspathDependencyResolver implements ClasspathDependencyReso
 			}
 		}
 		
-		/**
-		 * @param artifactElement
-		 * @return
-		 */
 		public boolean filterArtifact(ArtifactPathElement artifactElement) {
 			
 			DependencyPathElement parent = artifactElement.getParent();
@@ -482,10 +477,6 @@ public class BasicClasspathDependencyResolver implements ClasspathDependencyReso
 		
 		private void collectError(AnalysisArtifact artifact, Reason reason) {
 			collectedErrors.add(Pair.of( artifact, reason));
-		}
-		
-		private void collectError(AnalysisArtifact artifact, Exception e) {
-			collectError(artifact, InternalError.from(e));
 		}
 		
 		public boolean isTransitiveArtifact(ArtifactPathElement artifactPathElement) {

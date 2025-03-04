@@ -79,9 +79,9 @@ public class BasicPartEnricher implements PartEnricher {
 	}
 	
 	private class StateFullEnricher {
-		private PartDownloadScope downloadScope = partDownloadManager.openDownloadScope();
-		private List<AsyncPartDownloadEntry> asyncPartDownloadEntries = new ArrayList<>();
-		private PartEnrichingContext context;
+		private final PartDownloadScope downloadScope = partDownloadManager.openDownloadScope();
+		private final List<AsyncPartDownloadEntry> asyncPartDownloadEntries = new ArrayList<>();
+		private final PartEnrichingContext context;
 		
 		public StateFullEnricher(PartEnrichingContext context) {
 			this.context = context;
@@ -125,6 +125,9 @@ public class BasicPartEnricher implements PartEnricher {
 			AnalysisDependency parent = analysisArtifact.getParent();
 			if (parent != null) {
 				AnalysisArtifact artifact = parent.getSolution();
+				if (artifact == null)
+					throw new IllegalStateException("No solution exists for parent: " + parent);
+
 				collect(artifact, artifacts);
 				for (AnalysisDependency importDep : artifact.getImports()) {
 					AnalysisArtifact importSolution = importDep.getSolution();
@@ -139,7 +142,7 @@ public class BasicPartEnricher implements PartEnricher {
 		}
 
 		public void enrich(Iterable<AnalysisArtifact> artifacts) {
-			enrich(artifacts, (a,r) -> {});
+			enrich(artifacts, (a, r) -> { /* NO OP */ });
 		}
 		
 		public void enrich(Iterable<AnalysisArtifact> artifacts, BiConsumer<AnalysisArtifact, Reason> errorListener) {
