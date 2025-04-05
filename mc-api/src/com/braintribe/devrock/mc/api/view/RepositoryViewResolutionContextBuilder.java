@@ -15,6 +15,7 @@
 // ============================================================================
 package com.braintribe.devrock.mc.api.view;
 
+import java.io.File;
 import java.util.List;
 
 import com.braintribe.devrock.model.repository.RepositoryConfiguration;
@@ -24,7 +25,8 @@ public interface RepositoryViewResolutionContextBuilder {
 	
 	RepositoryViewResolutionContextBuilder enrich(List<ConfigurationEnrichment> enrichments);
 	RepositoryViewResolutionContextBuilder baseConfiguration(RepositoryConfiguration baseConfiguration);
-	
+	RepositoryViewResolutionContextBuilder viewConfigName(String name);
+	RepositoryViewResolutionContextBuilder effectiveRepoConfigFolder(File effectiveRepoConfigFolder);
 	
 	RepositoryViewResolutionContext done();
 }

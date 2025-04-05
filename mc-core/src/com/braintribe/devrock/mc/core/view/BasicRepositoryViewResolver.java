@@ -15,6 +15,14 @@
 // ============================================================================
 package com.braintribe.devrock.mc.core.view;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -22,10 +30,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.braintribe.cfg.Configurable;
 import com.braintribe.cfg.Required;
+import com.braintribe.codec.marshaller.api.GmSerializationOptions;
+import com.braintribe.codec.marshaller.api.OutputPrettiness;
+import com.braintribe.codec.marshaller.api.PlaceholderSupport;
+import com.braintribe.codec.marshaller.api.ScalarsFirst;
+import com.braintribe.codec.marshaller.yaml.YamlMarshaller;
+import com.braintribe.devrock.mc.api.download.PartEnricher;
 import com.braintribe.devrock.mc.api.download.PartEnrichingContext;
 import com.braintribe.devrock.mc.api.transitive.TransitiveDependencyResolver;
 import com.braintribe.devrock.mc.api.transitive.TransitiveResolutionContext;
@@ -45,9 +62,9 @@ import com.braintribe.devrock.model.repositoryview.enrichments.ArtifactFilterEnr
 import com.braintribe.devrock.model.repositoryview.enrichments.RepositoryEnrichment;
 import com.braintribe.devrock.model.repositoryview.resolution.RepositoryViewResolution;
 import com.braintribe.devrock.model.repositoryview.resolution.RepositoryViewSolution;
-import com.braintribe.gm.config.yaml.ModeledYamlConfigurationLoader;
+import com.braintribe.gm.config.yaml.YamlConfigurations;
+import com.braintribe.gm.model.reason.HasFailure;
 import com.braintribe.gm.model.reason.Maybe;
-import com.braintribe.gm.model.reason.essential.NotFound;
 import com.braintribe.logging.Logger;
 import com.braintribe.model.artifact.analysis.AnalysisArtifact;
 import com.braintribe.model.artifact.analysis.AnalysisArtifactResolution;
@@ -58,8 +75,12 @@ import com.braintribe.model.artifact.essential.PartIdentification;
 import com.braintribe.model.generic.GenericEntity;
 import com.braintribe.model.generic.reflection.EntityType;
 import com.braintribe.model.generic.reflection.Property;
+import com.braintribe.model.generic.reflection.VdHolder;
+import com.braintribe.model.generic.session.InputStreamProvider;
 import com.braintribe.model.resource.Resource;
+import com.braintribe.utils.encryption.Md5Tools;
 import com.braintribe.utils.lcd.CommonTools;
+import com.braintribe.utils.lcd.LazyInitialized;
 import com.braintribe.utils.lcd.NullSafe;
 import com.braintribe.utils.lcd.StringTools;
 import com.braintribe.ve.api.VirtualEnvironment;
@@ -83,10 +104,18 @@ public class BasicRepositoryViewResolver implements RepositoryViewResolver {
 	
 	private TransitiveDependencyResolver transitiveDependencyResolver;
 	private VirtualEnvironment virtualEnvironment = StandardEnvironment.INSTANCE;
+
+	private Function<File, ReadWriteLock> lockSupplier;
+	private PartEnricher partEnricher;
 	
 	@Configurable @Required
 	public void setTransitiveDependencyResolver(TransitiveDependencyResolver transitiveDependencyResolver) {
 		this.transitiveDependencyResolver = transitiveDependencyResolver;
+	}
+	
+	@Configurable @Required
+	public void setPartEnricher(PartEnricher partEnricher) {
+		this.partEnricher = partEnricher;
 	}
 	
 	@Configurable 
@@ -100,10 +129,14 @@ public class BasicRepositoryViewResolver implements RepositoryViewResolver {
 		return new StatefulRepositoryViewResolver(context, terminals).resolve();
 	}
 	
-	private class StatefulRepositoryViewResolver {
-		private final Map<RepositoryView, AnalysisArtifact> repositoryViews = new LinkedHashMap<>();
+	private record MappedRepositoryViewResolution(RepositoryViewResolution repositoryViewResolution, Map<RepositoryView, AnalysisArtifact> artifactMap) {}
+
+	private class StatefulRepositoryViewResolver implements RepositoryViewResolutionResult {
 		private RepositoryViewResolutionContext context;
 		private Iterable<? extends CompiledTerminal> compiledTerminals;
+		private AnalysisArtifactResolution resolution;
+		private RepositoryConfiguration mergedRepositoryConfiguration;
+		private LazyInitialized<Maybe<MappedRepositoryViewResolution>> lazyRepositoryViewResolution = new LazyInitialized<>(this::loadViews);
 		
 		public StatefulRepositoryViewResolver(RepositoryViewResolutionContext context,
 				Iterable<? extends CompiledTerminal> terminals) {
@@ -111,21 +144,31 @@ public class BasicRepositoryViewResolver implements RepositoryViewResolver {
 			this.context = context;
 			this.compiledTerminals = terminals;
 		}
-
+		
 		public Maybe<RepositoryViewResolutionResult> resolve() {
-			PartEnrichingContext peCtx = PartEnrichingContext.build().enrichPart(REPOSITORY_VIEW_PART_IDENTIFICATION).done();
+			TransitiveResolutionContext trContext = TransitiveResolutionContext.build().done();
 
-			TransitiveResolutionContext trContext = TransitiveResolutionContext.build() //
-					.enrich(peCtx).done();
-
-			AnalysisArtifactResolution resolution = transitiveDependencyResolver.resolve(trContext, compiledTerminals);
+			resolution = transitiveDependencyResolver.resolve(trContext, compiledTerminals);
 			
 			if (resolution.hasFailed()) {
-				return Maybe.incomplete(new BasicRepositoryViewResolutionResult(resolution, null, null), resolution.getFailure());
+				return Maybe.incomplete(this, resolution.getFailure());
 			}
+			
+			mergedRepositoryConfiguration = acquireMergedRepositoryConfiguration();
+			
+			return Maybe.complete(this);
+		}
+	
+		private Maybe<MappedRepositoryViewResolution> loadViews() {
+			if (resolution.hasFailed())
+				return Maybe.empty(resolution.getFailure());
+						
+			PartEnrichingContext peCtx = PartEnrichingContext.build().enrichPart(REPOSITORY_VIEW_PART_IDENTIFICATION).done();
+			partEnricher.enrich(peCtx, resolution);
 			
 			List<String> terminals;
 			List<String> viewsSolutions = new ArrayList<String>();
+			Map<RepositoryView, AnalysisArtifact> repositoryViews = new LinkedHashMap<>();
 
 			terminals = resolution.getTerminals().stream().map(AnalysisTerminal::asString).collect(Collectors.toList());
 
@@ -142,14 +185,99 @@ public class BasicRepositoryViewResolver implements RepositoryViewResolver {
 				viewsSolutions.add(solution.asString());
 			}
 
-			RepositoryConfiguration mergedRepositoryConfiguration = createMergedRepositoryConfiguration(repositoryViews, false);
 			RepositoryViewResolution repositoryViewResolution = createRepositoryViewResolution(repositoryViews, terminals);
 			
-			RepositoryViewResolutionResult repositoryViewResolutionResult = new BasicRepositoryViewResolutionResult(
-					resolution, repositoryViewResolution, mergedRepositoryConfiguration);
-			
-			return Maybe.complete(repositoryViewResolutionResult);
+			return Maybe.complete(new MappedRepositoryViewResolution(repositoryViewResolution, repositoryViews));
 		}
+		
+		private <T extends HasFailure> T convertFailureSensitive(EntityType<T> type, Maybe<T> maybe) {
+			if (maybe.isUnsatisfied()) {
+				T failed = type.create();
+				failed.setFailure(maybe.whyUnsatisfied());
+				return failed;
+			}
+			return maybe.get();
+		}
+		
+		private RepositoryConfiguration acquireMergedRepositoryConfiguration() {
+			String hash = buildSolutionHash(resolution);
+			
+			File effectiveConfigFile = determineEffectiveConfigFile(hash);
+			
+			if (effectiveConfigFile.exists()) {
+				Maybe<RepositoryConfiguration> maybeConfig = readYaml(RepositoryConfiguration.T, effectiveConfigFile);
+				return convertFailureSensitive(RepositoryConfiguration.T, maybeConfig);
+			}
+			
+			Maybe<MappedRepositoryViewResolution> resolutionMaybe = lazyRepositoryViewResolution.get();
+			
+			if (resolutionMaybe.isUnsatisfied())
+				return null;
+			
+			MappedRepositoryViewResolution mappedResolution = resolutionMaybe.get();
+			
+			RepositoryConfiguration mergedRepositoryConfiguration = createMergedRepositoryConfiguration(mappedResolution.artifactMap(), false);
+
+			if (mergedRepositoryConfiguration.hasFailed())
+				return mergedRepositoryConfiguration;
+			
+			writeEffectiveRepositoryConfiguration(mergedRepositoryConfiguration, effectiveConfigFile);
+			
+			return mergedRepositoryConfiguration;
+		}
+		
+		private String buildSolutionHash(AnalysisArtifactResolution result) {
+			StringBuilder builder = new StringBuilder();
+			
+			for (var solution: result.getSolutions()) {
+				builder.append(solution.asString());
+				builder.append("\n");
+			}
+			
+			String md5 = Md5Tools.getMd5(builder.toString());
+			return md5;
+		}
+		
+		private File determineEffectiveConfigFile(String hash) {
+			String viewConfigName = context.viewConfigName();
+			
+			String fileName = viewConfigName + "-effective-" + hash + ".yaml";
+			
+			File effectivConfigfolder = context.effectiveRepoConfigFolder();
+			
+			if (effectivConfigfolder == null)
+				effectivConfigfolder = new File(new File(System.getProperty("java.io.tmpdir")), "repository-views");
+			
+			File repoConfigFile = new File(effectivConfigfolder, fileName);
+			
+			return repoConfigFile;
+		}
+		
+		private void writeEffectiveRepositoryConfiguration(RepositoryConfiguration repositoryConfiguration, File effectiveConfigFile) {
+			effectiveConfigFile.getParentFile().mkdirs();
+			
+			Lock lock = lockSupplier.apply(effectiveConfigFile).writeLock();
+			
+			lock.lock();
+			
+			try (OutputStream out = new BufferedOutputStream(new FileOutputStream(effectiveConfigFile))) {
+				new YamlMarshaller().marshall( //
+						out, //
+						repositoryConfiguration, // 
+						GmSerializationOptions.deriveDefaults().outputPrettiness(OutputPrettiness.high) //
+						.set(ScalarsFirst.class, true)
+						.set(PlaceholderSupport.class, true)
+						.build() //
+				);
+			}
+			catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+			finally {
+				lock.unlock();
+			}
+		}
+
 		
 		private RepositoryConfiguration createMergedRepositoryConfiguration(Map<RepositoryView, AnalysisArtifact> repositoryViews,
 				boolean enableDevelopmentMode) {
@@ -185,26 +313,57 @@ public class BasicRepositoryViewResolver implements RepositoryViewResolver {
 			}
 			return mergedRepositoryConfiguration;
 		}
+
+
+		@Override
+		public AnalysisArtifactResolution getAnalysisResolution() {
+			return resolution;
+		}
+
+		@Override
+		public RepositoryViewResolution getRepositoryViewResolution() {
+			return lazyRepositoryViewResolution.get().get().repositoryViewResolution();
+		}
+		
+		@Override
+		public Maybe<RepositoryViewResolution> getRepositoryViewResolutionReasoned() {
+			var resolution = lazyRepositoryViewResolution.get();
+			
+			if (resolution.isUnsatisfied())
+				return resolution.whyUnsatisfied().asMaybe();
+			
+			return Maybe.complete(resolution.get().repositoryViewResolution());
+		}
+
+		@Override
+		public RepositoryConfiguration getMergedRepositoryConfiguration() {
+			return mergedRepositoryConfiguration;
+		}
+		
 	}
 
 	private Maybe<RepositoryView> readRepositoryView(AnalysisArtifact analysisArtifact) {
 		final Optional<Resource> partFile = findPartResource(analysisArtifact, REPOSITORY_VIEW_PART_IDENTIFICATION);
 		
 		if (partFile.isPresent()) {
-			return readYaml(partFile.get());
+			return readRepositoryViewYaml(partFile.get());
 		}
 		// this is expected (e.g. for parents)
 		return Maybe.complete(null);
 	}
 	
-	private Maybe<RepositoryView> readYaml(Resource resource) {
-		Maybe<RepositoryView> maybeConfig = new ModeledYamlConfigurationLoader() //
-				.virtualEnvironment(virtualEnvironment) //
-				.loadConfig(RepositoryView.T, resource::openStream);
-		
-		return maybeConfig;
+	private Maybe<RepositoryView> readRepositoryViewYaml(Resource resource) {
+		return readYaml(RepositoryView.T, resource::openStream, null);
 	}
-
+	
+	private <T extends GenericEntity> Maybe<T> readYaml(EntityType<T> type, File file) {
+		return readYaml(type, () -> new BufferedInputStream(new FileInputStream(file)), file);
+	}
+	
+	private <T extends GenericEntity> Maybe<T> readYaml(EntityType<T> type, InputStreamProvider inputStreamProvider, File file) {
+		return YamlConfigurations.read(type).placeholders().from(inputStreamProvider);
+	}
+	
 	private static Optional<Resource> findPartResource(AnalysisArtifact solution, PartIdentification partIdentification) {
 		Part part = solution.getParts().get(partIdentification.asString());
 		if (part == null)
@@ -374,10 +533,20 @@ public class BasicRepositoryViewResolver implements RepositoryViewResolver {
 		} else {
 			mergedRepository = (S) sourceRepository.entityType().create();
 			for (Property property : targetRepository.entityType().getProperties()) {
+				if (!mergedRepository.entityType().getProperties().contains(property))
+					continue;
+				
 				Object propertyValue = property.get(targetRepository);
-				if (!property.isAbsent(targetRepository) && mergedRepository.entityType().getProperties().contains(property)) {
-					property.set(mergedRepository, propertyValue);
+				
+				if (VdHolder.isVdHolder(propertyValue)) {
+					VdHolder vdHolder = (VdHolder)propertyValue;
+					if (vdHolder.isAbsenceInformation)
+						continue;
+					
+					property.setVd(mergedRepository, vdHolder.vd);
 				}
+				else
+					property.set(mergedRepository, propertyValue);
 			}
 		}
 
@@ -385,14 +554,30 @@ public class BasicRepositoryViewResolver implements RepositoryViewResolver {
 			if (property.getDeclaringType() == GenericEntity.T) {
 				continue; // Won't process GenericEntity properties (like globalId, partition)
 			}
+			
+			if (!mergedRepository.entityType().getProperties().contains(property))
+				continue;
+			
 			Object propertyValue = property.get(sourceRepository);
-			// Won't process absent properties
-			if (!property.isAbsent(sourceRepository) && mergedRepository.entityType().getProperties().contains(property)) {
+			
+			if (VdHolder.isVdHolder(propertyValue)) {
+				VdHolder vdHolder = (VdHolder)propertyValue;
+				
+				if (vdHolder.isAbsenceInformation) 
+					continue;
+				
+				property.setVd(mergedRepository, vdHolder.vd);
+			}
+			else {
 				if (property.getName().equals(Repository.artifactFilter)) {
 					mergeArtifactFilter((ArtifactFilter) propertyValue, mergedRepository);
 				} else {
 					property.set(mergedRepository, propertyValue);
 				}
+			}
+			
+			// Won't process absent properties
+			if (!property.isAbsent(sourceRepository) && mergedRepository.entityType().getProperties().contains(property)) {
 			}
 		}
 		return mergedRepository;
@@ -423,5 +608,10 @@ public class BasicRepositoryViewResolver implements RepositoryViewResolver {
 		} else {
 			disjunctionFilter.getOperands().add(artifactFilter);
 		}
+	}
+
+	@Required
+	public void setLockSupplier(Function<File, ReadWriteLock> lockSupplier) {
+		this.lockSupplier = lockSupplier;
 	}
 }

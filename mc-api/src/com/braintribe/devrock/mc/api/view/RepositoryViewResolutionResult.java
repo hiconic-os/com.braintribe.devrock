@@ -17,10 +17,12 @@ package com.braintribe.devrock.mc.api.view;
 
 import com.braintribe.devrock.model.repository.RepositoryConfiguration;
 import com.braintribe.devrock.model.repositoryview.resolution.RepositoryViewResolution;
+import com.braintribe.gm.model.reason.Maybe;
 import com.braintribe.model.artifact.analysis.AnalysisArtifactResolution;
 
 public interface RepositoryViewResolutionResult {
 	AnalysisArtifactResolution getAnalysisResolution();
 	RepositoryViewResolution getRepositoryViewResolution();
+	Maybe<RepositoryViewResolution> getRepositoryViewResolutionReasoned();
 	RepositoryConfiguration getMergedRepositoryConfiguration();
 }

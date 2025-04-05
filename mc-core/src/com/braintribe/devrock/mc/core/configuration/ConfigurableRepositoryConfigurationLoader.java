@@ -19,12 +19,13 @@ import java.io.File;
 import java.util.function.Supplier;
 
 import com.braintribe.cfg.Configurable;
+import com.braintribe.devrock.mc.api.repository.configuration.RawRepositoryConfiguration;
 import com.braintribe.devrock.mc.api.repository.configuration.RepositoryConfigurationLocation;
 import com.braintribe.devrock.mc.api.repository.configuration.RepositoryConfigurationLocator;
 import com.braintribe.devrock.mc.api.repository.configuration.RepositoryConfigurationLocatorContext;
 import com.braintribe.devrock.model.mc.cfg.origination.RepositoryConfigurationLoaded;
 import com.braintribe.devrock.model.repository.RepositoryConfiguration;
-import com.braintribe.gm.config.yaml.ModeledYamlConfigurationLoader;
+import com.braintribe.gm.config.yaml.YamlConfigurations;
 import com.braintribe.gm.model.reason.Maybe;
 import com.braintribe.gm.model.reason.Reason;
 import com.braintribe.gm.reason.TemplateReasons;
@@ -65,8 +66,7 @@ public class ConfigurableRepositoryConfigurationLoader implements Supplier<Maybe
 		return locator;
 	}
 	
-	@Override
-	public Maybe<RepositoryConfiguration> get() {
+	public Maybe<RawRepositoryConfiguration> getRaw() {
 		Maybe<RepositoryConfigurationLocation> locationMaybe = getLocator().locateRepositoryConfiguration(buildLocatorContext());
 		
 		if (locationMaybe.isUnsatisfied())
@@ -76,13 +76,10 @@ public class ConfigurableRepositoryConfigurationLoader implements Supplier<Maybe
 		
 		File configurationFile = location.getFile();
 		
-		Maybe<RepositoryConfiguration> maybeConfig = new ModeledYamlConfigurationLoader() //
-				.virtualEnvironment(virtualEnvironment) //
-				.variableResolver(location.getProperties()::get)
-				.loadConfig(RepositoryConfiguration.T, configurationFile, false);
+		Maybe<RepositoryConfiguration> maybeConfig = YamlConfigurations.read(RepositoryConfiguration.T).placeholders().from(configurationFile);
 		
 		if (maybeConfig.isUnsatisfied())
-			return maybeConfig;
+			return maybeConfig.whyUnsatisfied();
 		
 		RepositoryConfiguration repositoryConfiguration = maybeConfig.get();
 		
@@ -92,7 +89,17 @@ public class ConfigurableRepositoryConfigurationLoader implements Supplier<Maybe
 		
 		repositoryConfiguration.setOrigination(origination);
 
-		return Maybe.complete(repositoryConfiguration);
+		return Maybe.complete(new RawRepositoryConfiguration(repositoryConfiguration, configurationFile));
+	}
+	
+	@Override
+	public Maybe<RepositoryConfiguration> get() {
+		Maybe<RawRepositoryConfiguration> raw = getRaw();
+		
+		if (raw.isUnsatisfied())
+			return raw.whyUnsatisfied().asMaybe();
+		
+		return new RawRepositoryConfigurationEvaluator(virtualEnvironment).evaluate(raw.get());
 	}
 
 	private RepositoryConfigurationLocatorContext buildLocatorContext() {

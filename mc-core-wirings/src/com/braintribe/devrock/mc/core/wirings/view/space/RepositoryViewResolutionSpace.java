@@ -17,6 +17,8 @@ package com.braintribe.devrock.mc.core.wirings.view.space;
 
 import com.braintribe.devrock.mc.api.view.RepositoryViewResolver;
 import com.braintribe.devrock.mc.core.view.BasicRepositoryViewResolver;
+import com.braintribe.devrock.mc.core.wirings.backend.contract.ArtifactDataBackendContract;
+import com.braintribe.devrock.mc.core.wirings.resolver.contract.ArtifactDataResolverContract;
 import com.braintribe.devrock.mc.core.wirings.transitive.contract.TransitiveResolverContract;
 import com.braintribe.devrock.mc.core.wirings.view.contract.RepositoryViewResolutionContract;
 import com.braintribe.wire.api.annotation.Import;
@@ -28,12 +30,17 @@ public class RepositoryViewResolutionSpace implements RepositoryViewResolutionCo
 	@Import
 	private TransitiveResolverContract transitiveResolver;
 	
+	@Import
+	private ArtifactDataBackendContract artifactDataBackend;
+	
 	@Override
 	@Managed
 	public RepositoryViewResolver repositoryViewResolver() {
 		BasicRepositoryViewResolver bean = new BasicRepositoryViewResolver();
 		
 		bean.setTransitiveDependencyResolver(transitiveResolver.transitiveDependencyResolver());
+		bean.setLockSupplier(artifactDataBackend.lockSupplier());
+		bean.setPartEnricher(transitiveResolver.dataResolverContract().partEnricher());
 		
 		return bean;
 	}

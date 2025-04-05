@@ -15,6 +15,7 @@
 // ============================================================================
 package com.braintribe.devrock.mc.core.wirings.configuration.contract;
 
+import com.braintribe.devrock.mc.api.repository.configuration.RawRepositoryConfiguration;
 import com.braintribe.devrock.model.repository.RepositoryConfiguration;
 import com.braintribe.gm.model.reason.Maybe;
 import com.braintribe.wire.api.space.WireSpace;
@@ -28,5 +29,18 @@ public interface RepositoryConfigurationContract extends WireSpace {
 	/**
 	 * @return - a {@link RepositoryConfiguration}
 	 */
-	public Maybe<RepositoryConfiguration> repositoryConfiguration();
+	Maybe<RepositoryConfiguration> repositoryConfiguration();
+
+	/**
+	 * This method serves to expose the repository configuration before
+	 * evaluation of the property placeholders if the supplier supports such
+	 * a thing. The default implementation will simply return the repository configuration.
+	 */
+	default Maybe<RawRepositoryConfiguration> rawRepositoryConfiguration() {
+		var maybe = repositoryConfiguration();
+		if (maybe.isUnsatisfied())
+			return maybe.whyUnsatisfied().asMaybe();
+		
+		return Maybe.complete(new RawRepositoryConfiguration(maybe.get(), null));
+	}
 }

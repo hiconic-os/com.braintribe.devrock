@@ -15,6 +15,7 @@
 // ============================================================================
 package com.braintribe.devrock.mc.api.view;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,6 +25,8 @@ import com.braintribe.devrock.model.repositoryview.ConfigurationEnrichment;
 public class BasicRepositoryViewResolutionContext implements RepositoryViewResolutionContext, RepositoryViewResolutionContextBuilder {
 	private List<ConfigurationEnrichment> enrichments = Collections.emptyList();
 	private RepositoryConfiguration baseConfiguration;
+	private File effectiveRepoConfigFolder;
+	private String viewConfigName = "repository-configuration";
 
 	@Override
 	public RepositoryViewResolutionContext done() {
@@ -50,5 +53,27 @@ public class BasicRepositoryViewResolutionContext implements RepositoryViewResol
 	@Override
 	public RepositoryConfiguration baseConfiguration() {
 		return baseConfiguration;
+	}
+	
+	@Override
+	public File effectiveRepoConfigFolder() {
+		return effectiveRepoConfigFolder;
+	}
+	
+	@Override
+	public RepositoryViewResolutionContextBuilder effectiveRepoConfigFolder(File effectiveRepoConfigFolder) {
+		this.effectiveRepoConfigFolder = effectiveRepoConfigFolder;
+		return this;
+	}
+	
+	@Override
+	public String viewConfigName() {
+		return viewConfigName;
+	} 
+	
+	@Override
+	public RepositoryViewResolutionContextBuilder viewConfigName(String viewConfigName) {
+		this.viewConfigName = viewConfigName;
+		return this;
 	}
 }

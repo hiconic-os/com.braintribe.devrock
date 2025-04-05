@@ -15,6 +15,7 @@
 // ============================================================================
 package com.braintribe.devrock.mc.core.wirings.env.configuration.space;
 
+import com.braintribe.devrock.mc.api.repository.configuration.RawRepositoryConfiguration;
 import com.braintribe.devrock.mc.core.wirings.configuration.contract.RepositoryConfigurationContract;
 import com.braintribe.devrock.mc.core.wirings.configuration.contract.StandardRepositoryConfigurationContract;
 import com.braintribe.devrock.mc.core.wirings.maven.configuration.contract.MavenConfigurationContract;
@@ -54,6 +55,10 @@ public class EnvironmentSensitiveConfigurationSpace implements RepositoryConfigu
 			return repositoryConfigurationPotential;
 		}
 		
+		return mavenConfigurationFallback(whyEmpty);
+	}
+
+	private Maybe<RepositoryConfiguration> mavenConfigurationFallback(Reason whyEmpty) {
 		Maybe<RepositoryConfiguration> mavenConfigurationPotential = mavenConfiguration.repositoryConfiguration();
 		
 		if (mavenConfigurationPotential.isSatisfied())
@@ -73,8 +78,26 @@ public class EnvironmentSensitiveConfigurationSpace implements RepositoryConfigu
 					.causes(whyEmpty, mavenConfigurationPotential.whyUnsatisfied()) //
 					.toMaybe();
 		}
-		
-		
 	}
-
+	
+	@Override
+	public Maybe<RawRepositoryConfiguration> rawRepositoryConfiguration() {
+		Maybe<RawRepositoryConfiguration> repositoryConfigurationPotential = standardRepositoryConfiguration.rawRepositoryConfiguration();
+		
+		if (repositoryConfigurationPotential.isSatisfied())
+			return repositoryConfigurationPotential;
+		
+		Reason whyEmpty = repositoryConfigurationPotential.whyUnsatisfied();
+		
+		if (!(whyEmpty instanceof NoRepositoryConfiguration)) {
+			return repositoryConfigurationPotential;
+		}
+		
+		Maybe<RepositoryConfiguration> mavenConfigurationPotential = mavenConfigurationFallback(whyEmpty);
+		
+		if (mavenConfigurationPotential.isUnsatisfied())
+			return mavenConfigurationPotential.whyUnsatisfied().asMaybe();
+		
+		return Maybe.complete(new RawRepositoryConfiguration(mavenConfigurationPotential.get(), null));
+	}
 }

@@ -15,14 +15,15 @@
 // ============================================================================
 package com.braintribe.devrock.mc.core.wirings.configuration.space;
 
+import com.braintribe.devrock.mc.api.repository.configuration.RawRepositoryConfiguration;
 import com.braintribe.devrock.mc.core.configuration.ConfigurableRepositoryConfigurationLoader;
+import com.braintribe.devrock.mc.core.configuration.RawRepositoryConfigurationEvaluator;
 import com.braintribe.devrock.mc.core.wirings.configuration.contract.DevelopmentEnvironmentContract;
 import com.braintribe.devrock.mc.core.wirings.configuration.contract.RepositoryConfigurationContract;
 import com.braintribe.devrock.mc.core.wirings.configuration.contract.RepositoryConfigurationLocatorContract;
 import com.braintribe.devrock.mc.core.wirings.configuration.contract.StandardRepositoryConfigurationContract;
 import com.braintribe.devrock.mc.core.wirings.venv.contract.VirtualEnvironmentContract;
 import com.braintribe.devrock.model.repository.RepositoryConfiguration;
-import com.braintribe.gm.config.wire.contract.ModeledConfigurationContract;
 import com.braintribe.gm.model.reason.Maybe;
 import com.braintribe.wire.api.annotation.Import;
 import com.braintribe.wire.api.annotation.Managed;
@@ -43,8 +44,21 @@ public class RepositoryConfigurationSpace implements RepositoryConfigurationCont
 	private RepositoryConfigurationLocatorContract repositoryConfigurationLocator;
 	
 	@Override
+	@Managed
 	public Maybe<RepositoryConfiguration> repositoryConfiguration() {
-		return configurableRepositoryConfigurationLoader().get();
+		Maybe<RawRepositoryConfiguration> rawConfigMaybe = rawRepositoryConfiguration();
+		if (rawConfigMaybe.isUnsatisfied())
+			return rawConfigMaybe.whyUnsatisfied().asMaybe();
+		
+		RawRepositoryConfiguration rawConfig = rawConfigMaybe.get();
+		
+		return new RawRepositoryConfigurationEvaluator(virtualEnvironment.virtualEnvironment()).evaluate(rawConfig);
+	}
+	
+	@Override
+	@Managed
+	public Maybe<RawRepositoryConfiguration> rawRepositoryConfiguration() {
+		return configurableRepositoryConfigurationLoader().getRaw();
 	}
 	
 	@Managed

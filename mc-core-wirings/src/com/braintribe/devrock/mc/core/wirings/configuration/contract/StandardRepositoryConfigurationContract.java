@@ -15,13 +15,5 @@
 // ============================================================================
 package com.braintribe.devrock.mc.core.wirings.configuration.contract;
 
-import com.braintribe.devrock.model.repository.RepositoryConfiguration;
-import com.braintribe.gm.model.reason.Maybe;
-import com.braintribe.wire.api.space.WireSpace;
-
-public interface StandardRepositoryConfigurationContract extends WireSpace {
-	/**
-	 * @return - a {@link RepositoryConfiguration}
-	 */
-	Maybe<RepositoryConfiguration> repositoryConfiguration();
+public interface StandardRepositoryConfigurationContract extends RepositoryConfigurationContract {
 }
