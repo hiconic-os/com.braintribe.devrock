@@ -37,10 +37,8 @@ import com.braintribe.devrock.mc.core.compiled.RedirectAwareCompilingArtifactRes
 import com.braintribe.devrock.mc.core.configuration.BasicArtifactChangesSynchronization;
 import com.braintribe.devrock.mc.core.configuration.BasicGroupFilterPersistenceExpert;
 import com.braintribe.devrock.mc.core.configuration.BasicRepositoryReflection;
-import com.braintribe.devrock.mc.core.configuration.ConfigurableRepositoryConfigurationLoader;
 import com.braintribe.devrock.mc.core.configuration.OriginationPreparation;
 import com.braintribe.devrock.mc.core.configuration.ProbingResultPersistenceExpert;
-import com.braintribe.devrock.mc.core.configuration.RawRepositoryConfigurationEvaluator;
 import com.braintribe.devrock.mc.core.configuration.RepositoryConfigurationEnriching;
 import com.braintribe.devrock.mc.core.configuration.RepositoryConfigurationProbing;
 import com.braintribe.devrock.mc.core.configuration.bias.PcBiasCompiler;
@@ -316,7 +314,6 @@ public class ArtifactDataResolverSpace implements ArtifactDataResolverContract {
 	@Managed
 	public ViewRepositoryConfigurationCompiler viewRepositoryConfigurationCompiler() {
 		ViewRepositoryConfigurationCompiler bean = new ViewRepositoryConfigurationCompiler(repositoryConfiguration.rawRepositoryConfiguration(), virtualEnvironment.virtualEnvironment());
-		bean.setLockSupplier(backendContract().lockSupplier());
 		return bean;
 	}
 	

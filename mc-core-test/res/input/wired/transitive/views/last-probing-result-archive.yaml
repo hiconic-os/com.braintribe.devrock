@@ -1,0 +1,10 @@
+!pooled
+
+value: *0
+
+pool:
+
+- &0 !com.braintribe.model.artifact.changes.RepositoryProbingResult
+ repositoryProbeStatus: available
+ repositoryRestSupport: none
+ timestamp: 2025-04-09T13:12:59.976Z

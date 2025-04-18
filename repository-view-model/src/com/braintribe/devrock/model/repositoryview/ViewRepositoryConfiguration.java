@@ -34,6 +34,7 @@ public interface ViewRepositoryConfiguration extends RepositoryConfiguration {
 	String views = "views";
 	String injectedViews = "injectedViews";
 	String baseConfiguration = "baseConfiguration";
+	String compilationOutputDir = "compilationOutputDir";
 
 	// e.g. ['tribefire.release:tribefire-release-view#2.1.7', 'tribefire.simple.extension:simple-release-view#2.2']
 	List<String> getViews();
@@ -52,4 +53,11 @@ public interface ViewRepositoryConfiguration extends RepositoryConfiguration {
 	 */
 	RepositoryConfiguration getBaseConfiguration();
 	void setBaseConfiguration(RepositoryConfiguration value);
+	
+	/**
+	 * The directory to where configuration compiled from the resolved views is written to with a file name
+	 * derived from the view repository configuration filename and an infixed solution hash
+	 */
+	String getCompilationOutputDir();
+	void setCompilationOutputDir(String compilationOutputDir);
 }
