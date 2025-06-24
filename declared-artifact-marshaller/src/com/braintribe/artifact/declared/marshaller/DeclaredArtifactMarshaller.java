@@ -55,6 +55,8 @@ public class DeclaredArtifactMarshaller implements Marshaller, HasPomTokens {
 		boolean debug = log.isDebugEnabled();
 		try {
 			inputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false); // This disables DTDs entirely for that factory
+			inputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false); // This disables DTDs entirely for that factory
+			
 		} catch(Exception e) {
 			if (debug) log.debug("Could not set feature "+XMLInputFactory.SUPPORT_DTD+"=false", e);
 		}
