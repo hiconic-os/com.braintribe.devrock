@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -51,6 +52,7 @@ import com.braintribe.devrock.mc.api.view.RepositoryViewResolutionResult;
 import com.braintribe.devrock.mc.api.view.RepositoryViewResolver;
 import com.braintribe.devrock.mc.core.selectors.RepositorySelectorExpert;
 import com.braintribe.devrock.mc.core.selectors.RepositorySelectors;
+import com.braintribe.devrock.model.repository.MavenFileSystemRepository;
 import com.braintribe.devrock.model.repository.Repository;
 import com.braintribe.devrock.model.repository.RepositoryConfiguration;
 import com.braintribe.devrock.model.repository.filters.ArtifactFilter;
@@ -307,13 +309,36 @@ public class BasicRepositoryViewResolver implements RepositoryViewResolver {
 			for (ConfigurationEnrichment configurationEnrichment : configurationEnrichments) {
 				enrichRepositories(mergedRepositoryConfigurationRepositories, configurationEnrichment);
 			}
+			
 			normalizeDisjunctionArtifactFilters(mergedRepositoryConfigurationRepositories);
 			if (enableDevelopmentMode) {
 				wrapFiltersWithStandardDevelopmentViewArtifactFilters(mergedRepositoryConfigurationRepositories);
 			}
+			
+			// Order repositories by their type and filter qualities
+			Comparator<Repository> comparator = Comparator //
+					.comparing(this::getRepositoryTypePrio) //
+					.thenComparing(this::getRepositoryFilterPrio);
+			
+			mergedRepositoryConfigurationRepositories.sort(comparator);
+			
 			return mergedRepositoryConfiguration;
 		}
+		
+		private int getRepositoryTypePrio(Repository repo) {
+			if (repo instanceof MavenFileSystemRepository)
+				return 0;
 
+			return 1;
+		}
+		
+		private int getRepositoryFilterPrio(Repository repo) {
+			if (repo.getArtifactFilter() != null)
+				return 0;
+			
+			return 1;
+		}
+		
 
 		@Override
 		public AnalysisArtifactResolution getAnalysisResolution() {
