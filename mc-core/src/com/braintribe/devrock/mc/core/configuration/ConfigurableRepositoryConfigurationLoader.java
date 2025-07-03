@@ -79,7 +79,7 @@ public class ConfigurableRepositoryConfigurationLoader implements Supplier<Maybe
 		Maybe<RepositoryConfiguration> maybeConfig = YamlConfigurations.read(RepositoryConfiguration.T).placeholders().from(configurationFile);
 		
 		if (maybeConfig.isUnsatisfied())
-			return maybeConfig.whyUnsatisfied();
+			return maybeConfig.whyUnsatisfied().asMaybe();
 		
 		RepositoryConfiguration repositoryConfiguration = maybeConfig.get();
 		
