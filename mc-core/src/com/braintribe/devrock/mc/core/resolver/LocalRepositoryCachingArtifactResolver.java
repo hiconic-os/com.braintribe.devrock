@@ -753,8 +753,11 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 				List<PartReflection> partsOf = partsOfMaybe.get();
 				result.addAll( partsOf);
 
-				if (repoDelegate.repositoryDominanceFilter().matches(compiledArtifactIdentification))
-					break;
+				// PGA 20.8.2025 - The repoDelegate resolvers are not reliable in passing NotFound.
+				// They often return an empty result instead, so we can't just break here.
+				if (!partsOf.isEmpty())
+					if (repoDelegate.repositoryDominanceFilter().matches(compiledArtifactIdentification))
+						break;
 
 			} else {
 				// handle local repository here 

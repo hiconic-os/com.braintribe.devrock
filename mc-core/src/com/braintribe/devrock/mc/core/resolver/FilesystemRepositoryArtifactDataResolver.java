@@ -112,6 +112,10 @@ public class FilesystemRepositoryArtifactDataResolver implements ArtifactVersion
 								.push( compiledArtifactIdentification.getArtifactId())
 								.push( compiledArtifactIdentification.getVersion().asString())
 								.toFile();
+
+		if (!artifactRepository.isDirectory())
+			return Reasons.build(NotFound.T).toMaybe();
+
 		File [] files = artifactRepository.listFiles(); 
 		if (files == null || files.length == 0) {
 			return Maybe.complete(Collections.emptyList());

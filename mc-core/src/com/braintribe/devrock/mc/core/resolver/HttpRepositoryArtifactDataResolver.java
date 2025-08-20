@@ -554,6 +554,7 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase
 	private Maybe<List<PartReflection>> getPartsOfFromStandardRepo(CompiledArtifactIdentification compiledArtifactIdentification) {
 		Maybe<ArtifactDataResolution> htmlContent = getPartOverview(compiledArtifactIdentification);
 
+		// TODO why does this return empty result and not NotFound?
 		if (htmlContent.isUnsatisfiedBy(NotFound.T))
 			return Maybe.complete(Collections.emptyList());
 
@@ -563,6 +564,7 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase
 		try {
 			Maybe<InputStream> inMaybe = htmlContent.get().openStream();
 
+			// TODO why does this return empty result and not NotFound?
 			if (inMaybe.isUnsatisfiedBy(NotFound.T))
 				return Maybe.complete(Collections.emptyList());
 
