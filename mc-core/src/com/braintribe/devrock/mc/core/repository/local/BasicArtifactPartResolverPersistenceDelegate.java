@@ -121,7 +121,8 @@ public class BasicArtifactPartResolverPersistenceDelegate implements ArtifactPar
 
 	@Configurable @Required
 	public void setRepository(Repository repository) {
-		this.repository = repository;		
+		this.repository = repository;
+		// WTF is this?
 		this.isLocalDelegate = repository.getName().equalsIgnoreCase("local");
 	}
 
