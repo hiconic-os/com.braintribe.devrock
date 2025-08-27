@@ -211,6 +211,10 @@ public abstract class AbstractDescriptionBasedRepolet extends AbstractRepolet {
 		int p = constructedUrl.indexOf(compiledRestApiUrl);
 		String path = constructedUrl.substring(p + compiledRestApiUrl.length() + 1);
 
+		if (path.endsWith("/")) {
+			path = path.substring(0, path.length() - 1);
+		}
+
 		FolderInfo folderInfo = extractFolderInfo(path);
 		if (folderInfo == null) {
 			replyWith404(exchange);
