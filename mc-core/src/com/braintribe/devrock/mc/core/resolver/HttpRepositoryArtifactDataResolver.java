@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -496,14 +497,34 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 		return Maybe.complete(partReflections);
 	}
 
+	// #########################################################
+	// ## . . POTENTIAL "FREEZE" WHEN CALLING THIS METHOD . . ##
+	// #########################################################
+
+	/* It seems that accessing GitHub API URL can "take forever" - seems that if too many requests are made, GitHub doesn't respond with an error, but
+	 * the request just never returns. */
+
+	/* As a first step to mitigate this, we introduce caching, as this method was called multiple times for the same URL sometimes. */
+
+	/* Ideally we should time-out the download after a few seconds and try-again, maybe do later. */
+
+	private final Map<String, Maybe<String>> partOverviewCache = new ConcurrentHashMap<>();
+
 	private Maybe<String> getGitHubPartOverviewContent(GitHubInfo gitHubInfo, CompiledArtifactIdentification compiledArtifactIdentification) {
 		final String org = gitHubInfo.org();
-		final String repo = gitHubInfo.repo();
 		final String groupId = compiledArtifactIdentification.getGroupId();
 		final String artifactId = compiledArtifactIdentification.getArtifactId();
-		final String version = compiledArtifactIdentification.getVersion().asString();
 
 		final String idUrl = "https://api.github.com/orgs/" + org + "/packages/maven/" + groupId + "." + artifactId;
+
+		return partOverviewCache.computeIfAbsent(idUrl, url -> getGitHubPartOverviewContentCached(url, gitHubInfo, compiledArtifactIdentification));
+	}
+
+	private Maybe<String> getGitHubPartOverviewContentCached(String idUrl, GitHubInfo gitHubInfo, CompiledArtifactIdentification compiledArtifactIdentification) {
+		final String org = gitHubInfo.org();
+		final String repo = gitHubInfo.repo();
+		final String artifactId = compiledArtifactIdentification.getArtifactId();
+		final String version = compiledArtifactIdentification.getVersion().asString();
 
 		log.debug(() -> "Trying to get artifact ID via GitHub API call" + idUrl);
 
@@ -527,7 +548,7 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 		try (JsonParser jsonParser = new JsonFactory().createParser(idJson)) {
 
 			while (jsonParser.nextToken() != JsonToken.END_OBJECT) {
-				String name = jsonParser.getCurrentName();
+				String name = jsonParser.currentName();
 				if ("id".equals(name)) {
 					jsonParser.nextToken();
 					gitHubArtifactId = jsonParser.getText();
