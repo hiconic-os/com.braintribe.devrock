@@ -20,6 +20,8 @@ import org.junit.Test;
 
 import com.braintribe.devrock.mc.api.repository.configuration.RepositoryReflection;
 import com.braintribe.devrock.model.repolet.content.RepoletContent;
+import com.braintribe.devrock.model.repositoryview.resolution.RepositoryViewResolution;
+import com.braintribe.testing.junit.assertions.assertj.core.api.Assertions;
 
 public class ViewReflectionTest extends AbstractViewResolvingTest {
 	
@@ -32,6 +34,11 @@ public class ViewReflectionTest extends AbstractViewResolvingTest {
 	public void runViewReflectionTest() {
 		try {
 			RepositoryReflection reflection = getReflection();
+
+			RepositoryViewResolution repositoryViewResolution = reflection.getRepositoryViewResolution();
+			Assertions.assertThat(repositoryViewResolution.getSolutions().size()).isEqualTo(1);
+			Assertions.assertThat(repositoryViewResolution.getTerminals().size()).isEqualTo(1);
+			Assertions.assertThat(repositoryViewResolution.getTerminals().get(0)).isSameAs(repositoryViewResolution.getTerminals().get(0));
  
 			// validate : 
 			// local repository

@@ -70,6 +70,7 @@ import com.braintribe.gm.model.reason.Maybe;
 import com.braintribe.logging.Logger;
 import com.braintribe.model.artifact.analysis.AnalysisArtifact;
 import com.braintribe.model.artifact.analysis.AnalysisArtifactResolution;
+import com.braintribe.model.artifact.analysis.AnalysisDependency;
 import com.braintribe.model.artifact.analysis.AnalysisTerminal;
 import com.braintribe.model.artifact.compiled.CompiledTerminal;
 import com.braintribe.model.artifact.consumable.Part;
@@ -414,12 +415,21 @@ public class BasicRepositoryViewResolver implements RepositoryViewResolver {
 			repositoryViewSolution.setRepositoryView(repositoryView);
 			repositoryViewSolution.setDependencies(extractDependencies(nameToRepositoryViewSolutions, analysisArtifact));
 			repositoryViewResolution.getSolutions().add(repositoryViewSolution);
-			if (terminals.contains(analysisArtifact.asString())) {
+			
+			if (isTerminalSolution(analysisArtifact))
 				repositoryViewResolution.getTerminals().add(repositoryViewSolution);
-			}
 		}
-
+		
 		return repositoryViewResolution;
+	}
+	
+	private static boolean isTerminalSolution(AnalysisArtifact analysisArtifact) {
+		for (AnalysisDependency dependency : analysisArtifact.getDependers()) {
+			if (dependency.getDepender() == null)
+				return true;
+		}
+		
+		return false;
 	}
 
 	private static List<RepositoryViewSolution> extractDependencies(Map<String, RepositoryViewSolution> nameToRepositoryViewSolutions,

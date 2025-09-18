@@ -75,6 +75,7 @@ import com.braintribe.devrock.model.repository.filters.ConjunctionArtifactFilter
 import com.braintribe.devrock.model.repository.filters.DisjunctionArtifactFilter;
 import com.braintribe.devrock.model.repository.filters.JunctionArtifactFilter;
 import com.braintribe.devrock.model.repository.filters.NoneMatchingArtifactFilter;
+import com.braintribe.devrock.model.repositoryview.resolution.RepositoryViewResolution;
 import com.braintribe.gm.model.reason.Reason;
 import com.braintribe.gm.model.reason.Reasons;
 import com.braintribe.gm.reason.TemplateReasons;
@@ -319,7 +320,10 @@ public class ArtifactDataResolverSpace implements ArtifactDataResolverContract {
 	
 	@Managed
 	private RepositoryConfiguration baseRepositoryConfiguration() {
-		RepositoryConfiguration bean = viewRepositoryConfigurationCompiler().repositoryConfiguration();
+		ViewRepositoryConfigurationCompiler configurationCompiler = viewRepositoryConfigurationCompiler();
+		RepositoryConfiguration bean = configurationCompiler.repositoryConfiguration();
+		RepositoryViewResolution viewResolution = configurationCompiler.repositoryViewResolution();
+		repositoryViewResolution.repositoryViewResolutionHolder().accept(viewResolution);
 		return bean;
 	}
 

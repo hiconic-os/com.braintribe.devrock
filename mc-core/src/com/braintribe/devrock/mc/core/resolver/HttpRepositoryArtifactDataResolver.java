@@ -631,7 +631,8 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 	@Override
 	public Maybe<ArtifactDataResolution> getPartOverview(CompiledArtifactIdentification compiledArtifactIdentification) {
 		ArtifactAddressBuilder artifactAddress = ArtifactAddressBuilder.build() //
-				.root(root).artifact(compiledArtifactIdentification) //
+				.root(root)
+				.artifact(compiledArtifactIdentification) //
 				.version(compiledArtifactIdentification.getVersion().asString());
 
 		return resolve(artifactAddress, true);
