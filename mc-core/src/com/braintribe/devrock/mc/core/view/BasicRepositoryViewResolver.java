@@ -23,6 +23,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
+import java.security.DigestOutputStream;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -64,6 +66,7 @@ import com.braintribe.devrock.model.repositoryview.enrichments.ArtifactFilterEnr
 import com.braintribe.devrock.model.repositoryview.enrichments.RepositoryEnrichment;
 import com.braintribe.devrock.model.repositoryview.resolution.RepositoryViewResolution;
 import com.braintribe.devrock.model.repositoryview.resolution.RepositoryViewSolution;
+import com.braintribe.exception.Exceptions;
 import com.braintribe.gm.config.yaml.YamlConfigurations;
 import com.braintribe.gm.model.reason.HasFailure;
 import com.braintribe.gm.model.reason.Maybe;
@@ -81,11 +84,12 @@ import com.braintribe.model.generic.reflection.Property;
 import com.braintribe.model.generic.reflection.VdHolder;
 import com.braintribe.model.generic.session.InputStreamProvider;
 import com.braintribe.model.resource.Resource;
+import com.braintribe.utils.StringTools;
 import com.braintribe.utils.encryption.Md5Tools;
 import com.braintribe.utils.lcd.CommonTools;
 import com.braintribe.utils.lcd.LazyInitialized;
 import com.braintribe.utils.lcd.NullSafe;
-import com.braintribe.utils.lcd.StringTools;
+import com.braintribe.utils.stream.NullOutputStream;
 import com.braintribe.ve.api.VirtualEnvironment;
 import com.braintribe.ve.impl.StandardEnvironment;
 
@@ -229,8 +233,28 @@ public class BasicRepositoryViewResolver implements RepositoryViewResolver {
 			return mergedRepositoryConfiguration;
 		}
 		
+		private String hashConfig(RepositoryConfiguration baseRepositoryConfiguration) {
+			YamlMarshaller hashMarshaller = new YamlMarshaller();
+			
+			try {
+				MessageDigest digest = MessageDigest.getInstance("MD5");
+				try (DigestOutputStream hashOut = new DigestOutputStream(NullOutputStream.nullOutputStream(), digest)) {
+					hashMarshaller.marshall(hashOut, baseRepositoryConfiguration);
+				}
+				
+				return StringTools.toHex(digest.digest());
+			}
+			catch (Exception e) {
+				throw Exceptions.unchecked(e);
+			}
+		}
+		
 		private String buildSolutionHash(AnalysisArtifactResolution result) {
+			String baseHash = hashConfig(context.baseConfiguration());
+			
 			StringBuilder builder = new StringBuilder();
+			builder.append(baseHash);
+			builder.append("\n");
 			
 			for (var solution: result.getSolutions()) {
 				builder.append(solution.asString());
