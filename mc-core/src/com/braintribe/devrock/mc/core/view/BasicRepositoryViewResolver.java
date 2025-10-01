@@ -239,7 +239,7 @@ public class BasicRepositoryViewResolver implements RepositoryViewResolver {
 			try {
 				MessageDigest digest = MessageDigest.getInstance("MD5");
 				try (DigestOutputStream hashOut = new DigestOutputStream(NullOutputStream.nullOutputStream(), digest)) {
-					hashMarshaller.marshall(hashOut, baseRepositoryConfiguration);
+					hashMarshaller.marshall(hashOut, baseRepositoryConfiguration, GmSerializationOptions.deriveDefaults().set(PlaceholderSupport.class, true).build());
 				}
 				
 				return StringTools.toHex(digest.digest());
