@@ -68,6 +68,7 @@ import com.braintribe.devrock.model.repositoryview.resolution.RepositoryViewReso
 import com.braintribe.devrock.model.repositoryview.resolution.RepositoryViewSolution;
 import com.braintribe.exception.Exceptions;
 import com.braintribe.gm.config.yaml.YamlConfigurations;
+import com.braintribe.gm.config.yaml.api.ConfigurationReadBuilder;
 import com.braintribe.gm.model.reason.HasFailure;
 import com.braintribe.gm.model.reason.Maybe;
 import com.braintribe.logging.Logger;
@@ -87,7 +88,7 @@ import com.braintribe.model.resource.Resource;
 import com.braintribe.utils.StringTools;
 import com.braintribe.utils.encryption.Md5Tools;
 import com.braintribe.utils.lcd.CommonTools;
-import com.braintribe.utils.lcd.LazyInitialized;
+import com.braintribe.utils.lcd.Lazy;
 import com.braintribe.utils.lcd.NullSafe;
 import com.braintribe.utils.stream.NullOutputStream;
 import com.braintribe.ve.api.VirtualEnvironment;
@@ -143,7 +144,7 @@ public class BasicRepositoryViewResolver implements RepositoryViewResolver {
 		private Iterable<? extends CompiledTerminal> compiledTerminals;
 		private AnalysisArtifactResolution resolution;
 		private RepositoryConfiguration mergedRepositoryConfiguration;
-		private LazyInitialized<Maybe<MappedRepositoryViewResolution>> lazyRepositoryViewResolution = new LazyInitialized<>(this::loadViews);
+		private Lazy<Maybe<MappedRepositoryViewResolution>> lazyRepositoryViewResolution = new Lazy<>(this::loadViews);
 		
 		public StatefulRepositoryViewResolver(RepositoryViewResolutionContext context,
 				Iterable<? extends CompiledTerminal> terminals) {
@@ -212,7 +213,7 @@ public class BasicRepositoryViewResolver implements RepositoryViewResolver {
 			File effectiveConfigFile = determineEffectiveConfigFile(hash);
 			
 			if (effectiveConfigFile.exists()) {
-				Maybe<RepositoryConfiguration> maybeConfig = readYaml(RepositoryConfiguration.T, effectiveConfigFile);
+				Maybe<RepositoryConfiguration> maybeConfig = readYaml(RepositoryConfiguration.T, effectiveConfigFile, false);
 				return convertFailureSensitive(RepositoryConfiguration.T, maybeConfig);
 			}
 			
@@ -410,8 +411,20 @@ public class BasicRepositoryViewResolver implements RepositoryViewResolver {
 		return readYaml(type, () -> new BufferedInputStream(new FileInputStream(file)), file);
 	}
 	
+	private <T extends GenericEntity> Maybe<T> readYaml(EntityType<T> type, File file, boolean defaulting) {
+		return readYaml(type, () -> new BufferedInputStream(new FileInputStream(file)), file, defaulting);
+	}
+	
 	private <T extends GenericEntity> Maybe<T> readYaml(EntityType<T> type, InputStreamProvider inputStreamProvider, File file) {
-		return YamlConfigurations.read(type).placeholders().from(inputStreamProvider);
+		return readYaml(type, inputStreamProvider, file, true);
+	}
+	
+	private <T extends GenericEntity> Maybe<T> readYaml(EntityType<T> type, InputStreamProvider inputStreamProvider, File file, boolean defaulting) {
+		ConfigurationReadBuilder<T> readBuilder = YamlConfigurations.read(type).placeholders();
+		if (!defaulting) {
+			readBuilder.noDefaulting();
+		}
+		return readBuilder.from(inputStreamProvider);
 	}
 	
 	private static Optional<Resource> findPartResource(AnalysisArtifact solution, PartIdentification partIdentification) {
