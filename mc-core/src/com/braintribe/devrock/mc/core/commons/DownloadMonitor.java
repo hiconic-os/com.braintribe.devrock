@@ -120,7 +120,7 @@ public class DownloadMonitor implements AutoCloseable {
 				progress = String.valueOf(itemsDone * 100 / itemCount) + "%";
 			}
 			else {
-				progress = String.valueOf(itemCount);
+				progress = String.valueOf(itemsDone);
 			}
 			
 			if (!progress.equals(this.progress)) {
