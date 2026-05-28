@@ -1,25 +1,13 @@
-// ============================================================================
-// Copyright BRAINTRIBE TECHNOLOGY GMBH, Austria, 2002-2022
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// ============================================================================
 package com.braintribe.devrock.mc.core.resolver;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
 import java.util.Base64;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
@@ -51,6 +39,14 @@ import com.braintribe.utils.IOTools;
  *
  */
 public class HttpRepositoryBase {
+	private static final int MAX_RETRIES = 3;
+	private static final long INITIAL_RETRY_DELAY_MS = 250;
+	private static final long MAX_RETRY_DELAY_MS = 5_000;
+
+	private static final List<RetryStatusCodeRule> RETRY_STATUS_CODE_RULES = List.of(
+		new RetryStatusCodeRule(Pattern.compile("://maven\\.pkg\\.github\\.com[:/]"), Set.of(404))
+	);
+	
 	private final Logger logger = Logger.getLogger(HttpRepositoryBase.class);
 	protected String root;
 	protected String userName;
@@ -194,36 +190,102 @@ public class HttpRepositoryBase {
 	}
 
 	protected CloseableHttpResponse getResponse(String url) throws IOException {
-		int maxRetries = 3;
-		int retry = 0;
+		return getResponseWithRetry(new HttpGet(url));
+	}
+
+	protected CloseableHttpResponse getResponseWithRetry(HttpGet get) throws IOException {
+		return getResponseWithRetry((HttpRequestBase) get);
+	}
+
+	private CloseableHttpResponse getResponseWithRetry(HttpRequestBase requestBase) throws IOException {
+		String url = requestBase.getURI().toString();
+		int attempt = 1;
+
 		while (true) {
 			try {
-				return getResponse(url, false);
+				CloseableHttpResponse response = getResponse(requestBase);
+				int statusCode = response.getStatusLine().getStatusCode();
+
+				if (!shouldRetryStatusCode(url, statusCode) || attempt > MAX_RETRIES)
+					return response;
+
+				closeQuietly(response);
+
+				long delayMs = retryDelayMs(attempt);
+				logger.warn("received retryable HTTP status " + statusCode + " on try " + attempt + " of " + (MAX_RETRIES + 1) + " for: " + url
+						+ "; retrying after " + delayMs + " ms");
+
+				sleepBeforeRetry(delayMs);
+				attempt++;
 			} catch (UnknownHostException e) {
 				throw e;
 			} catch (IOException e) {
-				if ((++retry) > maxRetries)
+				if (attempt > MAX_RETRIES)
 					throw e;
 
-				logger.warn("failed try " + retry + " of " + maxRetries + " to open a http request to: " + url, e);
+				long delayMs = retryDelayMs(attempt);
+				logger.warn("failed try " + attempt + " of " + (MAX_RETRIES + 1) + " to open a http request to: " + url
+						+ "; retrying after " + delayMs + " ms", e);
+
+				sleepBeforeRetry(delayMs);
+				attempt++;
 			}
 		}
 	}
 
-	protected CloseableHttpResponse getResponseWithRetry(HttpGet get) throws IOException {
-		int maxRetries = 3;
-		int retry = 0;
-		while (true) {
-			try {
-				return getResponse(get);
-			} catch (UnknownHostException e) {
-				throw e;
-			} catch (IOException e) {
-				if ((++retry) > maxRetries)
-					throw e;
+	private static boolean shouldRetryStatusCode(String url, int statusCode) {
+		for (RetryStatusCodeRule rule: RETRY_STATUS_CODE_RULES) {
+			if (rule.matches(url, statusCode))
+				return true;
+		}
 
-				logger.warn("failed try " + retry + " of " + maxRetries + " to open a http request to: " + get.getURI(), e);
-			}
+		return false;
+	}
+
+	private static long retryDelayMs(int attempt) {
+		long factor = 1L << Math.min(attempt - 1, 20);
+		long delay = INITIAL_RETRY_DELAY_MS * factor;
+
+		if (delay < 0)
+			return MAX_RETRY_DELAY_MS;
+
+		return Math.min(delay, MAX_RETRY_DELAY_MS);
+	}
+
+	private static void sleepBeforeRetry(long delayMs) throws IOException {
+		if (delayMs <= 0)
+			return;
+
+		try {
+			Thread.sleep(delayMs);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new IOException("Interrupted while waiting before retry", e);
+		}
+	}
+
+	private void closeQuietly(CloseableHttpResponse response) {
+		if (response == null)
+			return;
+
+		try {
+			response.close();
+		} catch (IOException e) {
+			logger.warn("failed to close HTTP response before retry", e);
+		}
+	}
+
+	private static class RetryStatusCodeRule {
+		private final Pattern urlPattern;
+		private final Set<Integer> statusCodes;
+
+		private RetryStatusCodeRule(Pattern urlPattern, Set<Integer> statusCodes) {
+			this.urlPattern = urlPattern;
+			this.statusCodes = statusCodes;
+		}
+
+		private boolean matches(String url, int statusCode) {
+			return statusCodes.contains(statusCode) && urlPattern.matcher(url).find();
 		}
 	}
 }
