@@ -208,7 +208,7 @@ public class BasicArtifactChangesSynchronization implements ArtifactChangesSynch
 	@Override
 	public Maybe<List<VersionedArtifactIdentification>> queryChanges(File localRepo, Repository repository) {
 		if (!(repository instanceof MavenHttpRepository))
-			return Maybe.complete(Collections.emptyList());
+			return Maybe.complete(null);
 		
 		MavenHttpRepository mavenHttpRepository = (MavenHttpRepository) repository;
 		// read last access date
