@@ -266,33 +266,27 @@ public class BasicArtifactChangesSynchronization implements ArtifactChangesSynch
 					throw new UnsupportedOperationException("Repository [" + mavenHttpRepository.getName() + "] has unsupported changes index type: " + mavenHttpRepository.getChangesIndexType());
 			}
 			
+			if (touchedArtifactsMaybe.isUnsatisfied())
+				return touchedArtifactsMaybe.propagateReason();
+			
 			// only process (and store date) if a correct message was retrieved 
-			if (touchedArtifactsMaybe.isSatisfied()) {
-		
-				List<VersionedArtifactIdentification> touchedArtifacts = touchedArtifactsMaybe.get();
-				
-				groupFilterExpert.appendGroupFilterings(localRepo, mavenHttpRepository, touchedArtifacts.stream().map( vai -> vai.getGroupId()).distinct().collect(Collectors.toList()));
-															
-				// write last-access file (if all above is successful) 
-				changes.setLastSynchronization( lastAccess);
-				try (OutputStream out = new FileOutputStream(lastAccessFile)) {
-					marshaller.marshall( out, changes);
-					return Maybe.complete(touchedArtifacts);			
-				}
-				catch (IOException e) {
-					throw new UncheckedIOException("cannot write to file [" + lastAccessFile.getAbsolutePath() + "]", e);
-				}
+			List<VersionedArtifactIdentification> touchedArtifacts = touchedArtifactsMaybe.get();
+			
+			groupFilterExpert.appendGroupFilterings(localRepo, mavenHttpRepository, touchedArtifacts.stream().map( vai -> vai.getGroupId()).distinct().collect(Collectors.toList()));
+														
+			// write last-access file (if all above is successful) 
+			changes.setLastSynchronization( lastAccess);
+			try (OutputStream out = new FileOutputStream(lastAccessFile)) {
+				marshaller.marshall( out, changes);
+				return Maybe.complete(touchedArtifacts);			
 			}
-
-			if (!touchedArtifactsMaybe.isUnsatisfiedBy(AlreadyExists.T)) {
-				return touchedArtifactsMaybe.whyUnsatisfied().asMaybe();
+			catch (IOException e) {
+				throw new UncheckedIOException("cannot write to file [" + lastAccessFile.getAbsolutePath() + "]", e);
 			}
 		}
 		finally {
 			writeLock.unlock();
 		}		
-		return Maybe.complete(Collections.emptyList());
-		
 	}
 	
 	private Maybe<List<VersionedArtifactIdentification>> retrieveChangesTotally(ArtifactChanges artifactChanges, MavenHttpRepository mavenHttpRepository, boolean onlyReadIfNewVersionAvailable) {
@@ -314,7 +308,7 @@ public class BasicArtifactChangesSynchronization implements ArtifactChangesSynch
 		CompiledArtifactIdentification cai = caiMaybe.get();
 		
 		if (onlyReadIfNewVersionAvailable && !isHigherVersion(artifactChanges, cai)) {
-			return Maybe.empty(Reasons.build(AlreadyExists.T).text("no higher version found of :" + cai.asString()).toReason());
+			return Maybe.complete(Collections.emptyList());
 		}
 							
 		Maybe<ArtifactDataResolution> dataResMaybe = artifactDataResolver.resolvePart(cai, PartIdentification.create("gz"));

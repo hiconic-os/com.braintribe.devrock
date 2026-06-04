@@ -2,12 +2,19 @@ package com.braintribe.devrock.mc.core.resolver;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.NoRouteToHostException;
+import java.net.ProtocolException;
 import java.net.UnknownHostException;
+import java.net.UnknownServiceException;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
+
+import javax.net.ssl.SSLException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
@@ -39,12 +46,21 @@ import com.braintribe.utils.IOTools;
  *
  */
 public class HttpRepositoryBase {
-	private static final int MAX_RETRIES = 3;
-	private static final long INITIAL_RETRY_DELAY_MS = 250;
-	private static final long MAX_RETRY_DELAY_MS = 5_000;
-
 	private static final List<RetryStatusCodeRule> RETRY_STATUS_CODE_RULES = List.of(
-		new RetryStatusCodeRule(Pattern.compile("://maven\\.pkg\\.github\\.com[:/]"), Set.of(404))
+		new RetryStatusCodeRule(Pattern.compile("://maven\\.pkg\\.github\\.com[:/]"), Set.of(404), RetryCascade.of(0, 10))
+	);
+
+	private static final List<RetryExceptionRule> RETRY_EXCEPTION_RULES = List.of(
+		new RetryExceptionRule(Pattern.compile(".*"), IOException.class, RetryCascade.of(0, 100, 200))
+	);
+
+	private static final List<Class<? extends IOException>> NON_RETRYABLE_EXCEPTION_TYPES = List.of(
+		UnknownHostException.class,
+		NoRouteToHostException.class,
+		MalformedURLException.class,
+		ProtocolException.class,
+		UnknownServiceException.class,
+		SSLException.class
 	);
 	
 	private final Logger logger = Logger.getLogger(HttpRepositoryBase.class);
@@ -205,26 +221,26 @@ public class HttpRepositoryBase {
 			try {
 				CloseableHttpResponse response = getResponse(requestBase);
 				int statusCode = response.getStatusLine().getStatusCode();
+				RetryCascade retryCascade = retryCascadeForStatusCode(url, statusCode);
 
-				if (!shouldRetryStatusCode(url, statusCode) || attempt > MAX_RETRIES)
+				if (retryCascade == null || !retryCascade.hasDelayForAttempt(attempt))
 					return response;
 
 				closeQuietly(response);
 
-				long delayMs = retryDelayMs(attempt);
-				logger.warn("received retryable HTTP status " + statusCode + " on try " + attempt + " of " + (MAX_RETRIES + 1) + " for: " + url
+				long delayMs = retryCascade.delayForAttempt(attempt);
+				logger.warn("received retryable HTTP status " + statusCode + " on try " + attempt + " of " + retryCascade.totalTries() + " for: " + url
 						+ "; retrying after " + delayMs + " ms");
 
 				sleepBeforeRetry(delayMs);
 				attempt++;
-			} catch (UnknownHostException e) {
-				throw e;
 			} catch (IOException e) {
-				if (attempt > MAX_RETRIES)
+				RetryCascade retryCascade = retryCascadeForException(url, e);
+				if (retryCascade == null || !retryCascade.hasDelayForAttempt(attempt))
 					throw e;
 
-				long delayMs = retryDelayMs(attempt);
-				logger.warn("failed try " + attempt + " of " + (MAX_RETRIES + 1) + " to open a http request to: " + url
+				long delayMs = retryCascade.delayForAttempt(attempt);
+				logger.warn("failed try " + attempt + " of " + retryCascade.totalTries() + " to open a http request to: " + url
 						+ "; retrying after " + delayMs + " ms", e);
 
 				sleepBeforeRetry(delayMs);
@@ -233,23 +249,34 @@ public class HttpRepositoryBase {
 		}
 	}
 
-	private static boolean shouldRetryStatusCode(String url, int statusCode) {
+	private static RetryCascade retryCascadeForStatusCode(String url, int statusCode) {
 		for (RetryStatusCodeRule rule: RETRY_STATUS_CODE_RULES) {
 			if (rule.matches(url, statusCode))
+				return rule.retryCascade;
+		}
+
+		return null;
+	}
+
+	private static RetryCascade retryCascadeForException(String url, IOException exception) {
+		if (isNonRetryableException(exception))
+			return null;
+
+		for (RetryExceptionRule rule: RETRY_EXCEPTION_RULES) {
+			if (rule.matches(url, exception))
+				return rule.retryCascade;
+		}
+
+		return null;
+	}
+
+	private static boolean isNonRetryableException(IOException exception) {
+		for (Class<? extends IOException> nonRetryableExceptionType: NON_RETRYABLE_EXCEPTION_TYPES) {
+			if (nonRetryableExceptionType.isInstance(exception))
 				return true;
 		}
 
 		return false;
-	}
-
-	private static long retryDelayMs(int attempt) {
-		long factor = 1L << Math.min(attempt - 1, 20);
-		long delay = INITIAL_RETRY_DELAY_MS * factor;
-
-		if (delay < 0)
-			return MAX_RETRY_DELAY_MS;
-
-		return Math.min(delay, MAX_RETRY_DELAY_MS);
 	}
 
 	private static void sleepBeforeRetry(long delayMs) throws IOException {
@@ -278,14 +305,56 @@ public class HttpRepositoryBase {
 	private static class RetryStatusCodeRule {
 		private final Pattern urlPattern;
 		private final Set<Integer> statusCodes;
+		private final RetryCascade retryCascade;
 
-		private RetryStatusCodeRule(Pattern urlPattern, Set<Integer> statusCodes) {
+		private RetryStatusCodeRule(Pattern urlPattern, Set<Integer> statusCodes, RetryCascade retryCascade) {
 			this.urlPattern = urlPattern;
 			this.statusCodes = statusCodes;
+			this.retryCascade = retryCascade;
 		}
 
 		private boolean matches(String url, int statusCode) {
 			return statusCodes.contains(statusCode) && urlPattern.matcher(url).find();
+		}
+	}
+
+	private static class RetryExceptionRule {
+		private final Pattern urlPattern;
+		private final Class<? extends IOException> exceptionType;
+		private final RetryCascade retryCascade;
+
+		private RetryExceptionRule(Pattern urlPattern, Class<? extends IOException> exceptionType, RetryCascade retryCascade) {
+			this.urlPattern = urlPattern;
+			this.exceptionType = exceptionType;
+			this.retryCascade = retryCascade;
+		}
+
+		private boolean matches(String url, IOException exception) {
+			return exceptionType.isInstance(exception) && urlPattern.matcher(url).find();
+		}
+	}
+
+	private static class RetryCascade {
+		private final long[] retryDelayMs;
+
+		private RetryCascade(long[] retryDelayMs) {
+			this.retryDelayMs = retryDelayMs;
+		}
+
+		private static RetryCascade of(long... retryDelayMs) {
+			return new RetryCascade(Arrays.copyOf(retryDelayMs, retryDelayMs.length));
+		}
+
+		private boolean hasDelayForAttempt(int attempt) {
+			return attempt > 0 && attempt <= retryDelayMs.length;
+		}
+
+		private long delayForAttempt(int attempt) {
+			return retryDelayMs[attempt - 1];
+		}
+
+		private int totalTries() {
+			return retryDelayMs.length + 1;
 		}
 	}
 }

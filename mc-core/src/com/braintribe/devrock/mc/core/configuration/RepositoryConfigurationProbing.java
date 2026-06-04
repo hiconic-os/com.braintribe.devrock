@@ -282,7 +282,7 @@ public class RepositoryConfigurationProbing implements Supplier<RepositoryConfig
 			return queryChangesMaybe;
 		
 		changedVersionedArtifactIdentifications = queryChangesMaybe.get();
-		if (changedVersionedArtifactIdentifications != null && changedVersionedArtifactIdentifications.size() != 0) {
+		if (changedVersionedArtifactIdentifications != null) {
 		 
 			 // let the consumer of the changes artifacts know what has changed 
 			  // let the filter supplier give us the the current filter  

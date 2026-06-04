@@ -270,7 +270,7 @@ public class BasicClasspathDependencyResolver implements ClasspathDependencyReso
 			
 			Collection<String> jarClassifiers = extractJarClassifiers(artifact);
 			
-			if (jarClassifiers.isEmpty())
+ 			if (jarClassifiers.isEmpty())
 				return Collections.emptyList();
 
 			List<PartEnrichment> partEnrichments = new LinkedList<>();
