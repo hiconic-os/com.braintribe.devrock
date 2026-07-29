@@ -29,15 +29,20 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.braintribe.build.model.ModelClassFileReflection;
 import com.braintribe.build.model.ModelDeclarations;
+import com.braintribe.build.model.entity.Entity;
 import com.braintribe.devrock.mc.core.compiled.ArtifactCompiler;
 import com.braintribe.exception.Exceptions;
 import com.braintribe.gm.model.reason.Maybe;
 import com.braintribe.model.artifact.compiled.CompiledArtifact;
 import com.braintribe.model.mdbt.NewStyleEnum;
+import com.braintribe.model.mdbt.SomeDeeplyExtendedEntity;
 import com.braintribe.model.mdbt.SomeEntity;
 import com.braintribe.model.mdbt.SomeEnum;
 import com.braintribe.model.mdbt.SomeExtendedEntity;
+import com.braintribe.model.mdbt.SystemEnumToIgnore;
+import com.braintribe.model.resource.Resource;
 import com.braintribe.testing.junit.assertions.assertj.core.api.Assertions;
 import com.braintribe.utils.paths.PathCollectors;
 import com.braintribe.utils.xml.dom.DomUtils;
@@ -53,8 +58,26 @@ public class ModelDeclarationBuilderTest {
 	}
 
 	@Test
-	public void testWithAsmReflection() throws Exception {
+	public void testWithClassFileReflection() throws Exception {
 		testModelDeclarationBuilder(false);
+	}
+
+	@Test
+	public void classFileReflectionReadsModelSemanticsWithoutLoadingTypes() {
+		ModelClassFileReflection reflection = new ModelClassFileReflection(getClass().getClassLoader());
+
+		Entity deeplyExtendedEntity = reflection.load(SomeDeeplyExtendedEntity.class.getName());
+		Assert.assertTrue(deeplyExtendedEntity.getIsGenericEntity());
+
+		Entity someEnum = reflection.load(SomeEnum.class.getName());
+		Assert.assertTrue(someEnum.getIsEnum());
+
+		Entity resource = reflection.load(Resource.class.getName());
+		Assert.assertEquals("com.braintribe.gm:resource-model", resource.getForwardDeclaration());
+
+		Entity systemEnum = reflection.load(SystemEnumToIgnore.class.getName());
+		Assert.assertFalse(systemEnum.getIsEnum());
+		Assert.assertFalse(systemEnum.getIsGenericEntity());
 	}
 
 	private Maybe<CompiledArtifact> readPom(File file) {
@@ -62,7 +85,7 @@ public class ModelDeclarationBuilderTest {
 	}
 
 	private void testModelDeclarationBuilder(boolean useClassLoaderReflection) throws Exception {
-		File buildFolder = new File("build-snapshot");
+		File buildFolder = new File("build");
 		File pomFile = new File("test-pom.xml");
 		List<File> buildFolders = Collections.singletonList(buildFolder);
 		List<URL> cp = cp();
@@ -85,6 +108,7 @@ public class ModelDeclarationBuilderTest {
 				SomeEntity.class.getName(), //
 				SomeEnum.class.getName(), //
 				SomeExtendedEntity.class.getName(), //
+				SomeDeeplyExtendedEntity.class.getName(), //
 				NewStyleEnum.class.getName() //
 		);
 

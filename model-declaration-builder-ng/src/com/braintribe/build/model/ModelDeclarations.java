@@ -342,7 +342,7 @@ public class ModelDeclarations {
 			tools = ModelClassLoaderReflection.scan(classLoader);
 		}
 		else {
-			tools = ModelAsmReflection.scan( classLoader);
+			tools = ModelClassFileReflection.scan(classLoader);
 		}
 		
 		for (String className: classNames) {
