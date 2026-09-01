@@ -53,8 +53,6 @@ public abstract class AbstractRepoletBasedTest implements HasCommonFilesystemNod
 	
 	/**
 	 * call in your test's {@code @before} function
-	 * @param map - the repolet info to use for launching
-	 * @return - the port used 
 	 */
 	protected void runBefore() {		 		
 		

@@ -12,17 +12,12 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.braintribe.devrock.test.mc-ng-hashes</groupId>
-	<artifactId>terminal</artifactId>
-	<version>1.0</version>
+	<artifactId>c</artifactId>
+	<version>1.0.0</version>
 	
 	<properties>
 		<codebase>braintribe-dev</codebase>
 	</properties>
 	<dependencies>		
-		<dependency>
-			<groupId>com.braintribe.devrock.test.mc-ng-hashes</groupId>
-			<artifactId>a</artifactId>
-			<version>1.0</version>
-		</dependency>		
 	</dependencies>
 </project>

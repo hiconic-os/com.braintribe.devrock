@@ -253,30 +253,22 @@ public class HttpRepositoryArtifactDataResolver extends HttpRepositoryBase imple
 		}
 
 		/**
-		 * hash files seem to have this format : {@code [<file name><whitespace>]<hash>}, so if data contains whitespace characters, the part *AFTER*
-		 * the last whitespace is taken..
+		 * hash files seem to have this format : {@code [<file name><whitespace>]<hash>[<line-break>]}, so we trim and if data contains whitespace
+		 * characters, the part *AFTER* the last whitespace is taken..
 		 * 
 		 * @param hashOnServer
-		 *            - the values as returned from the server
-		 * @return - the relevant part of the hash
+		 *            - value as returned from the server
 		 */
 		private String extractRelevantHashpartFromServerData(String hashOnServer) {
-			int st = 0;
-			int index = -1;
-			for (int i = 0; i < hashOnServer.length(); i++) {
-				char c = hashOnServer.charAt(i);
-				if (Character.isWhitespace(c)) {
-					st = 1;
-				} else {
-					if (st == 1) {
-						index = i;
-						break;
-					}
-				}
-			}
-			String result = st == 1 ? hashOnServer.substring(index) : hashOnServer;
-
-			return result;
+		    String trimmed = hashOnServer.trim();
+		    int index = -1;
+		    for (int i = trimmed.length() - 1; i >= 0; i--) {
+		        if (Character.isWhitespace(trimmed.charAt(i))) {
+		            index = i;
+		            break;
+		        }
+		    }
+		    return index < 0 ? trimmed : trimmed.substring(index + 1);
 		}
 
 		/**

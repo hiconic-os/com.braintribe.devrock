@@ -57,6 +57,8 @@ import com.braintribe.utils.StringTools;
 
 
 /**
+ * Tests for {@link HttpRepositoryArtifactDataResolver}
+ * 
  * requires the following archive structure <br/>
  * 
  * com.braintribe.devrock.test.mc-ng-hashes:terminal#1.0 (no hashes) <br/>
@@ -71,14 +73,12 @@ import com.braintribe.utils.StringTools;
  * between the sent file and the sent hashes 
  * 
  * @author pit
- *
  */
-@Category(KnownIssue.class)
 public class HttpRepositoryArtifactDataResolverTest extends AbstractRepoletBasedTest {
 	private static final String GRP ="com.braintribe.devrock.test.mc-ng-hashes";	
 	
-	private File hashes = new File( input, "hashes");
-	private File scratch = new File( input, "scratch");	
+	private final File hashes = new File( input, "hashes");
+	private final File scratch = new File( input, "scratch");	
 	
 	{
 		launcher = Launcher.build()
@@ -284,6 +284,38 @@ public class HttpRepositoryArtifactDataResolverTest extends AbstractRepoletBased
 		CompiledArtifactIdentification ci = CompiledArtifactIdentification.parse( GRP + ":b#1.0.0");
 		PartIdentification pom = PartIdentifications.pom;				
 		ResolvingContext rc = new ResolvingContext( getRoot(), ci, pom, ChecksumPolicy.warn);
+		File resolved = resolve(rc);
+		// validate
+		validate( resolved, rc);
+	}
+	
+	/**
+	 * check CRC, download hash file whose content ends with a line break.
+	 * 
+	 * many repository servers (Nexus for instance) terminate their hash files with a line break, and
+	 * they send no X-Checksum-* header at all. artifact 'c' reproduces that combination.
+	 */
+	@Test	
+	public void testValidateCrcPerFileWithTrailingLineBreak() {	
+		CompiledArtifactIdentification ci = CompiledArtifactIdentification.parse( GRP + ":c#1.0.0");
+		PartIdentification pom = PartIdentifications.pom;				
+		ResolvingContext rc = new ResolvingContext( getRoot(), ci, pom, ChecksumPolicy.fail);
+		File resolved = resolve(rc);
+		// validate
+		validate( resolved, rc);
+	}
+	
+	/**
+	 * check CRC, download hash file that names the file before the hash.
+	 * 
+	 * this is the format the hash extraction documents, here combined with a terminating line break.
+	 * artifact 'd' reproduces that combination.
+	 */
+	@Test	
+	public void testValidateCrcPerFileWithNamePrefixedHash() {	
+		CompiledArtifactIdentification ci = CompiledArtifactIdentification.parse( GRP + ":d#1.0.0");
+		PartIdentification pom = PartIdentifications.pom;				
+		ResolvingContext rc = new ResolvingContext( getRoot(), ci, pom, ChecksumPolicy.fail);
 		File resolved = resolve(rc);
 		// validate
 		validate( resolved, rc);
