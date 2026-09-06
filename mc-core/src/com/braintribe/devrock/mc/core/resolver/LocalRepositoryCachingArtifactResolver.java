@@ -344,9 +344,10 @@ public class LocalRepositoryCachingArtifactResolver implements ReflectedArtifact
 			case 0:
 				return;
 			case 1:
-				throw Exceptions.unchecked(exceptions.get(0), message);
+				throw Exceptions.unchecked(exceptions.get(0), message + " Caused by: " + exceptions.get(0).getMessage());
 			default:
-				RuntimeException e = new RuntimeException(message);
+				RuntimeException e = new RuntimeException(
+						message + " Caused by: " + exceptions.stream().map(Throwable::getMessage).collect(Collectors.joining("; ")));
 				exceptions.forEach(e::addSuppressed);
 				throw e;
 			}
