@@ -49,7 +49,7 @@ import com.braintribe.devrock.model.repository.Repository;
 import com.braintribe.devrock.model.repository.RepositoryConfiguration;
 import com.braintribe.devrock.model.repository.WorkspaceRepository;
 import com.braintribe.devrock.model.repository.filters.ArtifactFilter;
-import com.braintribe.devrock.model.repository.filters.ConjunctionArtifactFilter;
+import com.braintribe.devrock.mc.core.filters.ArtifactFilters;
 import com.braintribe.gm.model.reason.Maybe;
 import com.braintribe.gm.model.reason.Reason;
 import com.braintribe.gm.model.reason.Reasons;
@@ -283,27 +283,16 @@ public class RepositoryConfigurationProbing implements Supplier<RepositoryConfig
 		
 		changedVersionedArtifactIdentifications = queryChangesMaybe.get();
 		if (changedVersionedArtifactIdentifications != null) {
-		 
-			 // let the consumer of the changes artifacts know what has changed 
-			  // let the filter supplier give us the the current filter  
-			 if (artifactFilterSupplier != null) { 
-				ArtifactFilter artifactFilter = artifactFilterSupplier.apply(localRepo, repository);				
-				if (repository.getArtifactFilter() == null) {
-					// no preconfigured filter, assign whatever the supplier returned 
-					repository.setArtifactFilter(artifactFilter);
-				}
-				else {
-					// preconfigured filter, build a conjunction filter
-					ConjunctionArtifactFilter conjunctionFilter = ConjunctionArtifactFilter.T.create();
-					conjunctionFilter.getOperands().add(repository.getArtifactFilter());
-					conjunctionFilter.getOperands().add(artifactFilter);
-					repository.setArtifactFilter(conjunctionFilter);
-				}
-			 }
+			// Changes still drive cache invalidation independently of the configured content filter.
+			if (artifactFilterSupplier != null) {
+				ArtifactFilter derivedFilter = artifactFilterSupplier.apply(localRepo, repository);
+				repository.setArtifactFilter(ArtifactFilters.resolveAutoFilter(repository.getArtifactFilter(), derivedFilter));
+			}
 		}
 		else {
 			changedVersionedArtifactIdentifications = Collections.emptyList();
 		}
+
 	
 	
 		if (log.isDebugEnabled()) {

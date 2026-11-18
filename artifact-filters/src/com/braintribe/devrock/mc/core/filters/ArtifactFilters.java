@@ -21,6 +21,7 @@ import java.util.function.Function;
 
 import com.braintribe.devrock.model.repository.filters.AllMatchingArtifactFilter;
 import com.braintribe.devrock.model.repository.filters.ArtifactFilter;
+import com.braintribe.devrock.model.repository.filters.AutoArtifactFilter;
 import com.braintribe.devrock.model.repository.filters.ConjunctionArtifactFilter;
 import com.braintribe.devrock.model.repository.filters.DisjunctionArtifactFilter;
 import com.braintribe.devrock.model.repository.filters.GroupsArtifactFilter;
@@ -33,6 +34,7 @@ import com.braintribe.devrock.model.repository.filters.StandardDevelopmentViewAr
 import com.braintribe.model.artifact.compiled.CompiledArtifactIdentification;
 import com.braintribe.model.artifact.compiled.CompiledPartIdentification;
 import com.braintribe.model.artifact.essential.ArtifactIdentification;
+import com.braintribe.model.generic.reflection.ConfigurableCloningContext;
 import com.braintribe.model.generic.reflection.EntityType;
 import com.braintribe.model.processing.core.expert.impl.PolymorphicDenotationMap;
 
@@ -51,11 +53,31 @@ public class ArtifactFilters {
 		addExpert(LockArtifactFilter.T, LockArtifactFilterExpert::new);
 		addExpert(GroupsArtifactFilter.T, GroupsArtifactFilterExpert::new);
 		addExpert(StandardDevelopmentViewArtifactFilter.T, ArtifactFilters::standardDevelopmentView);
+		addExpert(AutoArtifactFilter.T, (filter) -> AutoArtifactFilterExpert.instance);
 		addExpert(AllMatchingArtifactFilter.T, (filter) -> AllMatchingArtifactFilterExpert.instance);
 		addExpert(NoneMatchingArtifactFilter.T, (filter) -> NoneMatchingArtifactFilterExpert.instance);
 		addExpert(NegationArtifactFilter.T, ArtifactFilters::negation);
 		addExpert(DisjunctionArtifactFilter.T, ArtifactFilters::disjunction);
 		addExpert(ConjunctionArtifactFilter.T, ArtifactFilters::conjunction);
+	}
+
+	/**
+	 * Resolves automatic filter placeholders without modifying the configured graph. A missing configuration
+	 * uses the derived filter directly. Explicit filters are never implicitly intersected with it.
+	 * If no derived filter is available, automatic placeholders retain their pass-through semantics.
+	 * The caller must pass the original configuration again when refreshing the derived filter.
+	 */
+	public static ArtifactFilter resolveAutoFilter(ArtifactFilter configuredFilter, ArtifactFilter derivedFilter) {
+		if (configuredFilter == null)
+			return derivedFilter;
+
+		ArtifactFilter replacement = derivedFilter != null ? derivedFilter : AllMatchingArtifactFilter.T.create();
+		if (configuredFilter instanceof AutoArtifactFilter)
+			return replacement;
+
+		return configuredFilter.clone(ConfigurableCloningContext.build()
+				.withClonedValuePostProcesor((type, value) -> value instanceof AutoArtifactFilter ? replacement : value)
+				.done());
 	}
 
 	/**

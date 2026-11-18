@@ -63,7 +63,12 @@ public interface Repository extends HasFailure {
 
 	
 	/**
-	 * @return - the {@link ArtifactFilter}, i.e. a filter on the artifact (group or release/snapshot)
+	 * The configured content filter. If unspecified, repository probing uses the automatically derived filter.
+	 * An explicit filter is authoritative; include an
+	 * {@link com.braintribe.devrock.model.repository.filters.AutoArtifactFilter} wherever the derived filter
+	 * should participate in the expression. Change-index synchronization remains independent of this choice.
+	 *
+	 * @return the filter on artifacts, groups, versions and parts
 	 */
 	ArtifactFilter getArtifactFilter();
 	void setArtifactFilter(ArtifactFilter ArtifactFilter);
