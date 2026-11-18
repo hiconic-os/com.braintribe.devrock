@@ -35,7 +35,7 @@ public class AutoArtifactFilterExpert implements ArtifactFilterExpert {
 	public boolean matchesGroup(String groupId) {
 		return true;
 	}
-	
+
 	@Override
 	public boolean matches(ArtifactIdentification artifactIdentification) throws IllegalArgumentException {
 		return true;
