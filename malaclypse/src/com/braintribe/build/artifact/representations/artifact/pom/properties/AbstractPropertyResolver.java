@@ -18,9 +18,7 @@ import com.braintribe.codec.Codec;
 import com.braintribe.codec.CodecException;
 import com.braintribe.logging.Logger;
 import com.braintribe.model.artifact.Solution;
-import com.braintribe.model.generic.GMF;
 import com.braintribe.model.generic.GenericEntity;
-import com.braintribe.model.generic.reflection.GenericModelException;
 import com.braintribe.model.generic.reflection.Property;
 
 /**
@@ -60,12 +58,12 @@ public class AbstractPropertyResolver extends CommonPropertyResolver {
 			if (entity instanceof Solution && token.equals( "parent")) {
 				token = "resolvedParent";				
 			}
-			Property property;
-			try {								
-				property = GMF.getTypeReflection().getEntityType( entity.type().getTypeSignature()).getProperty( token);
-			} catch (GenericModelException e) {
+			Property property = entity.entityType().findProperty(token);
+			if (property == null) {
 				if (log.isDebugEnabled()) {
-					log.debug("cannot find a value for [" + expression + "] as it's not a property of the type [" + initial.getClass().getName());
+					log.debug("cannot find a value for [" + expression + "] on [" + initial.entityType().getTypeSignature() + "] as type ["
+							+ entity.entityType().getTypeSignature()
+							+ "] has no property [" + token + "]");
 				}
 				return null;
 			}

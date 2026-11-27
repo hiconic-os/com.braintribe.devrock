@@ -12,9 +12,7 @@ import java.util.StringTokenizer;
 
 import com.braintribe.build.artifact.representations.artifact.maven.properties.CommonPropertyResolver;
 import com.braintribe.logging.Logger;
-import com.braintribe.model.generic.GMF;
 import com.braintribe.model.generic.GenericEntity;
-import com.braintribe.model.generic.reflection.GenericModelException;
 import com.braintribe.model.generic.reflection.Property;
 
 /**
@@ -44,12 +42,12 @@ public abstract class AbstractSettingsPropertyResolver extends CommonPropertyRes
 			}
 			processed.append( token);
 			
-			Property property;
-			try {
-				property = GMF.getTypeReflection().getEntityType(entity.type().getTypeSignature()).getProperty( token);
-			} catch (GenericModelException e) {
-				if (log.isDebugEnabled()) { 
-					log.warn("cannot find a value for [" + expression + "] as it's not a property of the type [" + initial.getClass().getName());
+			Property property = entity.entityType().findProperty(token);
+			if (property == null) {
+				if (log.isDebugEnabled()) {
+					log.debug("cannot find a value for [" + expression + "] on [" + initial.entityType().getTypeSignature() + "] as type ["
+							+ entity.entityType().getTypeSignature()
+							+ "] has no property [" + token + "]");
 				}
 				return null;
 			}
